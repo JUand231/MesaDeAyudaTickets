@@ -1,19 +1,20 @@
 package modelo;
 
 public class Usuario {
+
     private int idUsuario;
     private String nombre;
     private String correo;
-    private String rol;
+    private int idRol;
 
     public Usuario() {
     }
 
-    public Usuario(int idUsuario, String nombre, String correo, String rol) {
+    public Usuario(int idUsuario, String nombre, String correo, int idRol) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.correo = correo;
-        this.rol = rol;
+        this.idRol = idRol;
     }
 
     public int getIdUsuario() {
@@ -40,14 +41,12 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public String getRol() {
-        return rol;
+    public int getIdRol() {
+        return idRol;
     }
 
-    public void setRol(String rol) {
-        this.rol = rol;
+    public void setIdRol(int idRol) {
+        this.idRol = idRol;
     }
-    
-    
-    
+
 }
