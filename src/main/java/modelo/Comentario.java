@@ -1,21 +1,19 @@
 package modelo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Comentario {
 
     private int idComentario;
-    private int idAutor;
+    private int idUsuario; // autor: quien escribio
     private String texto;
     private LocalDateTime fecha = LocalDateTime.now();
 
     public Comentario() {
     }
 
-    public Comentario(int idComentario, int idAutor, String texto) {
-        this.idComentario = idComentario;
-        this.idAutor = idAutor;
+    public Comentario(int idUsuario, String texto) {
+        this.idUsuario = idUsuario;
         this.texto = texto;
     }
 
@@ -27,12 +25,12 @@ public class Comentario {
         this.idComentario = idComentario;
     }
 
-    public int getIdAutor() {
-        return idAutor;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setIdAutor(int idAutor) {
-        this.idAutor = idAutor;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getTexto() {
@@ -50,5 +48,4 @@ public class Comentario {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
-
 }
