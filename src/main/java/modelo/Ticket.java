@@ -1,33 +1,58 @@
 package modelo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import modelo.estado.EstadoTicket;
+import modelo.estado.Nuevo;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ticket {
+
     private int idTicket;
     private String titulo;
     private String descripcion;
-    private String categoria;
-    private String prioridad;
-    private String solicitante;
-    private String agente;
-    private boolean estado;
-    private LocalDate fechaCreacion;
-    private String comentarios;
+    private int idCategoria;
+    private int idPrioridad;
+    private int idSolicitante;
+    private Integer idAgente;
+    private EstadoTicket estado = new Nuevo();
+    private LocalDateTime fechaCreacion = LocalDateTime.now();
+
+    private List<Comentario> comentarios = new ArrayList<>();
 
     public Ticket() {
     }
 
-    public Ticket(int idTicket, String titulo, String descripcion, String categoria, String prioridad, String solicitante, String agente, boolean estado, LocalDate fechaCreacion, String comentarios) {
-        this.idTicket = idTicket;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.categoria = categoria;
-        this.prioridad = prioridad;
-        this.solicitante = solicitante;
-        this.agente = agente;
-        this.estado = estado;
-        this.fechaCreacion = fechaCreacion;
-        this.comentarios = comentarios;
+    public void asignar() {
+        this.estado = this.estado.asignar();
+    }
+
+    public void iniciar() {
+        this.estado = this.estado.iniciar();
+    }
+
+    public void resolver() {
+        this.estado = this.estado.resolver();
+    }
+
+    public void cerrar() {
+        this.estado = this.estado.cerrar();
+    }
+
+    public void reabrir() {
+        this.estado = this.estado.reabrir();
+    }
+
+    public void cancelar() {
+        this.estado = this.estado.cancelar();
+    }
+
+    public String getEstadoNombre() {
+        return estado.nombre();
+    }
+
+    public void agregarComentario(Comentario comentario) {
+        this.comentarios.add(comentario);
     }
 
     public int getIdTicket() {
@@ -54,61 +79,55 @@ public class Ticket {
         this.descripcion = descripcion;
     }
 
-    public String getCategoria() {
-        return categoria;
+    public int getIdCategoria() {
+        return idCategoria;
     }
 
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
     }
 
-    public String getPrioridad() {
-        return prioridad;
+    public int getIdPrioridad() {
+        return idPrioridad;
     }
 
-    public void setPrioridad(String prioridad) {
-        this.prioridad = prioridad;
+    public void setIdPrioridad(int idPrioridad) {
+        this.idPrioridad = idPrioridad;
     }
 
-    public String getSolicitante() {
-        return solicitante;
+    public int getIdSolicitante() {
+        return idSolicitante;
     }
 
-    public void setSolicitante(String solicitante) {
-        this.solicitante = solicitante;
+    public void setIdSolicitante(int idSolicitante) {
+        this.idSolicitante = idSolicitante;
     }
 
-    public String getAgente() {
-        return agente;
+    public Integer getIdAgente() {
+        return idAgente;
     }
 
-    public void setAgente(String agente) {
-        this.agente = agente;
+    public void setIdAgente(Integer idAgente) {
+        this.idAgente = idAgente;
     }
 
-    public boolean isEstado() {
+    public EstadoTicket getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(EstadoTicket estado) {
         this.estado = estado;
     }
 
-    public LocalDate getFechaCreacion() {
+    public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(LocalDate fechaCreacion) {
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public String getComentarios() {
+    public List<Comentario> getComentarios() {
         return comentarios;
     }
-
-    public void setComentarios(String comentarios) {
-        this.comentarios = comentarios;
-    }
-    
-    
 }
