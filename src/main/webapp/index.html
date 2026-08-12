@@ -1,10 +1,92 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
     <head>
-        <title>Start Page</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <meta charset="UTF-8">
+
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0">
+
+        <title>Mesa de Ayuda CIMM</title>
+
+        <link rel="stylesheet"
+              href="${pageContext.request.contextPath}/css/estilo.css">
+
     </head>
+
     <body>
-        <h1>Hello World!</h1>
+
+        <div class="inicio">
+
+            <div class="inicio-contenido">
+
+                <div class="logo-inicio">
+
+                    <div class="logo-icono">
+                        <i>⌁</i>
+                    </div>
+
+                    <div>
+                        <span class="logo-titulo">
+                            MESA DE AYUDA
+                        </span>
+
+                        <span class="logo-subtitulo">
+                            CIMM · SENA Regional Boyacá
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="inicio-linea"></div>
+
+
+                <h1>
+                    Sistema de Soporte Técnico
+                </h1>
+
+                <p>
+                    Gestiona solicitudes, tickets y atención
+                    técnica desde un solo lugar.
+                </p>
+
+
+                <a href="${pageContext.request.contextPath}/dashboard"
+                   class="btn-inicio">
+
+                    Ingresar al sistema
+
+                    <span>→</span>
+
+                </a>
+
+
+                <div class="inicio-info">
+
+                    <div>
+                        <strong>●</strong>
+                        Sistema activo
+                    </div>
+
+                    <div>
+                        SENA · CIMM
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="inicio-decoracion decoracion-1"></div>
+            <div class="inicio-decoracion decoracion-2"></div>
+            <div class="inicio-decoracion decoracion-3"></div>
+
+        </div>
+
     </body>
+
 </html>
