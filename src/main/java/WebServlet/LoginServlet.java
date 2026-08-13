@@ -1,8 +1,6 @@
 package WebServlet;
 
 import modelo.Usuario;
-import repositorio.jdbc.UsuarioRepository;
-
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import repositorio.UsuarioRepository;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -18,7 +17,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() {
-        usuarioDAO = new UsuarioRepository();
+        usuarioDAO = (UsuarioRepository) getServletContext().getAttribute(AppContextListener.USUARIO_REPOSITORY);
     }
 
     @Override

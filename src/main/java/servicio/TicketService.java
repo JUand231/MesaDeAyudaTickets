@@ -1,23 +1,37 @@
 package servicio;
 
 import modelo.Comentario;
+import modelo.Prioridad;
 import modelo.Ticket;
+import modelo.Usuario;
 import repositorio.TicketRepository;
+import servicio.asignacion.EstrategiaAsignacion;
+import servicio.notificacion.Notificador;
+import servicio.sla.CalculadoraSLA;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Logica de negocio de los tickets. Depende de TicketRepository (interfaz)
- */
 public class TicketService {
 
     private final TicketRepository ticketRepository;
+    private final CalculadoraSLA calculadoraSLA;
+    private final EstrategiaAsignacion estrategiaAsignacion;
+    private final Notificador notificador;
 
-    public TicketService(TicketRepository ticketRepository) {
+    public TicketService(TicketRepository ticketRepository,
+            CalculadoraSLA calculadoraSLA,
+            EstrategiaAsignacion estrategiaAsignacion,
+            Notificador notificador) {
         this.ticketRepository = ticketRepository;
+        this.calculadoraSLA = calculadoraSLA;
+        this.estrategiaAsignacion = estrategiaAsignacion;
+        this.notificador = notificador;
     }
 
-    public Ticket crearTicket(String titulo, String descripcion, int idCategoria, int idPrioridad, int idSolicitante) {
+    public Ticket crearTicket(String titulo, String descripcion, int idCategoria,
+            int idPrioridad, int idSolicitante) {
 
         if (titulo == null || titulo.isBlank()) {
             throw new IllegalArgumentException("El titulo del ticket es obligatorio");
@@ -56,47 +70,78 @@ public class TicketService {
         return encontrado.get();
     }
 
-    public Ticket asignarAgente(int idTicket, int idAgente) {
+    public LocalDateTime calcularFechaLimiteSLA(int idTicket, Prioridad prioridad) {
+        Ticket ticket = buscarPorId(idTicket);
+        return calculadoraSLA.calcularFechaLimite(ticket, prioridad);
+    }
+
+    public boolean estaVencido(int idTicket, Prioridad prioridad) {
+        Ticket ticket = buscarPorId(idTicket);
+        return calculadoraSLA.estaVencido(ticket, prioridad);
+    }
+
+    public Ticket asignarAgenteAutomatico(int idTicket, List<Usuario> agentesDisponibles,
+            Usuario solicitante) {
+        Ticket ticket = buscarPorId(idTicket);
+        int idAgente = estrategiaAsignacion.asignarAgente(ticket, agentesDisponibles, listarTodos());
+        return asignarAgente(idTicket, idAgente, solicitante);
+    }
+
+    public Ticket asignarAgente(int idTicket, int idAgente, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.setIdAgente(idAgente);
-        ticket.asignar();
-        return ticketRepository.actualizar(ticket);
+        ticket.asignar(); // delega al EstadoTicket: lanza TransicionInvalidaException si no es valido
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket fue asignado a un agente.");
+        return actualizado;
     }
 
-    public Ticket iniciarAtencion(int idTicket) {
+    public Ticket iniciarAtencion(int idTicket, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.iniciar();
-        return ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket esta en proceso de atencion.");
+        return actualizado;
     }
 
-    public Ticket resolver(int idTicket) {
+    public Ticket resolver(int idTicket, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.resolver();
-        return ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket fue resuelto. Puedes confirmarlo o reabrirlo.");
+        return actualizado;
     }
 
-    public Ticket cerrar(int idTicket) {
+    public Ticket cerrar(int idTicket, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.cerrar();
-        return ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket fue cerrado. Gracias por confirmar.");
+        return actualizado;
     }
 
-    public Ticket reabrir(int idTicket) {
+    public Ticket reabrir(int idTicket, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.reabrir();
-        return ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket fue reabierto y vuelve a estar en proceso.");
+        return actualizado;
     }
 
-    public Ticket cancelar(int idTicket) {
+    public Ticket cancelar(int idTicket, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.cancelar();
-        return ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket fue cancelado por un administrador.");
+        return actualizado;
     }
 
-    public Ticket reasignarAgente(int idTicket, int nuevoIdAgente) {
+    public Ticket reasignarAgente(int idTicket, int nuevoIdAgente, Usuario solicitante) {
         Ticket ticket = buscarPorId(idTicket);
         ticket.setIdAgente(nuevoIdAgente);
-        return ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
+        notificador.notificar(solicitante, actualizado, "Tu ticket fue reasignado a otro agente.");
+        return actualizado;
     }
 
     public Ticket agregarComentario(int idTicket, int idUsuario, String texto) {
