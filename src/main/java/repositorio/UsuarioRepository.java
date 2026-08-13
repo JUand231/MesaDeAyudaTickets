@@ -27,7 +27,7 @@ public class UsuarioRepository {
 
                     Usuario usuario = new Usuario();
 
-                    usuario.setId(rs.getInt("Id"));
+                    usuario.setIdUsuario(rs.getInt("Id"));
                     usuario.setNombre(rs.getString("Nombre"));
                     usuario.setCorreo(rs.getString("Correo"));
                     usuario.setContrasena(rs.getString("Contrasena"));
