@@ -5,20 +5,16 @@ import java.time.LocalDateTime;
 public class Comentario {
 
     private int idComentario;
-    private int idTicket;
-    private int idUsuario;
+    private int idUsuario; // autor: quien escribio
     private String texto;
-    private LocalDateTime fecha;
+    private LocalDateTime fecha = LocalDateTime.now();
 
     public Comentario() {
     }
 
-    public Comentario(int idComentario, int idTicket, int idUsuario, String texto, LocalDateTime fecha) {
-        this.idComentario = idComentario;
-        this.idTicket = idTicket;
+    public Comentario(int idUsuario, String texto) {
         this.idUsuario = idUsuario;
         this.texto = texto;
-        this.fecha = fecha;
     }
 
     public int getIdComentario() {
@@ -29,19 +25,11 @@ public class Comentario {
         this.idComentario = idComentario;
     }
 
-    public int getidTicket() {
-        return idTicket;
-    }
-
-    public void setidTicketr(int idTicket) {
-        this.idTicket = idTicket;
-    }
-    
-    public int getidUsuario() {
+    public int getIdUsuario() {
         return idUsuario;
     }
 
-    public void setidUsuario(int idUsuario) {
+    public void setIdUsuario(int idUsuario) {
         this.idUsuario = idUsuario;
     }
 
@@ -60,5 +48,4 @@ public class Comentario {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
-
 }
