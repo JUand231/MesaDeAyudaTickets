@@ -5,17 +5,17 @@ public class Usuario {
     private int idUsuario;
     private String nombre;
     private String correo;
-    private String contraseña;
+    private String contrasena;
     private int idRol;
 
     public Usuario() {
     }
 
-    public Usuario(int idUsuario, String nombre, String correo, String contraseña, int idRol) {
+    public Usuario(int idUsuario, String nombre, String correo, String contrasena, int idRol) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.correo = correo;
-        this.contraseña = contraseña;
+        this.contrasena = contrasena;
         this.idRol = idRol;
     }
 
@@ -43,12 +43,12 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public int getIdRol() {
@@ -58,5 +58,4 @@ public class Usuario {
     public void setIdRol(int idRol) {
         this.idRol = idRol;
     }
-
 }

@@ -1,6 +1,10 @@
+<<<<<<< HEAD
+/target/
+=======
 target/
 *.class
 db.properties
 src/main/resources/db.properties
 .nb-gradle/
 nbproject/private/
+>>>>>>> 66c6b84796cf3d5f6f0a4a98593be176c31ffd32
