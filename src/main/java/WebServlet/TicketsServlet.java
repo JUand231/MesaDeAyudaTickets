@@ -6,6 +6,7 @@ import modelo.Categoria;
 import modelo.Prioridad;
 import modelo.Ticket;
 import modelo.Usuario;
+import WebServlet.AppContextListener;
 import repositorio.CategoriaRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
@@ -87,7 +88,7 @@ public class TicketsServlet extends HttpServlet {
         }
 
         request.setAttribute("tickets", ticketsDTO);
-        request.getRequestDispatcher("/WEB-INF/jsp/tickets.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/Administrador/ticketsAdmin.jsp")
                 .forward(request, response);
     }
 }

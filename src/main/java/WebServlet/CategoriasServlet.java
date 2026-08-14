@@ -15,7 +15,7 @@ public class CategoriasServlet extends HttpServlet {
                           HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/WEB-INF/jsp/categorias.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/Administrador/categoriasAdmin.jsp")
                .forward(request, response);
     }
 
