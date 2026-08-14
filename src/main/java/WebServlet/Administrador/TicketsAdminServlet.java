@@ -13,7 +13,6 @@ import servicio.TicketService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet("/dashboard")
-public class DashboardServlet extends HttpServlet {
+@WebServlet("/tickets")
+public class TicketsAdminServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -46,52 +45,21 @@ public class DashboardServlet extends HttpServlet {
 
         List<Ticket> tickets;
         switch (idRol) {
-            case 1:
+            case 1: // solicitante: solo los suyos
                 tickets = ticketService.listarPorSolicitante(idUsuario);
                 break;
-            case 2:
+            case 2: // agente: solo los asignados a el
                 tickets = ticketService.listarPorAgente(idUsuario);
                 break;
-            default:
+            default: // administrador: todos
                 tickets = ticketService.listarTodos();
                 break;
         }
 
+        List<TicketDTO> ticketsDTO = new ArrayList<>();
         try {
-            int total = tickets.size();
-            int pendientes = 0;
-            int resueltos = 0;
-            int criticos = 0;
-
             for (Ticket ticket : tickets) {
-                String estado = ticket.getEstadoNombre();
-                boolean esFinal = estado.equals("RESUELTO") || estado.equals("CERRADO")
-                        || estado.equals("CANCELADO");
 
-                if (!esFinal) {
-                    pendientes++;
-                }
-                if (estado.equals("RESUELTO") || estado.equals("CERRADO")) {
-                    resueltos++;
-                }
-
-                Prioridad prioridad = prioridadRepository.buscarPorId(ticket.getIdPrioridad()).orElse(null);
-                if (prioridad != null && "CRITICA".equals(prioridad.getTipo()) && !esFinal) {
-                    criticos++;
-                }
-            }
-
-            int porcentajeResolucion = total == 0 ? 0 : (resueltos * 100) / total;
-
-            // Los 4 tickets mas recientes, ordenados por fecha de creacion descendente
-            List<Ticket> masRecientes = new ArrayList<>(tickets);
-            masRecientes.sort(Comparator.comparing(Ticket::getFechaCreacion).reversed());
-            if (masRecientes.size() > 4) {
-                masRecientes = masRecientes.subList(0, 4);
-            }
-
-            List<TicketDTO> ticketsRecientes = new ArrayList<>();
-            for (Ticket ticket : masRecientes) {
                 String nombreCategoria = categoriaRepository.buscarPorId(ticket.getIdCategoria())
                         .map(Categoria::getNombreCategoria)
                         .orElse("Categoria #" + ticket.getIdCategoria());
@@ -111,22 +79,15 @@ public class DashboardServlet extends HttpServlet {
                             .orElse("Usuario #" + ticket.getIdAgente());
                 }
 
-                ticketsRecientes.add(TicketMapper.aDTO(ticket, nombreCategoria, nombrePrioridad,
+                ticketsDTO.add(TicketMapper.aDTO(ticket, nombreCategoria, nombrePrioridad,
                         nombreSolicitante, nombreAgente));
             }
-
-            request.setAttribute("totalTickets", total);
-            request.setAttribute("pendientes", pendientes);
-            request.setAttribute("resueltos", resueltos);
-            request.setAttribute("criticos", criticos);
-            request.setAttribute("porcentajeResolucion", porcentajeResolucion);
-            request.setAttribute("ticketsRecientes", ticketsRecientes);
-
         } catch (SQLException e) {
-            throw new ServletException("Error calculando estadisticas del dashboard", e);
+            throw new ServletException("Error consultando datos relacionados del ticket", e);
         }
 
-        request.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp")
+        request.setAttribute("tickets", ticketsDTO);
+        request.getRequestDispatcher("/WEB-INF/jsp/tickets.jsp")
                 .forward(request, response);
     }
 }

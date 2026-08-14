@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.annotation.WebServlet;
 
 @WebServlet("/reportes")
-public class ReportesServlet extends HttpServlet {
+public class ReportesAdminServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request,
