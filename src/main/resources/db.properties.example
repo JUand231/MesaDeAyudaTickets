@@ -1,3 +1,3 @@
-db.url=jdbc:sqlserver://DESKTOP-FRS25NN:1433;databaseName=bdTicket;encrypt=false;trustServerCertificate=true
+db.url=jdbc:sqlserver://SOFIA:1433;databaseName=dbTicket;encrypt=false;trustServerCertificate=true
 db.user=sa
 db.password=1234

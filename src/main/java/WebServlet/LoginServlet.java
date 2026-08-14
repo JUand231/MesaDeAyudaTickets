@@ -17,7 +17,9 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() {
-        usuarioDAO = (UsuarioRepository) getServletContext().getAttribute(AppContextListener.USUARIO_REPOSITORY);
+
+        usuarioDAO = (UsuarioRepository) getServletContext()
+                .getAttribute(AppContextListener.USUARIO_REPOSITORY);
     }
 
     @Override
@@ -41,58 +43,76 @@ public class LoginServlet extends HttpServlet {
 
         try {
 
-            Usuario usuario
-                    = usuarioDAO.validarLogin(correo, contrasena);
+            Usuario usuario = usuarioDAO.validarLogin(
+                    correo,
+                    contrasena
+            );
 
             if (usuario != null) {
 
                 HttpSession session = request.getSession();
 
                 session.setAttribute("usuario", usuario);
-                session.setAttribute("idUsuario", usuario.getIdUsuario());
-                session.setAttribute("nombreUsuario", usuario.getNombre());
-                session.setAttribute("idRol", usuario.getIdRol());
+                session.setAttribute(
+                        "idUsuario",
+                        usuario.getIdUsuario()
+                );
+                session.setAttribute(
+                        "nombreUsuario",
+                        usuario.getNombre()
+                );
+                session.setAttribute(
+                        "idRol",
+                        usuario.getIdRol()
+                );
 
                 switch (usuario.getIdRol()) {
 
                     case 1:
                         response.sendRedirect(
-                                request.getContextPath() + "/mis-tickets"
+                                request.getContextPath()
+                                + "/mis-tickets"
                         );
                         break;
 
                     case 2:
                         response.sendRedirect(
-                                request.getContextPath() + "/tickets"
+                                request.getContextPath()
+                                + "/tickets"
                         );
                         break;
 
                     case 3:
                         response.sendRedirect(
-                                request.getContextPath() + "/dashboard"
+                                request.getContextPath()
+                                + "/dashboard"
                         );
                         break;
 
                     default:
+
                         session.invalidate();
 
                         response.sendRedirect(
-                                request.getContextPath() + "/?error=1"
+                                request.getContextPath()
+                                + "/login?error=1"
                         );
+
                         break;
                 }
 
             } else {
 
                 response.sendRedirect(
-                        request.getContextPath() + "/?error=1"
+                        request.getContextPath() + "/login?error=1"
                 );
             }
 
         } catch (Exception e) {
 
             throw new ServletException(
-                    "Error al validar el inicio de sesión", e
+                    "Error al validar el inicio de sesión",
+                    e
             );
         }
     }
