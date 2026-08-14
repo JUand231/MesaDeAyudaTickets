@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 
@@ -503,572 +504,93 @@
 
                         <tbody>
 
+                            <c:if test="${empty tickets}">
+                                <tr>
+                                    <td colspan="9" style="text-align:center; padding:24px;">
+                                        No hay tickets para mostrar.
+                                    </td>
+                                </tr>
+                            </c:if>
 
-                            <!-- TICKET 1 -->
+                            <c:forEach var="ticket" items="${tickets}">
+                                <tr>
 
-                            <tr>
+                                    <td>
+                                        <strong class="ticket-id">
+                                            #TK-${ticket.idTicket}
+                                        </strong>
+                                    </td>
 
-                                <td>
-
-                                    <strong class="ticket-id">
-                                        #TK-0248
-                                    </strong>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="ticket-titulo">
-                                        Problema con conexión de red
-                                    </span>
-
-                                    <small class="ticket-descripcion">
-                                        No hay acceso a Internet.
-                                    </small>
-
-                                </td>
-
-
-                                <td>
-                                    <span class="categoria-texto">
-                                        Red
-                                    </span>
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge prioridad-critica">
-                                        CRÍTICA
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar">
-                                            S
-                                        </div>
-
-                                        <span>
-                                            Sofia Lara
+                                    <td>
+                                        <span class="ticket-titulo">
+                                            ${ticket.titulo}
                                         </span>
+                                        <small class="ticket-descripcion">
+                                            ${ticket.descripcion}
+                                        </small>
+                                    </td>
 
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar agente">
-                                            C
-                                        </div>
-
-                                        <span>
-                                            Carlos M.
+                                    <td>
+                                        <span class="categoria-texto">
+                                            Categoria #${ticket.idCategoria}
                                         </span>
+                                    </td>
 
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge estado-proceso">
-                                        EN PROCESO
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-                                    11/08/2026
-                                </td>
-
-
-                                <td>
-
-                                    <div class="acciones-ticket">
-
-                                        <a href="#"
-                                           class="accion ver"
-                                           title="Ver ticket">
-
-                                            👁
-
-                                        </a>
-
-
-                                        <a href="#"
-                                           class="accion editar"
-                                           title="Editar ticket">
-
-                                            ✎
-
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-
-                            <!-- TICKET 2 -->
-
-                            <tr>
-
-                                <td>
-
-                                    <strong class="ticket-id">
-                                        #TK-0247
-                                    </strong>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="ticket-titulo">
-                                        Equipo no enciende
-                                    </span>
-
-                                    <small class="ticket-descripcion">
-                                        Computador no responde.
-                                    </small>
-
-                                </td>
-
-
-                                <td>
-                                    <span class="categoria-texto">
-                                        Hardware
-                                    </span>
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge prioridad-alta">
-                                        ALTA
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar">
-                                            J
-                                        </div>
-
-                                        <span>
-                                            Juan Pérez
+                                    <td>
+                                        <span class="badge">
+                                            Prioridad #${ticket.idPrioridad}
                                         </span>
+                                    </td>
 
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar agente">
-                                            L
+                                    <td>
+                                        <div class="persona">
+                                            <span>Solicitante #${ticket.idSolicitante}</span>
                                         </div>
+                                    </td>
 
-                                        <span>
-                                            Laura P.
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge estado-nuevo">
-                                        NUEVO
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-                                    11/08/2026
-                                </td>
-
-
-                                <td>
-
-                                    <div class="acciones-ticket">
-
-                                        <a href="#"
-                                           class="accion ver">
-                                            👁
-                                        </a>
-
-                                        <a href="#"
-                                           class="accion editar">
-                                            ✎
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-
-                            <!-- TICKET 3 -->
-
-                            <tr>
-
-                                <td>
-
-                                    <strong class="ticket-id">
-                                        #TK-0246
-                                    </strong>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="ticket-titulo">
-                                        Instalación de software
-                                    </span>
-
-                                    <small class="ticket-descripcion">
-                                        Solicitud de instalación.
-                                    </small>
-
-                                </td>
-
-
-                                <td>
-                                    <span class="categoria-texto">
-                                        Software
-                                    </span>
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge prioridad-media">
-                                        MEDIA
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar">
-                                            M
+                                    <td>
+                                        <div class="persona">
+                                            <c:choose>
+                                                <c:when test="${empty ticket.idAgente}">
+                                                    <span>Sin asignar</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span>Agente #${ticket.idAgente}</span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
+                                    </td>
 
-                                        <span>
-                                            María Gómez
-                                        </span>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${ticket.estado == 'NUEVO'}">
+                                                <span class="badge estado-nuevo">NUEVO</span>
+                                            </c:when>
+                                            <c:when test="${ticket.estado == 'EN_PROCESO'}">
+                                                <span class="badge estado-proceso">EN PROCESO</span>
+                                            </c:when>
+                                            <c:when test="${ticket.estado == 'RESUELTO'}">
+                                                <span class="badge estado-resuelto">RESUELTO</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge">${ticket.estado}</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
 
-                                    </div>
+                                    <td>
+                                        ${ticket.fechaCreacion}
+                                    </td>
 
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar agente">
-                                            A
+                                    <td>
+                                        <div class="acciones-ticket">
+                                            <a href="${pageContext.request.contextPath}/tickets?id=${ticket.idTicket}"
+                                               class="accion ver" title="Ver ticket">👁</a>
                                         </div>
+                                    </td>
 
-                                        <span>
-                                            Andrés R.
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge estado-resuelto">
-                                        RESUELTO
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-                                    10/08/2026
-                                </td>
-
-
-                                <td>
-
-                                    <div class="acciones-ticket">
-
-                                        <a href="#"
-                                           class="accion ver">
-                                            👁
-                                        </a>
-
-                                        <a href="#"
-                                           class="accion editar">
-                                            ✎
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-
-                            <!-- TICKET 4 -->
-
-                            <tr>
-
-                                <td>
-
-                                    <strong class="ticket-id">
-                                        #TK-0245
-                                    </strong>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="ticket-titulo">
-                                        Mantenimiento de equipo
-                                    </span>
-
-                                    <small class="ticket-descripcion">
-                                        Mantenimiento preventivo.
-                                    </small>
-
-                                </td>
-
-
-                                <td>
-                                    <span class="categoria-texto">
-                                        Mantenimiento
-                                    </span>
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge prioridad-baja">
-                                        BAJA
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar">
-                                            D
-                                        </div>
-
-                                        <span>
-                                            David Ruiz
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar agente">
-                                            C
-                                        </div>
-
-                                        <span>
-                                            Carlos M.
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge estado-resuelto">
-                                        RESUELTO
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-                                    10/08/2026
-                                </td>
-
-
-                                <td>
-
-                                    <div class="acciones-ticket">
-
-                                        <a href="#"
-                                           class="accion ver">
-                                            👁
-                                        </a>
-
-                                        <a href="#"
-                                           class="accion editar">
-                                            ✎
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-
-                            <!-- TICKET 5 -->
-
-                            <tr>
-
-                                <td>
-
-                                    <strong class="ticket-id">
-                                        #TK-0244
-                                    </strong>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="ticket-titulo">
-                                        Error en sistema académico
-                                    </span>
-
-                                    <small class="ticket-descripcion">
-                                        No permite iniciar sesión.
-                                    </small>
-
-                                </td>
-
-
-                                <td>
-                                    <span class="categoria-texto">
-                                        Software
-                                    </span>
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge prioridad-alta">
-                                        ALTA
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar">
-                                            L
-                                        </div>
-
-                                        <span>
-                                            Laura Torres
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <div class="persona">
-
-                                        <div class="persona-avatar agente">
-                                            A
-                                        </div>
-
-                                        <span>
-                                            Andrés R.
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-                                <td>
-
-                                    <span class="badge estado-proceso">
-                                        EN PROCESO
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-                                    09/08/2026
-                                </td>
-
-
-                                <td>
-
-                                    <div class="acciones-ticket">
-
-                                        <a href="#"
-                                           class="accion ver">
-                                            👁
-                                        </a>
-
-                                        <a href="#"
-                                           class="accion editar">
-                                            ✎
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
+                                </tr>
+                            </c:forEach>
 
                         </tbody>
 
