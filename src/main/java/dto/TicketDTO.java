@@ -1,4 +1,5 @@
 package dto;
+
 /**
  * Objeto de transferencia para la vista. Solo datos ya listos para mostrar
  */
@@ -11,8 +12,12 @@ public class TicketDTO {
     private int idPrioridad;
     private int idSolicitante;
     private Integer idAgente;
-    private String estado;          
-    private String fechaCreacion;   
+    private String nombreCategoria;
+    private String nombrePrioridad;
+    private String nombreSolicitante;
+    private String nombreAgente;
+    private String estado;
+    private String fechaCreacion;
     private int totalComentarios;
 
     public TicketDTO() {
@@ -72,6 +77,38 @@ public class TicketDTO {
 
     public void setIdAgente(Integer idAgente) {
         this.idAgente = idAgente;
+    }
+
+    public String getNombreCategoria() {
+        return nombreCategoria;
+    }
+
+    public void setNombreCategoria(String nombreCategoria) {
+        this.nombreCategoria = nombreCategoria;
+    }
+
+    public String getNombrePrioridad() {
+        return nombrePrioridad;
+    }
+
+    public void setNombrePrioridad(String nombrePrioridad) {
+        this.nombrePrioridad = nombrePrioridad;
+    }
+
+    public String getNombreSolicitante() {
+        return nombreSolicitante;
+    }
+
+    public void setNombreSolicitante(String nombreSolicitante) {
+        this.nombreSolicitante = nombreSolicitante;
+    }
+
+    public String getNombreAgente() {
+        return nombreAgente;
+    }
+
+    public void setNombreAgente(String nombreAgente) {
+        this.nombreAgente = nombreAgente;
     }
 
     public String getEstado() {

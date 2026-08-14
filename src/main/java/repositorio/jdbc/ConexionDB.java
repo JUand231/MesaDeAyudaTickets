@@ -11,6 +11,16 @@ public class ConexionDB {
 
     private static final Properties PROPIEDADES = cargarPropiedades();
 
+    static {
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            throw new ExceptionInInitializerError(
+                    "No se encontro el driver de SQL Server en el classpath: " + e.getMessage());
+        }
+    }
+
     private ConexionDB() {
 
     }
