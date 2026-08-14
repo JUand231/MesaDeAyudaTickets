@@ -532,32 +532,25 @@
 
                                     <td>
                                         <span class="categoria-texto">
-                                            Categoria #${ticket.idCategoria}
+                                            ${ticket.nombreCategoria}
                                         </span>
                                     </td>
 
                                     <td>
                                         <span class="badge">
-                                            Prioridad #${ticket.idPrioridad}
+                                            ${ticket.nombrePrioridad}
                                         </span>
                                     </td>
 
                                     <td>
                                         <div class="persona">
-                                            <span>Solicitante #${ticket.idSolicitante}</span>
+                                            <span>${ticket.nombreSolicitante}</span>
                                         </div>
                                     </td>
 
                                     <td>
                                         <div class="persona">
-                                            <c:choose>
-                                                <c:when test="${empty ticket.idAgente}">
-                                                    <span>Sin asignar</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span>Agente #${ticket.idAgente}</span>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <span>${ticket.nombreAgente}</span>
                                         </div>
                                     </td>
 
