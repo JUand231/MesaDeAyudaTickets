@@ -20,8 +20,6 @@
 
 
     <body>
-
-
         <!-- ==================================================
              SIDEBAR
         ================================================== -->
@@ -47,7 +45,6 @@
                 </div>
 
             </div>
-
 
             <div class="menu-titulo">
                 PRINCIPAL
@@ -76,7 +73,6 @@
                     <label>
                         Tickets
                     </label>
-
                 </a>
 
 
@@ -93,11 +89,9 @@
 
             </nav>
 
-
             <div class="menu-titulo">
                 ADMINISTRACIÓN
             </div>
-
 
             <nav class="menu">
 
@@ -112,7 +106,6 @@
 
                 </a>
 
-
                 <a href="${pageContext.request.contextPath}/agentes"
                    class="menu-item">
 
@@ -123,7 +116,6 @@
                     </label>
 
                 </a>
-
 
                 <a href="${pageContext.request.contextPath}/categorias"
                    class="menu-item activo">
@@ -203,8 +195,6 @@
             </div>
 
         </aside>
-
-
 
         <!-- ==================================================
              CONTENIDO PRINCIPAL
