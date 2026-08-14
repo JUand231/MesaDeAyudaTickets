@@ -97,7 +97,7 @@
 
                             <div class="input-icono">
 
-                                <span>⌑</span>
+                                <span>👁️‍🗨️️️</span>
 
                                 <input type="password"
                                        id="contrasena"
@@ -219,7 +219,7 @@
                 }
 
             }
-
+ 
         </script>
 
     </body>
