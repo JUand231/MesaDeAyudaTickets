@@ -28,7 +28,7 @@
                     <span>⌂</span><label>Dashboard</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
+                <a href="${pageContext.request.contextPath}/nose" class="menu-item">
                     <span>▣</span><label>Mis tickets</label>
                 </a>
             </nav>
@@ -52,12 +52,13 @@
             <div class="menu-titulo">SISTEMA</div>
 
             <nav class="menu">
-                <a href="#" class="menu-item">
-                    <span>⚙</span><label>Configuración</label>
+                <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
+                    <span>⚙</span><label>Mi Perfil</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/logout" class="menu-item">
-                    <span>↪</span><label>Cerrar sesión</label>
+                <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
+                    <span>↪</span>
+                    <label> Cerrar sesión </label>
                 </a>
             </nav>
 
@@ -204,98 +205,6 @@
                     </div>
 
                 </div>
-
-                <!-- ACTIVIDAD -->
-                <div class="panel">
-
-                    <div class="panel-header">
-                        <div>
-                            <h2>Mi actividad</h2>
-                            <p>Últimos movimientos realizados</p>
-                        </div>
-                    </div>
-
-                    <div class="actividad">
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon azul">→</div>
-                            <div>
-                                <strong>Ticket atendido</strong>
-                                <p>Comenzaste a atender el ticket #TK-0248</p>
-                                <small>Hace 5 minutos</small>
-                            </div>
-                        </div>
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon verde">✓</div>
-                            <div>
-                                <strong>Ticket resuelto</strong>
-                                <p>#TK-0245 fue marcado como resuelto</p>
-                                <small>Hace 18 minutos</small>
-                            </div>
-                        </div>
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon naranja">→</div>
-                            <div>
-                                <strong>Estado actualizado</strong>
-                                <p>#TK-0246 cambió a En Proceso</p>
-                                <small>Hace 32 minutos</small>
-                            </div>
-                        </div>
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon rojo">!</div>
-                            <div>
-                                <strong>Atención requerida</strong>
-                                <p>El ticket #TK-0248 tiene prioridad crítica</p>
-                                <small>Hace 1 hora</small>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- ACCESOS RÁPIDOS -->
-            <section class="panel accesos">
-
-                <div class="panel-header">
-                    <div>
-                        <h2>Accesos rápidos</h2>
-                        <p>Gestión de tus tickets asignados</p>
-                    </div>
-                </div>
-
-                <div class="accesos-grid">
-
-                    <a href="${pageContext.request.contextPath}/tickets" class="acceso">
-                        <span>▣</span>
-                        <strong>Mis tickets</strong>
-                        <small>Ver tickets asignados</small>
-                    </a>
-
-                    <a href="${pageContext.request.contextPath}/tickets?estado=Pendiente" class="acceso">
-                        <span>◷</span>
-                        <strong>Pendientes</strong>
-                        <small>Tickets por atender</small>
-                    </a>
-
-                    <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="acceso">
-                        <span>→</span>
-                        <strong>En proceso</strong>
-                        <small>Tickets que estás atendiendo</small>
-                    </a>
-
-                    <a href="${pageContext.request.contextPath}/tickets?estado=Resuelto" class="acceso">
-                        <span>✓</span>
-                        <strong>Resueltos</strong>
-                        <small>Tickets solucionados</small>
-                    </a>
-
-                </div>
-
             </section>
 
         </main>

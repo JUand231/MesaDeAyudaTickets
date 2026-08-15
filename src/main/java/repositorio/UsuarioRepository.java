@@ -5,6 +5,8 @@ import modelo.Usuario;
 import java.sql.SQLException;
 
 public interface UsuarioRepository {
+    
+    void actualizar(Usuario usuario) throws SQLException;
 
     Usuario validarLogin(String correo, String contrasena) throws SQLException;
 

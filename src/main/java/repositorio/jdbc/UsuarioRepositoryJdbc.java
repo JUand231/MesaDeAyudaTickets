@@ -55,4 +55,16 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         usuario.setIdRol(rs.getInt("IdRol"));
         return usuario;
     }
+
+    @Override
+    public void actualizar(Usuario usuario) throws SQLException {
+        String sql = "UPDATE Usuario SET Correo = ?, Contrasena = ? WHERE Id = ?";
+
+        try (Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, usuario.getCorreo());
+            ps.setString(2, usuario.getContrasena());
+            ps.setInt(3, usuario.getIdUsuario());
+            ps.executeUpdate();
+        }
+    }
 }

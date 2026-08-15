@@ -71,21 +71,21 @@ public class LoginServlet extends HttpServlet {
                     case 1:
                         response.sendRedirect(
                                 request.getContextPath()
-                                + "/mis-tickets"
+                                + "/dashboardSolicitante"
                         );
                         break;
 
                     case 2:
                         response.sendRedirect(
                                 request.getContextPath()
-                                + "/tickets"
+                                + "/dashboardAgente"
                         );
                         break;
 
                     case 3:
                         response.sendRedirect(
                                 request.getContextPath()
-                                + "/dashboard"
+                                + "/dashboardAdmin"
                         );
                         break;
 
