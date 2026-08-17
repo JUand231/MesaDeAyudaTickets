@@ -82,7 +82,6 @@
                 </div>
 
                 <div class="barra-acciones">
-                    <button class="btn-notificacion">♧<span></span></button>
                     <a href="${pageContext.request.contextPath}/tickets" class="btn-principal">▣ Mis tickets</a>
                 </div>
             </header>

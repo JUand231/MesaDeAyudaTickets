@@ -110,23 +110,6 @@
 
                         </div>
 
-
-                        <div class="login-opciones">
-
-                            <label class="recordarme">
-
-                                <input type="checkbox"
-                                       name="recordarme">
-
-                                <span></span>
-
-                                Recordarme
-
-                            </label>
-
-                        </div>
-
-
                         <button type="submit"
                                 class="btn-login">
 
@@ -168,14 +151,6 @@
 
                     </div>
 
-
-                    <p class="login-ayuda">
-                        ¿Necesitas ayuda para ingresar?
-                        <a href="#">
-                            Contacta al administrador
-                        </a>
-                    </p>
-
                 </div>
 
 
@@ -183,10 +158,6 @@
 
                     <span>
                         © 2026 Mesa de Ayuda CIMM
-                    </span>
-
-                    <span>
-                        Sistema de gestión de soporte
                     </span>
 
                 </div>
@@ -219,7 +190,7 @@
                 }
 
             }
- 
+
         </script>
 
     </body>

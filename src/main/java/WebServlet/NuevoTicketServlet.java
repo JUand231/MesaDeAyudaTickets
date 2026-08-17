@@ -31,7 +31,7 @@ public class NuevoTicketServlet extends HttpServlet {
         }
 
         cargarListas(request);
-        request.getRequestDispatcher("/WEB-INF/jsp/nuevo-ticket.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/Solicitante/nuevo-ticket.jsp")
                 .forward(request, response);
     }
 
@@ -61,13 +61,13 @@ public class NuevoTicketServlet extends HttpServlet {
 
             ticketService.crearTicket(titulo, descripcion, idCategoria, idPrioridad, idSolicitante);
 
-            response.sendRedirect(request.getContextPath() + "/tickets");
+            response.sendRedirect(request.getContextPath() + "/dashboardSolicitante");
 
         } catch (IllegalArgumentException e) {
             // titulo/descripcion vacios, o los ids no eran numeros validos
             request.setAttribute("error", e.getMessage());
             cargarListas(request);
-            request.getRequestDispatcher("/WEB-INF/jsp/nuevo-ticket.jsp")
+            request.getRequestDispatcher("/WEB-INF/jsp/Solicitante/nuevo-ticket.jsp")
                     .forward(request, response);
         }
     }

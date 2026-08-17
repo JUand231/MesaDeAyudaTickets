@@ -94,7 +94,6 @@ public class TicketsAdminServlet extends HttpServlet {
         // ==================================================
         // FILTROS
         // ==================================================
-
         String buscar = request.getParameter("buscar");
         String estado = request.getParameter("estado");
         String prioridad = request.getParameter("prioridad");
@@ -147,15 +146,26 @@ public class TicketsAdminServlet extends HttpServlet {
         request.setAttribute("filtroPrioridad", prioridad);
         request.setAttribute("filtroCategoria", categoria);
 
-        request.getRequestDispatcher("/WEB-INF/jsp/Administrador/ticketsAdmin.jsp")
-                .forward(request, response);
+        if (idRol == 1) {
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/jsp/Solicitante/ticketsSolicitante.jsp")
+                    .forward(request, response);
+
+        } else {
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/jsp/Administrador/ticketsAdmin.jsp")
+                    .forward(request, response);
+        }
+
     }
 
     /**
      * Normaliza texto para poder comparar valores que vienen del formulario
-     * (con tildes y espacios) contra los que están guardados en base de
-     * datos (en mayúsculas, sin tildes y con guion bajo).
-     * Ej: "En proceso" -> "EN_PROCESO", "Crítica" -> "CRITICA"
+     * (con tildes y espacios) contra los que están guardados en base de datos
+     * (en mayúsculas, sin tildes y con guion bajo). Ej: "En proceso" ->
+     * "EN_PROCESO", "Crítica" -> "CRITICA"
      */
     private String normalizar(String texto) {
         if (texto == null) {

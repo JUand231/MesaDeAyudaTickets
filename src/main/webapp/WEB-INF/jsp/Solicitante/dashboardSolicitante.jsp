@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -34,7 +35,8 @@
                     <span>▣</span><label>Mis tickets</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/tickets?estado=Nuevo" class="menu-item">
+                <a href="${pageContext.request.contextPath}/comentarios"
+                   class="menu-item">
                     <span>●</span><label>Comentarios</label>
                 </a>
 
@@ -82,7 +84,7 @@
                 <div class="barra-acciones">
 
                     <button class="btn-notificacion">
-                        ♧<span></span>
+                        🔔<span></span>
                     </button>
 
                     <a href="${pageContext.request.contextPath}/ticket/nuevo" class="btn-principal">
@@ -134,7 +136,7 @@
                 </div>
 
             </section>
-                        
+
             <!-- GRID PRINCIPAL -->
             <section class="dashboard-grid">
 
@@ -165,46 +167,46 @@
 
                             <tbody>
 
-                            <c:if test="${empty ticketsRecientes}">
-                                <tr>
-                                    <td colspan="4">No hay tickets recientes.</td>
-                                </tr>
-                            </c:if>
+                                <c:if test="${empty ticketsRecientes}">
+                                    <tr>
+                                        <td colspan="4">No hay tickets recientes.</td>
+                                    </tr>
+                                </c:if>
 
-                            <c:forEach var="ticket" items="${ticketsRecientes}">
-                                <tr>
+                                <c:forEach var="ticket" items="${ticketsRecientes}">
+                                    <tr>
 
-                                    <td>
-                                        <strong class="ticket-id">#TK-${ticket.idTicket}</strong>
-                                        <span class="ticket-titulo">${ticket.titulo}</span>
-                                    </td>
+                                        <td>
+                                            <strong class="ticket-id">#TK-${ticket.idTicket}</strong>
+                                            <span class="ticket-titulo">${ticket.titulo}</span>
+                                        </td>
 
-                                    <td>${ticket.nombreCategoria}</td>
+                                        <td>${ticket.nombreCategoria}</td>
 
-                                    <td>
-                                <c:choose>
-                                    <c:when test="${ticket.estado == 'NUEVO'}">
-                                        <span class="badge estado-nuevo">NUEVO</span>
-                                    </c:when>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${ticket.estado == 'NUEVO'}">
+                                                    <span class="badge estado-nuevo">NUEVO</span>
+                                                </c:when>
 
-                                    <c:when test="${ticket.estado == 'EN_PROCESO'}">
-                                        <span class="badge estado-proceso">EN PROCESO</span>
-                                    </c:when>
+                                                <c:when test="${ticket.estado == 'EN_PROCESO'}">
+                                                    <span class="badge estado-proceso">EN PROCESO</span>
+                                                </c:when>
 
-                                    <c:when test="${ticket.estado == 'RESUELTO'}">
-                                        <span class="badge estado-resuelto">RESUELTO</span>
-                                    </c:when>
+                                                <c:when test="${ticket.estado == 'RESUELTO'}">
+                                                    <span class="badge estado-resuelto">RESUELTO</span>
+                                                </c:when>
 
-                                    <c:otherwise>
-                                        <span class="badge">${ticket.estado}</span>
-                                    </c:otherwise>
-                                </c:choose>
-                                </td>
+                                                <c:otherwise>
+                                                    <span class="badge">${ticket.estado}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
 
-                                <td>${ticket.nombreAgente}</td>
+                                        <td>${ticket.nombreAgente}</td>
 
-                                </tr>
-                            </c:forEach>
+                                    </tr>
+                                </c:forEach>
 
                             </tbody>
 

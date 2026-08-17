@@ -19,6 +19,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import repositorio.ComentarioRepository;
+import repositorio.jdbc.ComentarioRepositoryJdbc;
 
 @WebListener
 public class AppContextListener implements ServletContextListener {
@@ -27,6 +29,7 @@ public class AppContextListener implements ServletContextListener {
     public static final String USUARIO_REPOSITORY = "usuarioRepository";
     public static final String CATEGORIA_REPOSITORY = "categoriaRepository";
     public static final String PRIORIDAD_REPOSITORY = "prioridadRepository";
+    public static final String COMENTARIO_REPOSITORY = "comentarioRepository";
 
     @Override
     public void contextInitialized(ServletContextEvent evento) {
@@ -37,6 +40,7 @@ public class AppContextListener implements ServletContextListener {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryJdbc();
         CategoriaRepository categoriaRepository = new CategoriaRepositoryJdbc();
         PrioridadRepository prioridadRepository = new PrioridadRepositoryJdbc();
+        ComentarioRepository comentarioRepository = new ComentarioRepositoryJdbc();
 
         // Estrategias
         CalculadoraSLA calculadoraSLA = new CalculadoraSLAPorPrioridad();
@@ -51,6 +55,7 @@ public class AppContextListener implements ServletContextListener {
         contexto.setAttribute(USUARIO_REPOSITORY, usuarioRepository);
         contexto.setAttribute(CATEGORIA_REPOSITORY, categoriaRepository);
         contexto.setAttribute(PRIORIDAD_REPOSITORY, prioridadRepository);
+        contexto.setAttribute(COMENTARIO_REPOSITORY, comentarioRepository);
     }
 
     @Override

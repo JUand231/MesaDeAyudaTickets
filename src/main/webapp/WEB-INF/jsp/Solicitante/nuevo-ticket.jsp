@@ -3,61 +3,182 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <title>Nuevo Ticket | Mesa de Ayuda</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
+
+        <link rel="stylesheet"
+              href="${pageContext.request.contextPath}/css/estilo.css">
     </head>
-    <body>
 
-        <main style="max-width:600px; margin:40px auto; padding:24px;">
+    <body class="pagina-nuevo-ticket">
 
-            <h1>Nuevo Ticket</h1>
-            <p>Describe el problema que necesitas reportar.</p>
+        <main class="contenido">
 
-            <c:if test="${not empty error}">
-                <p style="color:red;">${error}</p>
-            </c:if>
+            <div class="nuevo-ticket-contenedor">
 
-            <form method="post" action="${pageContext.request.contextPath}/ticket/nuevo">
+                <!-- ENCABEZADO -->
+                <div class="nuevo-ticket-header">
 
-                <div style="margin-bottom:16px;">
-                    <label for="titulo">Titulo</label><br>
-                    <input type="text" id="titulo" name="titulo" required
-                           style="width:100%; padding:8px;">
+                    <h1>Nuevo Ticket</h1>
+
+                    <p>
+                        Describe el problema que necesitas reportar.
+                    </p>
+
                 </div>
 
-                <div style="margin-bottom:16px;">
-                    <label for="descripcion">Descripcion</label><br>
-                    <textarea id="descripcion" name="descripcion" rows="4" required
-                              style="width:100%; padding:8px;"></textarea>
+
+                <!-- FORMULARIO -->
+                <div class="formulario-ticket">
+
+                    <!-- MENSAJE DE ERROR -->
+                    <c:if test="${not empty error}">
+
+                        <div class="error-ticket">
+                            ${error}
+                        </div>
+
+                    </c:if>
+
+
+                    <form method="post"
+                          action="${pageContext.request.contextPath}/ticket/nuevo">
+
+
+                        <!-- TÍTULO -->
+                        <div class="campo-ticket">
+
+                            <label for="titulo">
+                                Título
+                            </label>
+
+                            <input
+                                type="text"
+                                id="titulo"
+                                name="titulo"
+                                required
+                                maxlength="150"
+                                placeholder="Ej. No hay conexión a Internet"
+                                >
+
+                        </div>
+
+
+                        <!-- DESCRIPCIÓN -->
+                        <div class="campo-ticket">
+
+                            <label for="descripcion">
+                                Descripción
+                            </label>
+
+                            <textarea
+                                id="descripcion"
+                                name="descripcion"
+                                required
+                                placeholder="Describe detalladamente el problema que estás presentando..."
+                                ></textarea>
+
+                        </div>
+
+
+                        <!-- CATEGORÍA -->
+                        <div class="campo-ticket">
+
+                            <label for="idCategoria">
+                                Categoría
+                            </label>
+
+                            <select
+                                id="idCategoria"
+                                name="idCategoria"
+                                required
+                                >
+
+                                <option value="">
+                                    Selecciona una categoría
+                                </option>
+
+                                <c:forEach
+                                    var="categoria"
+                                    items="${categorias}"
+                                    >
+
+                                    <option value="${categoria.idCategoria}">
+                                        ${categoria.nombreCategoria}
+                                    </option>
+
+                                </c:forEach>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- PRIORIDAD -->
+                        <div class="campo-ticket">
+
+                            <label for="idPrioridad">
+                                Prioridad
+                            </label>
+
+                            <select
+                                id="idPrioridad"
+                                name="idPrioridad"
+                                required
+                                >
+
+                                <option value="">
+                                    Selecciona una prioridad
+                                </option>
+
+                                <c:forEach
+                                    var="prioridad"
+                                    items="${prioridades}"
+                                    >
+
+                                    <option value="${prioridad.idPrioridad}">
+                                        ${prioridad.tipo}
+                                    </option>
+
+                                </c:forEach>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- BOTONES -->
+                        <div class="acciones-ticket">
+
+                            <button
+                                type="submit"
+                                class="btn-crear-ticket"
+                                >
+                                Crear ticket
+                            </button>
+
+
+                            <a
+                                href="${pageContext.request.contextPath}/dashboardSolicitante"
+                                class="btn-secundario"
+                                >
+                                Cancelar
+                            </a>
+
+                        </div>
+
+                    </form>
+
                 </div>
 
-                <div style="margin-bottom:16px;">
-                    <label for="idCategoria">Categoria</label><br>
-                    <select id="idCategoria" name="idCategoria" required style="width:100%; padding:8px;">
-                        <c:forEach var="categoria" items="${categorias}">
-                            <option value="${categoria.idCategoria}">${categoria.nombreCategoria}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-
-                <div style="margin-bottom:16px;">
-                    <label for="idPrioridad">Prioridad</label><br>
-                    <select id="idPrioridad" name="idPrioridad" required style="width:100%; padding:8px;">
-                        <c:forEach var="prioridad" items="${prioridades}">
-                            <option value="${prioridad.idPrioridad}">${prioridad.tipo}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-
-                <button type="submit" style="padding:10px 20px;">Crear ticket</button>
-                <a href="${pageContext.request.contextPath}/dashboard" style="margin-left:12px;">Cancelar</a>
-
-            </form>
+            </div>
 
         </main>
 
     </body>
+
 </html>

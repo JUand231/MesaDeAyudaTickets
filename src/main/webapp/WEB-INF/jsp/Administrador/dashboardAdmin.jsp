@@ -88,7 +88,7 @@
 
                 <div class="barra-acciones">
                     <button class="btn-notificacion">
-                        ♧<span></span>
+                        🔔<span></span>
                     </button>
                 </div>
             </header>

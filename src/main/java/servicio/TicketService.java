@@ -149,7 +149,7 @@ public class TicketService {
             throw new IllegalArgumentException("El comentario no puede estar vacio");
         }
         Ticket ticket = buscarPorId(idTicket);
-        ticket.agregarComentario(new Comentario(idUsuario, texto));
+        ticket.agregarComentario(new Comentario(0, idUsuario, idTicket, texto.trim()));
         return ticketRepository.actualizar(ticket);
     }
 }
