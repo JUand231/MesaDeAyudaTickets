@@ -148,12 +148,21 @@ public class TicketsAdminServlet extends HttpServlet {
 
         if (idRol == 1) {
 
+            // SOLICITANTE
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Solicitante/ticketsSolicitante.jsp")
                     .forward(request, response);
 
+        } else if (idRol == 2) {
+
+            // AGENTE
+            request.getRequestDispatcher(
+                    "/WEB-INF/jsp/Agente/ticketsAgente.jsp")
+                    .forward(request, response);
+
         } else {
 
+            // ADMINISTRADOR
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Administrador/ticketsAdmin.jsp")
                     .forward(request, response);

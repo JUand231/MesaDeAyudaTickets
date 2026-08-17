@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="es">
     <head>
@@ -12,6 +13,7 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
+
 
             <div class="marca">
                 <div class="marca-icono"><span>⌁</span></div>
@@ -28,63 +30,59 @@
                     <span>⌂</span><label>Dashboard</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/nose" class="menu-item">
-                    <span>▣</span><label>Mis tickets</label>
+                <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
+                    <span>▣</span>
+                    <label>Mis tickets</label>
                 </a>
             </nav>
 
             <div class="menu-titulo">GESTIÓN</div>
 
             <nav class="menu">
-                <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="menu-item">
-                    <span>◷</span><label>En proceso</label>
+                <!-- PENDIENTES -->
+                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO"
+                   class="menu-item">
+                    <span>●</span>
+                    <label>Pendientes</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/tickets?estado=Pendiente" class="menu-item">
-                    <span>!</span><label>Pendientes</label>
+                <!-- EN PROCESO -->
+                <a href="${pageContext.request.contextPath}/tickets?estado=EN_PROCESO"
+                   class="menu-item">
+                    <span>◷</span>
+                    <label>En proceso</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/tickets?estado=Resuelto" class="menu-item">
-                    <span>✓</span><label>Resueltos</label>
-                </a>
-            </nav>
-
-            <div class="menu-titulo">SISTEMA</div>
-
-            <nav class="menu">
-                <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
-                    <span>⚙</span><label>Mi Perfil</label>
+                <!-- RESUELTOS -->
+                <a href="${pageContext.request.contextPath}/tickets?estado=RESUELTO"
+                   class="menu-item">
+                    <span>✓</span>
+                    <label>Resueltos</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
-                    <span>↪</span>
-                    <label> Cerrar sesión </label>
-                </a>
-            </nav>
+                <div class="menu-titulo">SISTEMA</div>
 
-            <div class="usuario-sidebar">
-                <div class="usuario-avatar">A</div>
-                <div>
-                    <strong>Agente</strong>
-                    <small>Agente de soporte</small>
+                <nav class="menu">
+                    <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
+                        <span>⚙</span><label>Mi Perfil</label>
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
+                        <span>↪</span>
+                        <label> Cerrar sesión </label>
+                    </a>
+                </nav>
+
+                <div class="usuario-sidebar">
+                    <div class="usuario-avatar">A</div>
+                    <div>
+                        <strong>Agente</strong>
+                        <small>Agente de soporte</small>
+                    </div>
                 </div>
-            </div>
 
         </aside>
-
-        <!-- CONTENIDO -->
         <main class="contenido">
-
-            <header class="barra-superior">
-                <div>
-                    <h1>Dashboard</h1>
-                    <p>Bienvenido al centro de atención y soporte.</p>
-                </div>
-
-                <div class="barra-acciones">
-                    <a href="${pageContext.request.contextPath}/tickets" class="btn-principal">▣ Mis tickets</a>
-                </div>
-            </header>
 
             <!-- ESTADÍSTICAS -->
             <section class="estadisticas">
@@ -93,7 +91,7 @@
                     <div class="estadistica-icono azul">▣</div>
                     <div>
                         <span>MIS TICKETS</span>
-                        <strong>24</strong>
+                        <strong>${totalTickets}</strong>
                         <small>Tickets asignados</small>
                     </div>
                 </div>
@@ -102,7 +100,7 @@
                     <div class="estadistica-icono naranja">◷</div>
                     <div>
                         <span>PENDIENTES</span>
-                        <strong>8</strong>
+                        <strong>${pendientes}</strong>
                         <small>Requieren atención</small>
                     </div>
                 </div>
@@ -111,7 +109,7 @@
                     <div class="estadistica-icono verde">→</div>
                     <div>
                         <span>EN PROCESO</span>
-                        <strong>10</strong>
+                        <strong>${enProceso}</strong>
                         <small>Actualmente atendiendo</small>
                     </div>
                 </div>
@@ -120,7 +118,7 @@
                     <div class="estadistica-icono rojo">✓</div>
                     <div>
                         <span>RESUELTOS</span>
-                        <strong>6</strong>
+                        <strong>${resueltos}</strong>
                         <small class="positivo">Tickets solucionados</small>
                     </div>
                 </div>
@@ -155,49 +153,63 @@
 
                             <tbody>
 
-                                <tr>
-                                    <td>
-                                        <strong class="ticket-id">#TK-0248</strong>
-                                        <span class="ticket-titulo">Problema con conexión de red</span>
-                                    </td>
-                                    <td>Red</td>
-                                    <td><span class="badge prioridad-critica">CRÍTICA</span></td>
-                                    <td><span class="badge estado-proceso">EN PROCESO</span></td>
-                                    <td>Sofia L.</td>
-                                </tr>
+                                <c:forEach var="ticket" items="${tickets}">
 
-                                <tr>
-                                    <td>
-                                        <strong class="ticket-id">#TK-0247</strong>
-                                        <span class="ticket-titulo">Equipo no enciende</span>
-                                    </td>
-                                    <td>Hardware</td>
-                                    <td><span class="badge prioridad-alta">ALTA</span></td>
-                                    <td><span class="badge estado-nuevo">NUEVO</span></td>
-                                    <td>Carlos M.</td>
-                                </tr>
+                                    <tr>
+                                        <td>
+                                            <strong class="ticket-id">
+                                                #TK-${ticket.idTicket}
+                                            </strong>
 
-                                <tr>
-                                    <td>
-                                        <strong class="ticket-id">#TK-0246</strong>
-                                        <span class="ticket-titulo">Instalación de software</span>
-                                    </td>
-                                    <td>Software</td>
-                                    <td><span class="badge prioridad-media">MEDIA</span></td>
-                                    <td><span class="badge estado-proceso">EN PROCESO</span></td>
-                                    <td>Laura P.</td>
-                                </tr>
+                                            <span class="ticket-titulo">
+                                                ${ticket.titulo}
+                                            </span>
+                                        </td>
 
-                                <tr>
-                                    <td>
-                                        <strong class="ticket-id">#TK-0245</strong>
-                                        <span class="ticket-titulo">Mantenimiento de equipo</span>
-                                    </td>
-                                    <td>Mantenimiento</td>
-                                    <td><span class="badge prioridad-baja">BAJA</span></td>
-                                    <td><span class="badge estado-resuelto">RESUELTO</span></td>
-                                    <td>Andrés R.</td>
-                                </tr>
+                                        <td>
+                                            ${nombresCategorias[ticket.idCategoria]}
+                                        </td>
+
+                                        <td>
+                                            ${nombresPrioridades[ticket.idPrioridad]}
+                                        </td>
+
+                                        <td>
+                                            <c:choose>
+
+                                                <c:when test="${ticket.estadoNombre == 'NUEVO' || ticket.estadoNombre == 'ASIGNADO'}">
+                                                    <span class="badge estado-nuevo">
+                                                        ${ticket.estadoNombre}
+                                                    </span>
+                                                </c:when>
+
+                                                <c:when test="${ticket.estadoNombre == 'EN_PROCESO'}">
+                                                    <span class="badge estado-proceso">
+                                                        EN PROCESO
+                                                    </span>
+                                                </c:when>
+
+                                                <c:when test="${ticket.estadoNombre == 'RESUELTO'}">
+                                                    <span class="badge estado-resuelto">
+                                                        RESUELTO
+                                                    </span>
+                                                </c:when>
+
+                                                <c:otherwise>
+                                                    <span class="badge">
+                                                        ${ticket.estadoNombre}
+                                                    </span>
+                                                </c:otherwise>
+
+                                            </c:choose>
+                                        </td>
+
+                                        <td>
+                                            ${nombresUsuarios[ticket.idSolicitante]}
+                                        </td>
+                                    </tr>
+
+                                </c:forEach>
 
                             </tbody>
                         </table>

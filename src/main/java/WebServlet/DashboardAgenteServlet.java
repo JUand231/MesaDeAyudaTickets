@@ -1,10 +1,18 @@
 package WebServlet;
 
+import modelo.Categoria;
+import repositorio.CategoriaRepository;
 import modelo.Ticket;
+import modelo.Prioridad;
+import modelo.Usuario;
+import repositorio.PrioridadRepository;
+import repositorio.UsuarioRepository;
 import servicio.TicketService;
-
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -32,13 +40,21 @@ public class DashboardAgenteServlet extends HttpServlet {
             return;
         }
 
-        int idUsuario
-                = (Integer) session.getAttribute("idUsuario");
+        int idUsuario = (Integer) session.getAttribute("idUsuario");
 
-        int idRol
-                = (Integer) session.getAttribute("idRol");
+        int idRol = (Integer) session.getAttribute("idRol");
+        CategoriaRepository categoriaRepository = (CategoriaRepository) getServletContext().getAttribute(AppContextListener.CATEGORIA_REPOSITORY);
 
-        // Verificar que sea Agente
+        PrioridadRepository prioridadRepository
+                = (PrioridadRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.PRIORIDAD_REPOSITORY);
+
+        UsuarioRepository usuarioRepository
+                = (UsuarioRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.USUARIO_REPOSITORY);
+
         if (idRol != 2) {
 
             response.sendRedirect(
@@ -55,9 +71,75 @@ public class DashboardAgenteServlet extends HttpServlet {
         List<Ticket> tickets
                 = ticketService.listarPorAgente(idUsuario);
 
+        Map<Integer, String> nombresCategorias = new HashMap<>();
+        Map<Integer, String> nombresPrioridades = new HashMap<>();
+        Map<Integer, String> nombresUsuarios = new HashMap<>();
+
+        for (Ticket ticket : tickets) {
+            int idCategoria = ticket.getIdCategoria();
+
+            if (!nombresCategorias.containsKey(idCategoria)) {
+                String nombre = "Sin categoría";
+
+                try {
+                    nombre = categoriaRepository
+                            .buscarPorId(idCategoria)
+                            .map(Categoria::getNombreCategoria)
+                            .orElse("Sin categoría");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                nombresCategorias.put(idCategoria, nombre);
+            }
+        }
+        for (Ticket ticket : tickets) {
+
+            int idPrioridad = ticket.getIdPrioridad();
+
+            if (!nombresPrioridades.containsKey(idPrioridad)) {
+
+                String nombre = "Sin prioridad";
+
+                try {
+                    nombre = prioridadRepository
+                            .buscarPorId(idPrioridad)
+                            .map(Prioridad::getTipo)
+                            .orElse("Sin prioridad");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                nombresPrioridades.put(idPrioridad, nombre);
+            }
+        }
+        for (Ticket ticket : tickets) {
+
+            int idSolicitante = ticket.getIdSolicitante();
+
+            if (!nombresUsuarios.containsKey(idSolicitante)) {
+
+                String nombre = "Sin solicitante";
+
+                try {
+                    nombre = usuarioRepository
+                            .buscarPorId(idSolicitante)
+                            .map(Usuario::getNombre)
+                            .orElse("Sin solicitante");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                nombresUsuarios.put(idSolicitante, nombre);
+            }
+        }
+
         int totalTickets = tickets.size();
+
         int pendientes = 0;
+
         int enProceso = 0;
+
         int resueltos = 0;
 
         for (Ticket ticket : tickets) {
@@ -69,12 +151,15 @@ public class DashboardAgenteServlet extends HttpServlet {
                 continue;
             }
 
+            estado = estado.trim();
+
             if (estado.equalsIgnoreCase("NUEVO")
+                    || estado.equalsIgnoreCase("ASIGNADO")
                     || estado.equalsIgnoreCase("PENDIENTE")) {
 
                 pendientes++;
 
-            } else if (estado.equalsIgnoreCase("EN PROCESO")) {
+            } else if (estado.equalsIgnoreCase("EN_PROCESO")) {
 
                 enProceso++;
 
@@ -85,19 +170,36 @@ public class DashboardAgenteServlet extends HttpServlet {
         }
 
         request.setAttribute(
-                "tickets", tickets);
+                "tickets",
+                tickets);
 
         request.setAttribute(
-                "totalTickets", totalTickets);
+                "nombresCategorias",
+                nombresCategorias);
 
         request.setAttribute(
-                "pendientes", pendientes);
+                "nombresPrioridades",
+                nombresPrioridades);
 
         request.setAttribute(
-                "enProceso", enProceso);
+                "nombresUsuarios",
+                nombresUsuarios);
 
         request.setAttribute(
-                "resueltos", resueltos);
+                "totalTickets",
+                totalTickets);
+
+        request.setAttribute(
+                "pendientes",
+                pendientes);
+
+        request.setAttribute(
+                "enProceso",
+                enProceso);
+
+        request.setAttribute(
+                "resueltos",
+                resueltos);
 
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/Agente/dashboardAgente.jsp")
