@@ -44,11 +44,7 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/categorias" class="menu-item">
-                    <span>◇</span><label>Categorías</label>
-                </a>
-
-                <a href="${pageContext.request.contextPath}/reportes" class="menu-item">
-                    <span>▥</span><label>Reportes</label>
+                    <span>▥</span><label>Categorías</label>
                 </a>
 
                 <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item activo">

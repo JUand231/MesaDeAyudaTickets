@@ -4,22 +4,15 @@
 <!DOCTYPE html>
 
 <html lang="es">
-
     <head>
-
         <meta charset="UTF-8">
-
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0">
-
         <title>
             Tickets | Mesa de Ayuda
         </title>
-
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/css/estilo.css">
-
-
         <!-- ==========================================================
              CSS ESPECÍFICO DE ESTA PÁGINA
              ========================================================== -->
@@ -286,11 +279,7 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/categorias" class="menu-item">
-                    <span>◇</span><label>Categorías</label>
-                </a>
-
-                <a href="${pageContext.request.contextPath}/reportes" class="menu-item">
-                    <span>▥</span><label>Reportes</label>
+                    <span>▥</span><label>Categorías</label>
                 </a>
 
                 <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item">
