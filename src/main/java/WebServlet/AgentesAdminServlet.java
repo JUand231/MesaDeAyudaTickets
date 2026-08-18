@@ -32,19 +32,25 @@ public class AgentesAdminServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
+            String buscar = request.getParameter("buscar");
+            if (buscar == null) {
+                buscar = "";
+            }
+            String buscarNormalizado = buscar.trim().toLowerCase();
 
             List<Usuario> usuarios = usuarioRepository.listar();
 
             List<Usuario> agentes = usuarios.stream()
                     .filter(usuario -> usuario.getIdRol() == 2)
+                    .filter(usuario -> buscarNormalizado.isEmpty()
+                    || usuario.getNombre().toLowerCase().contains(buscarNormalizado)
+                    || usuario.getCorreo().toLowerCase().contains(buscarNormalizado)
+                    || String.valueOf(usuario.getIdUsuario()).contains(buscarNormalizado))
                     .collect(java.util.stream.Collectors.toList());
 
             request.setAttribute("agentes", agentes);
-
             request.setAttribute("totalAgentes", agentes.size());
-
             request.setAttribute("agentesActivos", agentes.size());
             request.setAttribute("agentesInactivos", 0);
 
@@ -53,9 +59,7 @@ public class AgentesAdminServlet extends HttpServlet {
             ).forward(request, response);
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println("<h2>Error al cargar los agentes</h2>");
             response.getWriter().println("<p>" + e.getMessage() + "</p>");

@@ -30,6 +30,7 @@ public class AppContextListener implements ServletContextListener {
     public static final String CATEGORIA_REPOSITORY = "categoriaRepository";
     public static final String PRIORIDAD_REPOSITORY = "prioridadRepository";
     public static final String COMENTARIO_REPOSITORY = "comentarioRepository";
+    public static final String TICKET_REPOSITORY = "ticketRepository";
 
     @Override
     public void contextInitialized(ServletContextEvent evento) {
@@ -56,10 +57,10 @@ public class AppContextListener implements ServletContextListener {
         contexto.setAttribute(CATEGORIA_REPOSITORY, categoriaRepository);
         contexto.setAttribute(PRIORIDAD_REPOSITORY, prioridadRepository);
         contexto.setAttribute(COMENTARIO_REPOSITORY, comentarioRepository);
+        contexto.setAttribute(TICKET_REPOSITORY, ticketRepository);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent evento) {
-
     }
 }

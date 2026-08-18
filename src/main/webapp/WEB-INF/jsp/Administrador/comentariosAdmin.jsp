@@ -15,64 +15,59 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
+
             <div class="marca">
-                <div class="marca-icono">
-                    <span>🌐</span>
-                </div>
+                <div class="marca-icono"><span>🌐</span></div>
                 <div class="marca-texto">
                     <strong>MESA DE AYUDA</strong>
                     <small>CIMM · SENA</small>
                 </div>
             </div>
 
-            <!-- PRINCIPAL -->
             <div class="menu-titulo">PRINCIPAL</div>
+
             <nav class="menu">
-                <a href="${pageContext.request.contextPath}/dashboardAdmin" class="menu-item">
-                    <span>⌂</span>
-                    <label>Dashboard</label>
+                <a href="${pageContext.request.contextPath}/dashboardAdmin" class="menu-item ">
+                    <span>⌂</span><label>Dashboard</label>
                 </a>
+
                 <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
-                    <span>🏷</span>
-                    <label>Tickets</label>
+                    <span>🏷</span><label>Tickets</label>
                 </a>
             </nav>
 
-            <!-- ADMINISTRACIÓN -->
             <div class="menu-titulo">ADMINISTRACIÓN</div>
+
             <nav class="menu">
-                <a href="${pageContext.request.contextPath}/agentes" class="menu-item">
-                    <span>♟</span>
-                    <label>Agentes</label>
+                <a href="${pageContext.request.contextPath}/admin/agentes" class="menu-item">
+                    <span>♟</span><label>Agentes</label>
                 </a>
+
                 <a href="${pageContext.request.contextPath}/categorias" class="menu-item">
-                    <span>◇</span>
-                    <label>Categorías</label>
+                    <span>◇</span><label>Categorías</label>
                 </a>
+
                 <a href="${pageContext.request.contextPath}/reportes" class="menu-item">
-                    <span>▥</span>
-                    <label>Reportes</label>
+                    <span>▥</span><label>Reportes</label>
                 </a>
+
                 <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item activo">
-                    <span>🖂</span>
-                    <label>Comentarios</label>
+                    <span>🖂️</span><label>Comentarios</label>
                 </a>
             </nav>
 
-            <!-- SISTEMA -->
             <div class="menu-titulo">SISTEMA</div>
+
             <nav class="menu">
                 <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
-                    <span>⚙</span>
-                    <label>Mi Perfil</label>
+                    <span>⚙</span><label>Mi Perfil</label>
                 </a>
+
                 <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
-                    <span>↪</span>
-                    <label>Cerrar sesión</label>
+                    <span>↪</span><label>Cerrar sesión</label>
                 </a>
             </nav>
 
-            <!-- USUARIO -->
             <div class="usuario-sidebar">
                 <div class="usuario-avatar">A</div>
                 <div>
@@ -80,6 +75,7 @@
                     <small>Administrador</small>
                 </div>
             </div>
+
         </aside>
 
         <!-- CONTENIDO -->

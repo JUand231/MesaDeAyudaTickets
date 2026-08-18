@@ -289,6 +289,7 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
                 + "c.Texto, "
                 + "c.Fecha, "
                 + "u.Nombre AS NombreUsuario, "
+                + "u.IdRol, "
                 + "t.Titulo AS TituloTicket "
                 + "FROM Comentarios c "
                 + "LEFT JOIN Usuario u "
@@ -297,13 +298,32 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
                 + "ON c.IdTicket = t.Id "
                 + "WHERE 1 = 1 ";
 
+        // ==========================================
+        // FILTRO DE BÚSQUEDA
+        // ==========================================
         if (buscar != null && !buscar.trim().isEmpty()) {
+
             sql += "AND ("
                     + "CAST(c.IdTicket AS VARCHAR) LIKE ? "
                     + "OR c.Texto LIKE ? "
                     + "OR u.Nombre LIKE ? "
                     + "OR t.Titulo LIKE ?"
                     + ") ";
+        }
+
+        // ==========================================
+        // FILTRO POR ROL
+        // ==========================================
+        if (rol != null && !rol.trim().isEmpty()) {
+
+            if ("AGENTE".equalsIgnoreCase(rol)) {
+
+                sql += "AND u.IdRol = 2 ";
+
+            } else if ("SOLICITANTE".equalsIgnoreCase(rol)) {
+
+                sql += "AND u.IdRol = 1 ";
+            }
         }
 
         sql += "ORDER BY c.Fecha DESC";
@@ -315,6 +335,9 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
 
             int posicion = 1;
 
+            // ==========================================
+            // PARÁMETROS DE BÚSQUEDA
+            // ==========================================
             if (buscar != null && !buscar.trim().isEmpty()) {
 
                 String filtro = "%" + buscar.trim() + "%";
@@ -325,6 +348,9 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
                 stmt.setString(posicion++, filtro);
             }
 
+            // ==========================================
+            // EJECUTAR
+            // ==========================================
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
@@ -338,6 +364,28 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
                     comentario.setTituloTicket(
                             rs.getString("TituloTicket")
                     );
+
+                    // ==========================================
+                    // MAPEO DE ROL
+                    // ==========================================
+                    int idRolUsuario = rs.getInt("IdRol");
+
+                    String nombreRol;
+                    switch (idRolUsuario) {
+                        case 1:
+                            nombreRol = "SOLICITANTE";
+                            break;
+                        case 2:
+                            nombreRol = "AGENTE";
+                            break;
+                        case 3:
+                            nombreRol = "ADMINISTRADOR";
+                            break;
+                        default:
+                            nombreRol = "SOLICITANTE";
+                    }
+
+                    comentario.setNombreRol(nombreRol);
 
                     comentarios.add(comentario);
                 }
