@@ -28,7 +28,7 @@
                     <span>⌂</span><label>Dashboard</label>
                 </a>
                 <a href="${pageContext.request.contextPath}/tickets" class="menu-item activo">
-                    <span>▣</span><label>Tickets</label>
+                    <span>🏷</span><label>Tickets</label>
                 </a>
             </nav>
 
@@ -44,7 +44,7 @@
                     <span>▥</span><label>Reportes</label>
                 </a>
                 <a href="${pageContext.request.contextPath}/usuarios" class="menu-item">
-                    <span>●️</span><label>Comentarios</label>
+                    <span>🖂️</span><label>Comentarios</label>
                 </a>
             </nav>
 

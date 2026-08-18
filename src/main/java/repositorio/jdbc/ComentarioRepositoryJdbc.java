@@ -227,4 +227,130 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
 
         return comentario;
     }
+
+    @Override
+    public List<Comentario> listarTodos() {
+
+        String sql
+                = "SELECT "
+                + "c.Id, "
+                + "c.IdTicket, "
+                + "c.IdUsuario, "
+                + "c.Texto, "
+                + "c.Fecha, "
+                + "u.Nombre AS NombreUsuario, "
+                + "t.Titulo AS TituloTicket "
+                + "FROM Comentarios c "
+                + "LEFT JOIN Usuario u "
+                + "ON c.IdUsuario = u.Id "
+                + "LEFT JOIN Ticket t "
+                + "ON c.IdTicket = t.Id "
+                + "ORDER BY c.Fecha DESC";
+
+        List<Comentario> comentarios = new ArrayList<>();
+
+        try (
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+
+                Comentario comentario = mapear(rs);
+
+                comentario.setNombreUsuario(
+                        rs.getString("NombreUsuario")
+                );
+
+                comentario.setTituloTicket(
+                        rs.getString("TituloTicket")
+                );
+
+                comentarios.add(comentario);
+            }
+
+            return comentarios;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error listando todos los comentarios",
+                    e
+            );
+        }
+    }
+
+    @Override
+    public List<Comentario> buscarAdmin(String buscar, String rol) {
+
+        String sql
+                = "SELECT "
+                + "c.Id, "
+                + "c.IdTicket, "
+                + "c.IdUsuario, "
+                + "c.Texto, "
+                + "c.Fecha, "
+                + "u.Nombre AS NombreUsuario, "
+                + "t.Titulo AS TituloTicket "
+                + "FROM Comentarios c "
+                + "LEFT JOIN Usuario u "
+                + "ON c.IdUsuario = u.Id "
+                + "LEFT JOIN Ticket t "
+                + "ON c.IdTicket = t.Id "
+                + "WHERE 1 = 1 ";
+
+        if (buscar != null && !buscar.trim().isEmpty()) {
+            sql += "AND ("
+                    + "CAST(c.IdTicket AS VARCHAR) LIKE ? "
+                    + "OR c.Texto LIKE ? "
+                    + "OR u.Nombre LIKE ? "
+                    + "OR t.Titulo LIKE ?"
+                    + ") ";
+        }
+
+        sql += "ORDER BY c.Fecha DESC";
+
+        List<Comentario> comentarios = new ArrayList<>();
+
+        try (
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            int posicion = 1;
+
+            if (buscar != null && !buscar.trim().isEmpty()) {
+
+                String filtro = "%" + buscar.trim() + "%";
+
+                stmt.setString(posicion++, filtro);
+                stmt.setString(posicion++, filtro);
+                stmt.setString(posicion++, filtro);
+                stmt.setString(posicion++, filtro);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Comentario comentario = mapear(rs);
+
+                    comentario.setNombreUsuario(
+                            rs.getString("NombreUsuario")
+                    );
+
+                    comentario.setTituloTicket(
+                            rs.getString("TituloTicket")
+                    );
+
+                    comentarios.add(comentario);
+                }
+            }
+
+            return comentarios;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error buscando comentarios",
+                    e
+            );
+        }
+    }
 }

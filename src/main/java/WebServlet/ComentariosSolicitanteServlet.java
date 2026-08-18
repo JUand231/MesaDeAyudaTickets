@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @WebServlet("/comentarios")
-public class ComentariosServlet extends HttpServlet {
+public class ComentariosSolicitanteServlet extends HttpServlet {
 
     @Override
     protected void doGet(

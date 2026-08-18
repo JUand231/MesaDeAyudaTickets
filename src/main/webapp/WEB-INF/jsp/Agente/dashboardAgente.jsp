@@ -16,7 +16,7 @@
 
 
             <div class="marca">
-                <div class="marca-icono"><span>⌁</span></div>
+                <div class="marca-icono"><span>🌐</span></div>
                 <div class="marca-texto">
                     <strong>MESA DE AYUDA</strong>
                     <small>CIMM · SENA</small>

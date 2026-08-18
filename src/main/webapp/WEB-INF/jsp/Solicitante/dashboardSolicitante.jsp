@@ -16,7 +16,7 @@
         <aside class="sidebar" id="sidebar">
 
             <div class="marca">
-                <div class="marca-icono"><span>⌁</span></div>
+                <div class="marca-icono"><span>🌐</span></div>
                 <div class="marca-texto">
                     <strong>MESA DE AYUDA</strong>
                     <small>CIMM · SENA</small>
@@ -37,7 +37,7 @@
 
                 <a href="${pageContext.request.contextPath}/comentarios"
                    class="menu-item">
-                    <span>●</span><label>Comentarios</label>
+                    <span>🧑‍💻</span><label>Comentarios</label>
                 </a>
 
                 <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="menu-item">
