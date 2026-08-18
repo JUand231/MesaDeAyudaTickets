@@ -527,14 +527,8 @@ public class ComentarioRepositoryJdbc
                         "ADMINISTRADOR"
                 );
                 break;
-
-            default:
-                comentario.setNombreRol(
-                        "USUARIO"
-                );
-                break;
         }
-
         return comentario;
     }
+
 }

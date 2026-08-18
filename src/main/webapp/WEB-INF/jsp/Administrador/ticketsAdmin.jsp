@@ -4,22 +4,15 @@
 <!DOCTYPE html>
 
 <html lang="es">
-
     <head>
-
         <meta charset="UTF-8">
-
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0">
-
         <title>
             Tickets | Mesa de Ayuda
         </title>
-
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/css/estilo.css">
-
-
         <!-- ==========================================================
              CSS ESPECÍFICO DE ESTA PÁGINA
              ========================================================== -->
@@ -255,180 +248,66 @@
     <body>
 
 
-        <!-- ==========================================================
-             SIDEBAR
-             ========================================================== -->
-
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
 
-
             <div class="marca">
-
-                <div class="marca-icono">
-                    <span>🌐</span>
-                </div>
-
+                <div class="marca-icono"><span>🌐</span></div>
                 <div class="marca-texto">
-
-                    <strong>
-                        MESA DE AYUDA
-                    </strong>
-
-                    <small>
-                        CIMM · SENA
-                    </small>
-
+                    <strong>MESA DE AYUDA</strong>
+                    <small>CIMM · SENA</small>
                 </div>
-
             </div>
 
-
-            <div class="menu-titulo">
-                PRINCIPAL
-            </div>
-
+            <div class="menu-titulo">PRINCIPAL</div>
 
             <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/dashboardAdmin"
-                   class="menu-item">
-
-                    <span>⌂</span>
-
-                    <label>
-                        Dashboard
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/dashboardAdmin" class="menu-item">
+                    <span>⌂</span><label>Dashboard</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/tickets"
-                   class="menu-item activo">
-
-                    <span>▣</span>
-
-                    <label>
-                        Tickets
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/tickets" class="menu-item activo">
+                    <span>🏷</span><label>Tickets</label>
                 </a>
-
             </nav>
 
-
-            <div class="menu-titulo">
-                ADMINISTRACIÓN
-            </div>
-
+            <div class="menu-titulo">ADMINISTRACIÓN</div>
 
             <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/agentes"
-                   class="menu-item">
-
-                    <span>♟</span>
-
-                    <label>
-                        Agentes
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/admin/agentes" class="menu-item">
+                    <span>♟</span><label>Agentes</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/categorias"
-                   class="menu-item">
-
-                    <span>◇</span>
-
-                    <label>
-                        Categorías
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/categorias" class="menu-item">
+                    <span>▥</span><label>Categorías</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/reportes"
-                   class="menu-item">
-
-                    <span>▥</span>
-
-                    <label>
-                        Reportes
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item">
+                    <span>🖂️</span><label>Comentarios</label>
                 </a>
-
-
-                <a href="${pageContext.request.contextPath}/usuarios"
-                   class="menu-item">
-
-                    <span>●</span>
-
-                    <label>
-                        Comentarios
-                    </label>
-
-                </a>
-
             </nav>
 
-
-            <div class="menu-titulo">
-                SISTEMA
-            </div>
-
+            <div class="menu-titulo">SISTEMA</div>
 
             <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/perfil"
-                   class="menu-item">
-
-                    <span>⚙</span>
-
-                    <label>
-                        Mi Perfil
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
+                    <span>⚙</span><label>Mi Perfil</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/CerrarSesion"
-                   class="menu-item">
-
-                    <span>↪</span>
-
-                    <label>
-                        Cerrar sesión
-                    </label>
-
+                <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
+                    <span>↪</span><label>Cerrar sesión</label>
                 </a>
-
             </nav>
-
 
             <div class="usuario-sidebar">
-
-                <div class="usuario-avatar">
-                    A
-                </div>
-
+                <div class="usuario-avatar">A</div>
                 <div>
-
-                    <strong>
-                        Administrador
-                    </strong>
-
-                    <small>
-                        Administrador
-                    </small>
-
+                    <strong>Administrador</strong>
+                    <small>Administrador</small>
                 </div>
-
             </div>
 
         </aside>
-
-
 
         <!-- ==========================================================
              CONTENIDO PRINCIPAL

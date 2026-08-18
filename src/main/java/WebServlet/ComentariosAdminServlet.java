@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import repositorio.TicketRepository;
+import modelo.Ticket;
+import repositorio.TicketRepository;
 
 @WebServlet("/comentariosAdmin")
 public class ComentariosAdminServlet extends HttpServlet {
@@ -36,7 +39,7 @@ public class ComentariosAdminServlet extends HttpServlet {
 
         int idRol = (Integer) session.getAttribute("idRol");
 
-        // Administrador
+        // Solo administrador
         if (idRol != 3) {
 
             response.sendError(
@@ -52,29 +55,63 @@ public class ComentariosAdminServlet extends HttpServlet {
                         .getAttribute(
                                 AppContextListener.COMENTARIO_REPOSITORY
                         );
-
         if (comentarioRepository == null) {
             throw new ServletException(
                     "ComentarioRepository no está configurado"
             );
         }
 
-        List<Comentario> comentarios
-                = comentarioRepository.listarTodos();
-
-        System.out.println("COMENTARIOS ENCONTRADOS: " + comentarios.size());
-
-        for (Comentario c : comentarios) {
-            System.out.println(
-                    "Comentario: "
-                    + c.getIdComentario()
-                    + " | Usuario: "
-                    + c.getNombreUsuario()
-                    + " | Ticket: "
-                    + c.getIdTicket()
+// ==========================================
+// TICKETS (para el select "Agregar comentario")
+// ==========================================
+        TicketRepository ticketRepository
+                = (TicketRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.TICKET_REPOSITORY );
+        if (ticketRepository == null) {
+            throw new ServletException(
+                    "TicketRepository no está configurado"
             );
         }
 
+        List<Ticket> tickets = ticketRepository.listarTodos();
+        request.setAttribute("tickets", tickets);
+
+        // ==========================================
+        // FILTROS
+        // ==========================================
+        String buscar = request.getParameter("buscar");
+        String rol = request.getParameter("rol");
+
+        System.out.println("=================================");
+        System.out.println("PARAMETRO buscar = [" + buscar + "]");
+        System.out.println("PARAMETRO rol = [" + rol + "]");
+        System.out.println("=================================");
+
+        // Evitamos null
+        if (buscar == null) {
+            buscar = "";
+        }
+
+        if (rol == null) {
+            rol = "";
+        }
+
+        // ==========================================
+        // BUSCAR COMENTARIOS
+        // ==========================================
+        List<Comentario> comentarios
+                = comentarioRepository.buscarAdmin(buscar, rol);
+
+        System.out.println(
+                "BUSQUEDA: [" + buscar + "]"
+                + " | ROL: [" + rol + "]"
+                + " | RESULTADOS: " + comentarios.size()
+        );
+
+        // ==========================================
+        // ENVIAR A JSP
+        // ==========================================
         request.setAttribute(
                 "comentarios",
                 comentarios

@@ -10,9 +10,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
     </head>
     <body>
-        <!-- ==================================================
-             SIDEBAR
-        ================================================== -->
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
 
             <div class="marca">
@@ -38,19 +36,15 @@
             <div class="menu-titulo">ADMINISTRACIÓN</div>
 
             <nav class="menu">
-                <a href="${pageContext.request.contextPath}/agentes" class="menu-item">
+                <a href="${pageContext.request.contextPath}/admin/agentes" class="menu-item">
                     <span>♟</span><label>Agentes</label>
                 </a>
 
                 <a href="${pageContext.request.contextPath}/categorias" class="menu-item activo">
-                    <span>◇</span><label>Categorías</label>
+                    <span>▥</span><label>Categorías</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/reportes" class="menu-item">
-                    <span>▥</span><label>Reportes</label>
-                </a>
-
-                <a href="${pageContext.request.contextPath}/usuarios" class="menu-item">
+                <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item">
                     <span>🖂️</span><label>Comentarios</label>
                 </a>
             </nav>
@@ -91,7 +85,6 @@
                 </div>
 
                 <div class="barra-acciones">
-                    <!-- BOTÓN AGREGADO PARA ABRIR MODAL -->
                     <button class="btn-guardar" onclick="abrirModalCategoria()">
                         + Nueva Categoría
                     </button>
@@ -113,23 +106,7 @@
                     <div class="icono-resumen azul">◇</div>
                     <div>
                         <span>Total categorías</span>
-                        <strong>${totalCategorias != null ? totalCategorias : 6}</strong>
-                    </div>
-                </div>
-
-                <div class="card-categoria-resumen">
-                    <div class="icono-resumen verde">✓</div>
-                    <div>
-                        <span>Categorías activas</span>
-                        <strong>${categoriasActivas != null ? categoriasActivas : 6}</strong>
-                    </div>
-                </div>
-
-                <div class="card-categoria-resumen">
-                    <div class="icono-resumen morado">▣</div>
-                    <div>
-                        <span>Tickets clasificados</span>
-                        <strong>${totalTicketsClasificados != null ? totalTicketsClasificados : 248}</strong>
+                        <strong>${totalCategorias != null ? totalCategorias : 0}</strong>
                     </div>
                 </div>
 
@@ -164,29 +141,23 @@
                                 <article class="categoria-card">
                                     <div class="categoria-card-superior">
                                         <div class="categoria-icono azul">◈</div>
-                                        <span class="estado-categoria ${cat.estado ? 'activa' : 'inactiva'}">
-                                            ${cat.estado ? 'Activa' : 'Inactiva'}
-                                        </span>
                                     </div>
 
                                     <div class="categoria-info">
-                                        <h3>${cat.nombre}</h3>
-                                        <p>${cat.descripcion}</p>
+                                        <h3>${cat.nombreCategoria}</h3>
                                     </div>
 
                                     <div class="categoria-footer">
-                                        <span><strong>${cat.totalTickets}</strong> tickets</span>
-
                                         <div class="categoria-acciones">
-                                            <button class="accion-categoria editar" 
-                                                    title="Editar" 
-                                                    onclick="editarCategoria('${cat.id}', '${cat.nombre}')">
+                                            <button class="accion-categoria editar"
+                                                    title="Editar"
+                                                    onclick="editarCategoria('${cat.idCategoria}', '${cat.nombreCategoria}')">
                                                 ✎
                                             </button>
 
-                                            <button class="accion-categoria eliminar" 
-                                                    title="Eliminar" 
-                                                    onclick="eliminarCategoria('${cat.id}')">
+                                            <button class="accion-categoria eliminar"
+                                                    title="Eliminar"
+                                                    onclick="eliminarCategoria('${cat.idCategoria}')">
                                                 ×
                                             </button>
                                         </div>
@@ -195,24 +166,7 @@
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <!-- VISTA POR DEFECTO / FALLBACK EN CASO DE NO HABER ATRIBUTOS DE SESIÓN -->
-                            <article class="categoria-card">
-                                <div class="categoria-card-superior">
-                                    <div class="categoria-icono azul">◈</div>
-                                    <span class="estado-categoria activa">Activa</span>
-                                </div>
-                                <div class="categoria-info">
-                                    <h3>Hardware</h3>
-                                    <p>Problemas relacionados con equipos, computadores y dispositivos físicos.</p>
-                                </div>
-                                <div class="categoria-footer">
-                                    <span><strong>58</strong> tickets</span>
-                                    <div class="categoria-acciones">
-                                        <button class="accion-categoria editar" title="Editar">✎</button>
-                                        <button class="accion-categoria eliminar" title="Eliminar">×</button>
-                                    </div>
-                                </div>
-                            </article>
+                            <p style="padding: 20px; color: #888;">No hay categorías registradas todavía.</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -261,6 +215,45 @@
         </div>
 
         <!-- ==================================================
+             MODAL EDITAR CATEGORÍA
+        ================================================== -->
+
+        <div class="modal-overlay" id="modalEditarCategoria">
+            <div class="modal-categoria">
+                <button class="modal-cerrar" onclick="cerrarModalEditar()">×</button>
+
+                <div class="modal-icono">✎</div>
+
+                <h2>Editar categoría</h2>
+                <p>Actualiza el nombre de la categoría.</p>
+
+                <form action="${pageContext.request.contextPath}/categorias" method="post">
+                    <input type="hidden" name="accion" value="editar">
+                    <input type="hidden" name="idCategoria" id="editIdCategoria">
+
+                    <div class="campo-modal">
+                        <label for="editNombreCategoria">Nombre de la categoría</label>
+                        <input type="text"
+                               id="editNombreCategoria"
+                               name="nombreCategoria"
+                               maxlength="80"
+                               required>
+                    </div>
+
+                    <div class="modal-botones">
+                        <button type="button" class="btn-cancelar" onclick="cerrarModalEditar()">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn-guardar">
+                            Guardar cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================================================
              SCRIPTS
         ================================================== -->
         <script>
@@ -272,26 +265,29 @@
                 document.getElementById("modalCategoria").classList.remove("mostrar");
             }
 
+            function editarCategoria(id, nombre) {
+                document.getElementById("editIdCategoria").value = id;
+                document.getElementById("editNombreCategoria").value = nombre;
+                document.getElementById("modalEditarCategoria").classList.add("mostrar");
+            }
+
+            function cerrarModalEditar() {
+                document.getElementById("modalEditarCategoria").classList.remove("mostrar");
+            }
+
             function filtrarCategorias() {
                 const texto = document.getElementById("buscarCategoria").value.toLowerCase();
                 const categorias = document.querySelectorAll(".categoria-card");
 
                 categorias.forEach(function (categoria) {
                     const nombre = categoria.querySelector("h3").textContent.toLowerCase();
-                    const descripcion = categoria.querySelector("p") ? categoria.querySelector("p").textContent.toLowerCase() : "";
 
-                    if (nombre.includes(texto) || descripcion.includes(texto)) {
+                    if (nombre.includes(texto)) {
                         categoria.style.display = "";
                     } else {
                         categoria.style.display = "none";
                     }
                 });
-            }
-
-            // Carga modal de edición o confirmación de borrado
-            function editarCategoria(id, nombre) {
-                console.log("Editar categoría:", id, nombre);
-                // Lógica de apertura de modal con datos pre-cargados
             }
 
             function eliminarCategoria(id) {
@@ -300,10 +296,15 @@
                 }
             }
 
-            // Cerrar al hacer clic en el backdrop
             document.getElementById("modalCategoria").addEventListener("click", function (e) {
                 if (e.target === this) {
                     cerrarModalCategoria();
+                }
+            });
+
+            document.getElementById("modalEditarCategoria").addEventListener("click", function (e) {
+                if (e.target === this) {
+                    cerrarModalEditar();
                 }
             });
         </script>
