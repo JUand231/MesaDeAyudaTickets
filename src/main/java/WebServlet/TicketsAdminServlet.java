@@ -6,7 +6,6 @@ import modelo.Categoria;
 import modelo.Prioridad;
 import modelo.Ticket;
 import modelo.Usuario;
-import WebServlet.AppContextListener;
 import repositorio.CategoriaRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
@@ -17,6 +16,7 @@ import java.sql.SQLException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,161 +27,582 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/tickets")
 public class TicketsAdminServlet extends HttpServlet {
 
+    // ==========================================================
+    // GET
+    // LISTAR TICKETS
+    // ==========================================================
     @Override
-    protected void doGet(HttpServletRequest request,
+    protected void doGet(
+            HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        // ==========================================================
+        // VALIDAR SESIÓN
+        // ==========================================================
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("idUsuario") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+
+        if (session == null
+                || session.getAttribute("idUsuario") == null) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login");
+
             return;
         }
 
-        int idUsuario = (Integer) session.getAttribute("idUsuario");
-        int idRol = (Integer) session.getAttribute("idRol");
+        int idUsuario
+                = (Integer) session.getAttribute("idUsuario");
 
-        TicketService ticketService = (TicketService) getServletContext().getAttribute(AppContextListener.TICKET_SERVICE);
-        CategoriaRepository categoriaRepository = (CategoriaRepository) getServletContext().getAttribute(AppContextListener.CATEGORIA_REPOSITORY);
-        PrioridadRepository prioridadRepository = (PrioridadRepository) getServletContext().getAttribute(AppContextListener.PRIORIDAD_REPOSITORY);
-        UsuarioRepository usuarioRepository = (UsuarioRepository) getServletContext().getAttribute(AppContextListener.USUARIO_REPOSITORY);
+        int idRol
+                = (Integer) session.getAttribute("idRol");
 
+        // ==========================================================
+        // OBTENER SERVICIOS Y REPOSITORIOS
+        // ==========================================================
+        TicketService ticketService
+                = (TicketService) getServletContext()
+                        .getAttribute(
+                                AppContextListener.TICKET_SERVICE);
+
+        CategoriaRepository categoriaRepository
+                = (CategoriaRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.CATEGORIA_REPOSITORY);
+
+        PrioridadRepository prioridadRepository
+                = (PrioridadRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.PRIORIDAD_REPOSITORY);
+
+        UsuarioRepository usuarioRepository
+                = (UsuarioRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.USUARIO_REPOSITORY);
+
+        if (ticketService == null
+                || categoriaRepository == null
+                || prioridadRepository == null
+                || usuarioRepository == null) {
+
+            throw new ServletException(
+                    "Los componentes necesarios no están configurados.");
+        }
+
+        // ==========================================================
+        // OBTENER TICKETS SEGÚN EL ROL
+        // ==========================================================
         List<Ticket> tickets;
 
         switch (idRol) {
-            case 1: // solicitante: solo los suyos
-                tickets = ticketService.listarPorSolicitante(idUsuario);
+
+            case 1:
+                // SOLICITANTE
+                tickets
+                        = ticketService.listarPorSolicitante(
+                                idUsuario);
                 break;
-            case 2: // agente: solo los asignados a el
-                tickets = ticketService.listarPorAgente(idUsuario);
+
+            case 2:
+                // AGENTE
+                tickets
+                        = ticketService.listarPorAgente(
+                                idUsuario);
                 break;
-            default: // administrador: todos
-                tickets = ticketService.listarTodos();
+
+            default:
+                // ADMINISTRADOR
+                tickets
+                        = ticketService.listarTodos();
                 break;
         }
 
-        List<TicketDTO> ticketsDTO = new ArrayList<>();
+        // ==========================================================
+        // CONVERTIR TICKETS A DTO
+        // ==========================================================
+        List<TicketDTO> ticketsDTO
+                = new ArrayList<>();
 
         try {
+
             for (Ticket ticket : tickets) {
 
-                String nombreCategoria = categoriaRepository.buscarPorId(ticket.getIdCategoria())
-                        .map(Categoria::getNombreCategoria)
-                        .orElse("Categoria #" + ticket.getIdCategoria());
+                // --------------------------------------------------
+                // CATEGORÍA
+                // --------------------------------------------------
+                String nombreCategoria
+                        = categoriaRepository
+                                .buscarPorId(
+                                        ticket.getIdCategoria())
+                                .map(
+                                        Categoria::getNombreCategoria)
+                                .orElse(
+                                        "Categoria #"
+                                        + ticket.getIdCategoria());
 
-                String nombrePrioridad = prioridadRepository.buscarPorId(ticket.getIdPrioridad())
-                        .map(Prioridad::getTipo)
-                        .orElse("Prioridad #" + ticket.getIdPrioridad());
+                // --------------------------------------------------
+                // PRIORIDAD
+                // --------------------------------------------------
+                String nombrePrioridad
+                        = prioridadRepository
+                                .buscarPorId(
+                                        ticket.getIdPrioridad())
+                                .map(
+                                        Prioridad::getTipo)
+                                .orElse(
+                                        "Prioridad #"
+                                        + ticket.getIdPrioridad());
 
-                String nombreSolicitante = usuarioRepository.buscarPorId(ticket.getIdSolicitante())
-                        .map(Usuario::getNombre)
-                        .orElse("Usuario #" + ticket.getIdSolicitante());
+                // --------------------------------------------------
+                // SOLICITANTE
+                // --------------------------------------------------
+                String nombreSolicitante
+                        = usuarioRepository
+                                .buscarPorId(
+                                        ticket.getIdSolicitante())
+                                .map(
+                                        Usuario::getNombre)
+                                .orElse(
+                                        "Usuario #"
+                                        + ticket.getIdSolicitante());
 
+                // --------------------------------------------------
+                // AGENTE
+                // --------------------------------------------------
                 String nombreAgente = null;
+
                 if (ticket.getIdAgente() != null) {
-                    nombreAgente = usuarioRepository.buscarPorId(ticket.getIdAgente())
-                            .map(Usuario::getNombre)
-                            .orElse("Usuario #" + ticket.getIdAgente());
+
+                    nombreAgente
+                            = usuarioRepository
+                                    .buscarPorId(
+                                            ticket.getIdAgente())
+                                    .map(
+                                            Usuario::getNombre)
+                                    .orElse(
+                                            "Usuario #"
+                                            + ticket.getIdAgente());
                 }
 
-                ticketsDTO.add(TicketMapper.aDTO(ticket, nombreCategoria, nombrePrioridad,
-                        nombreSolicitante, nombreAgente));
+                // --------------------------------------------------
+                // CREAR DTO
+                // --------------------------------------------------
+                ticketsDTO.add(
+                        TicketMapper.aDTO(
+                                ticket,
+                                nombreCategoria,
+                                nombrePrioridad,
+                                nombreSolicitante,
+                                nombreAgente));
             }
+
         } catch (SQLException e) {
-            throw new ServletException("Error consultando datos relacionados del ticket", e);
+
+            throw new ServletException(
+                    "Error consultando datos relacionados del ticket.",
+                    e);
         }
 
-        // ==================================================
+        // ==========================================================
         // FILTROS
-        // ==================================================
-        String buscar = request.getParameter("buscar");
-        String estado = request.getParameter("estado");
-        String prioridad = request.getParameter("prioridad");
-        String categoria = request.getParameter("categoria");
+        // ==========================================================
+        String buscar
+                = request.getParameter("buscar");
 
-        List<TicketDTO> ticketsFiltrados = new ArrayList<>();
+        String estado
+                = request.getParameter("estado");
+
+        String prioridad
+                = request.getParameter("prioridad");
+
+        String categoria
+                = request.getParameter("categoria");
+
+        List<TicketDTO> ticketsFiltrados
+                = new ArrayList<>();
 
         for (TicketDTO dto : ticketsDTO) {
 
-            if (buscar != null && !buscar.trim().isEmpty()) {
-                String textoBusqueda = buscar.trim().toLowerCase();
-                String titulo = dto.getTitulo() != null ? dto.getTitulo().toLowerCase() : "";
-                String descripcion = dto.getDescripcion() != null ? dto.getDescripcion().toLowerCase() : "";
-                String idTexto = "tk-" + dto.getIdTicket();
+            // ------------------------------------------------------
+            // BUSCAR
+            // ------------------------------------------------------
+            if (buscar != null
+                    && !buscar.trim().isEmpty()) {
 
-                boolean coincide = titulo.contains(textoBusqueda)
+                String textoBusqueda
+                        = buscar.trim().toLowerCase();
+
+                String titulo
+                        = dto.getTitulo() != null
+                        ? dto.getTitulo().toLowerCase()
+                        : "";
+
+                String descripcion
+                        = dto.getDescripcion() != null
+                        ? dto.getDescripcion().toLowerCase()
+                        : "";
+
+                String idTexto
+                        = "tk-" + dto.getIdTicket();
+
+                boolean coincide
+                        = titulo.contains(textoBusqueda)
                         || descripcion.contains(textoBusqueda)
                         || idTexto.contains(textoBusqueda)
-                        || String.valueOf(dto.getIdTicket()).contains(textoBusqueda);
+                        || String.valueOf(
+                                dto.getIdTicket())
+                                .contains(textoBusqueda);
 
                 if (!coincide) {
                     continue;
                 }
             }
 
-            if (estado != null && !estado.trim().isEmpty()
-                    && !normalizar(dto.getEstado()).equals(normalizar(estado))) {
+            // ------------------------------------------------------
+            // ESTADO
+            // ------------------------------------------------------
+            if (estado != null
+                    && !estado.trim().isEmpty()
+                    && !normalizar(
+                            dto.getEstado())
+                            .equals(
+                                    normalizar(estado))) {
+
                 continue;
             }
 
-            if (prioridad != null && !prioridad.trim().isEmpty()
-                    && !normalizar(dto.getNombrePrioridad()).equals(normalizar(prioridad))) {
+            // ------------------------------------------------------
+            // PRIORIDAD
+            // ------------------------------------------------------
+            if (prioridad != null
+                    && !prioridad.trim().isEmpty()
+                    && !normalizar(
+                            dto.getNombrePrioridad())
+                            .equals(
+                                    normalizar(prioridad))) {
+
                 continue;
             }
 
-            if (categoria != null && !categoria.trim().isEmpty()
-                    && !normalizar(dto.getNombreCategoria()).equals(normalizar(categoria))) {
+            // ------------------------------------------------------
+            // CATEGORÍA
+            // ------------------------------------------------------
+            if (categoria != null
+                    && !categoria.trim().isEmpty()
+                    && !normalizar(
+                            dto.getNombreCategoria())
+                            .equals(
+                                    normalizar(categoria))) {
+
                 continue;
             }
 
             ticketsFiltrados.add(dto);
         }
 
-        request.setAttribute("tickets", ticketsFiltrados);
-        request.setAttribute("totalTickets", ticketsFiltrados.size());
+        // ==========================================================
+        // ENVIAR TICKETS AL JSP
+        // ==========================================================
+        request.setAttribute(
+                "tickets",
+                ticketsFiltrados);
 
-        // Para que el formulario recuerde lo que el usuario filtró
-        request.setAttribute("filtroBuscar", buscar);
-        request.setAttribute("filtroEstado", estado);
-        request.setAttribute("filtroPrioridad", prioridad);
-        request.setAttribute("filtroCategoria", categoria);
+        request.setAttribute(
+                "totalTickets",
+                ticketsFiltrados.size());
 
+        request.setAttribute(
+                "filtroBuscar",
+                buscar);
+
+        request.setAttribute(
+                "filtroEstado",
+                estado);
+
+        request.setAttribute(
+                "filtroPrioridad",
+                prioridad);
+
+        request.setAttribute(
+                "filtroCategoria",
+                categoria);
+
+        // ==========================================================
+        // CARGAR AGENTES DISPONIBLES
+        // SOLO ADMINISTRADOR
+        // ==========================================================
+        if (idRol != 1 && idRol != 2) {
+
+            try {
+
+                List<Usuario> agentes
+                        = usuarioRepository.listarAgentes();
+
+                request.setAttribute(
+                        "agentes",
+                        agentes);
+
+            } catch (SQLException e) {
+
+                throw new ServletException(
+                        "Error consultando los agentes.",
+                        e);
+            }
+        }
+
+        // ==========================================================
+        // SELECCIONAR JSP SEGÚN ROL
+        // ==========================================================
         if (idRol == 1) {
 
-            // SOLICITANTE
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Solicitante/ticketsSolicitante.jsp")
-                    .forward(request, response);
+                    .forward(
+                            request,
+                            response);
 
         } else if (idRol == 2) {
 
-            // AGENTE
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Agente/ticketsAgente.jsp")
-                    .forward(request, response);
+                    .forward(
+                            request,
+                            response);
 
         } else {
 
-            // ADMINISTRADOR
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Administrador/ticketsAdmin.jsp")
-                    .forward(request, response);
+                    .forward(
+                            request,
+                            response);
         }
-
     }
 
-    /**
-     * Normaliza texto para poder comparar valores que vienen del formulario
-     * (con tildes y espacios) contra los que están guardados en base de datos
-     * (en mayúsculas, sin tildes y con guion bajo). Ej: "En proceso" ->
-     * "EN_PROCESO", "Crítica" -> "CRITICA"
-     */
+    // ==========================================================
+    // POST
+    // ASIGNAR AGENTE
+    // NUEVO -> ASIGNADO
+    // ==========================================================
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // ==========================================================
+        // VALIDAR SESIÓN
+        // ==========================================================
+        HttpSession session
+                = request.getSession(false);
+
+        if (session == null
+                || session.getAttribute("idUsuario") == null) {
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/login");
+
+            return;
+        }
+
+        // ==========================================================
+        // OBTENER ROL
+        // ==========================================================
+        int idRol
+                = (Integer) session.getAttribute("idRol");
+
+        // ==========================================================
+        // SOLO ADMINISTRADOR
+        // ==========================================================
+        if (idRol == 1 || idRol == 2) {
+
+            response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "No tienes permisos para asignar agentes.");
+
+            return;
+        }
+
+        // ==========================================================
+        // DATOS DEL FORMULARIO
+        // ==========================================================
+        String idTicketStr
+                = request.getParameter("idTicket");
+
+        String idAgenteStr
+                = request.getParameter("idAgente");
+
+        if (idTicketStr == null
+                || idAgenteStr == null
+                || idTicketStr.trim().isEmpty()
+                || idAgenteStr.trim().isEmpty()) {
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/tickets");
+
+            return;
+        }
+
+        int idTicket;
+        int idAgente;
+
+        try {
+
+            idTicket
+                    = Integer.parseInt(
+                            idTicketStr);
+
+            idAgente
+                    = Integer.parseInt(
+                            idAgenteStr);
+
+        } catch (NumberFormatException e) {
+
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "El ID del ticket o del agente no es válido.");
+
+            return;
+        }
+
+        // ==========================================================
+        // OBTENER SERVICIOS
+        // ==========================================================
+        TicketService ticketService
+                = (TicketService) getServletContext()
+                        .getAttribute(
+                                AppContextListener.TICKET_SERVICE);
+
+        UsuarioRepository usuarioRepository
+                = (UsuarioRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.USUARIO_REPOSITORY);
+
+        if (ticketService == null
+                || usuarioRepository == null) {
+
+            throw new ServletException(
+                    "TicketService o UsuarioRepository no están configurados.");
+        }
+
+        try {
+
+            // ======================================================
+            // BUSCAR TICKET
+            // ======================================================
+            Ticket ticket
+                    = ticketService.buscarPorId(
+                            idTicket);
+
+            // ======================================================
+            // VALIDAR ESTADO
+            // SOLO NUEVO PUEDE SER ASIGNADO
+            // ======================================================
+            if (!"NUEVO".equals(
+                    ticket.getEstadoNombre())) {
+
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Solo se pueden asignar agentes a tickets NUEVO.");
+
+                return;
+            }
+
+            // ======================================================
+            // BUSCAR AGENTE
+            // ======================================================
+            Usuario agente
+                    = usuarioRepository
+                            .buscarPorId(
+                                    idAgente)
+                            .orElseThrow(
+                                    ()
+                                    -> new IllegalArgumentException(
+                                            "No existe el agente seleccionado."));
+
+            // ======================================================
+            // VALIDAR QUE REALMENTE SEA AGENTE
+            // ======================================================
+            if (agente.getIdRol() != 2) {
+
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "El usuario seleccionado no es un agente.");
+
+                return;
+            }
+
+            // ======================================================
+            // BUSCAR SOLICITANTE
+            // ======================================================
+            Usuario solicitante
+                    = usuarioRepository
+                            .buscarPorId(
+                                    ticket.getIdSolicitante())
+                            .orElseThrow(
+                                    ()
+                                    -> new IllegalArgumentException(
+                                            "No se encontró el solicitante del ticket."));
+
+            // ======================================================
+            // ASIGNAR AGENTE
+            //
+            // El State Pattern ejecutará:
+            //
+            // NUEVO
+            //   ↓
+            // ASIGNADO
+            // ======================================================
+            ticketService.asignarAgente(
+                    idTicket,
+                    agente.getIdUsuario(),
+                    solicitante);
+
+            // ======================================================
+            // VOLVER A LA LISTA
+            // ======================================================
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/tickets");
+
+        } catch (SQLException e) {
+
+            throw new ServletException(
+                    "Error consultando usuarios para asignar el ticket.",
+                    e);
+
+        } catch (IllegalArgumentException e) {
+
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    e.getMessage());
+        }
+    }
+
+    // ==========================================================
+    // NORMALIZAR
+    // ==========================================================
     private String normalizar(String texto) {
+
         if (texto == null) {
             return "";
         }
-        String sinAcentos = Normalizer.normalize(texto, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-        return sinAcentos.trim().toUpperCase().replace(" ", "_");
+
+        String sinAcentos
+                = Normalizer.normalize(
+                        texto,
+                        Normalizer.Form.NFD)
+                        .replaceAll(
+                                "\\p{M}",
+                                "");
+
+        return sinAcentos
+                .trim()
+                .toUpperCase()
+                .replace(
+                        " ",
+                        "_");
     }
 }

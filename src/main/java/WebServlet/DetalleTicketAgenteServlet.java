@@ -3,17 +3,22 @@ package WebServlet;
 import dto.TicketDTO;
 import mapper.TicketMapper;
 import modelo.Categoria;
+import modelo.Comentario;
 import modelo.Prioridad;
 import modelo.Ticket;
 import modelo.Usuario;
 import repositorio.CategoriaRepository;
+import repositorio.ComentarioRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
-import repositorio.ComentarioRepository;
 import servicio.TicketService;
-import modelo.Comentario;
+
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,6 +28,9 @@ import javax.servlet.http.HttpSession;
 
 @WebServlet("/detalleTicket")
 public class DetalleTicketAgenteServlet extends HttpServlet {
+
+    private static final DateTimeFormatter FORMATO_SLA
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
     protected void doGet(
@@ -41,13 +49,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        int idUsuario
-                = (Integer) session.getAttribute("idUsuario");
+        int idUsuario = (Integer) session.getAttribute("idUsuario");
+        int idRol = (Integer) session.getAttribute("idRol");
 
-        int idRol
-                = (Integer) session.getAttribute("idRol");
-
-        // Solo puede entrar un agente
+        // ==================================================
+        // SOLO AGENTE
+        // ==================================================
         if (idRol != 2) {
 
             response.sendRedirect(
@@ -56,8 +63,10 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        String idParametro
-                = request.getParameter("id");
+        // ==================================================
+        // ID DEL TICKET
+        // ==================================================
+        String idParametro = request.getParameter("id");
 
         if (idParametro == null
                 || idParametro.trim().isEmpty()) {
@@ -72,8 +81,7 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
 
         try {
 
-            idTicket
-                    = Integer.parseInt(idParametro);
+            idTicket = Integer.parseInt(idParametro);
 
         } catch (NumberFormatException e) {
 
@@ -83,6 +91,9 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
+        // ==================================================
+        // SERVICIOS Y REPOSITORIOS
+        // ==================================================
         TicketService ticketService
                 = (TicketService) getServletContext()
                         .getAttribute(
@@ -108,12 +119,25 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                         .getAttribute(
                                 AppContextListener.COMENTARIO_REPOSITORY);
 
+        if (ticketService == null
+                || categoriaRepository == null
+                || prioridadRepository == null
+                || usuarioRepository == null
+                || comentarioRepository == null) {
+
+            throw new ServletException(
+                    "Los repositorios o servicios no están configurados");
+
+        }
+
+        // ==================================================
+        // BUSCAR TICKET
+        // ==================================================
         Ticket ticket;
 
         try {
 
-            ticket
-                    = ticketService.buscarPorId(idTicket);
+            ticket = ticketService.buscarPorId(idTicket);
 
         } catch (IllegalArgumentException e) {
 
@@ -123,54 +147,76 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
+        // ==================================================
+        // SEGURIDAD
+        // EL AGENTE SOLO VE SUS TICKETS
+        // ==================================================
         if (ticket.getIdAgente() == null
                 || ticket.getIdAgente() != idUsuario) {
 
-            response.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "No tienes permiso para ver este ticket.");
+            response.sendRedirect(
+                    request.getContextPath() + "/tickets");
 
             return;
         }
 
         try {
 
+            // ==================================================
+            // CATEGORÍA
+            // ==================================================
             String nombreCategoria
                     = categoriaRepository
-                            .buscarPorId(
-                                    ticket.getIdCategoria())
+                            .buscarPorId(ticket.getIdCategoria())
                             .map(Categoria::getNombreCategoria)
                             .orElse(
                                     "Categoria #"
                                     + ticket.getIdCategoria());
 
-            String nombrePrioridad
+            // ==================================================
+            // PRIORIDAD
+            // ==================================================
+            Prioridad prioridad
                     = prioridadRepository
-                            .buscarPorId(
-                                    ticket.getIdPrioridad())
-                            .map(Prioridad::getTipo)
-                            .orElse(
-                                    "Prioridad #"
-                                    + ticket.getIdPrioridad());
+                            .buscarPorId(ticket.getIdPrioridad())
+                            .orElse(null);
 
+            String nombrePrioridad
+                    = prioridad != null
+                            ? prioridad.getTipo()
+                            : "Prioridad #"
+                            + ticket.getIdPrioridad();
+
+            // ==================================================
+            // SOLICITANTE
+            // ==================================================
             String nombreSolicitante
                     = usuarioRepository
-                            .buscarPorId(
-                                    ticket.getIdSolicitante())
+                            .buscarPorId(ticket.getIdSolicitante())
                             .map(Usuario::getNombre)
                             .orElse(
                                     "Usuario #"
                                     + ticket.getIdSolicitante());
 
-            String nombreAgente
-                    = usuarioRepository
-                            .buscarPorId(
-                                    ticket.getIdAgente())
-                            .map(Usuario::getNombre)
-                            .orElse(
-                                    "Usuario #"
-                                    + ticket.getIdAgente());
+            // ==================================================
+            // AGENTE
+            // ==================================================
+            String nombreAgente = "Sin asignar";
 
+            if (ticket.getIdAgente() != null) {
+
+                nombreAgente
+                        = usuarioRepository
+                                .buscarPorId(ticket.getIdAgente())
+                                .map(Usuario::getNombre)
+                                .orElse(
+                                        "Usuario #"
+                                        + ticket.getIdAgente());
+            }
+
+            // ==================================================
+            // DTO
+            // ==================================================
             TicketDTO ticketDTO
                     = TicketMapper.aDTO(
                             ticket,
@@ -183,24 +229,48 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                     "ticket",
                     ticketDTO);
 
-            Usuario solicitante
-                    = usuarioRepository
-                            .buscarPorId(
-                                    ticket.getIdSolicitante())
-                            .orElse(null);
+            // ==================================================
+            // SLA
+            // ==================================================
+            if (prioridad != null) {
 
-            request.setAttribute(
-                    "solicitante",
-                    solicitante);
+                LocalDateTime fechaLimiteSLA
+                        = ticketService.calcularFechaLimiteSLA(
+                                ticket.getIdTicket(),
+                                prioridad);
 
-            if (comentarioRepository != null) {
+                boolean slaVencido
+                        = ticketService.estaVencido(
+                                ticket.getIdTicket(),
+                                prioridad);
 
                 request.setAttribute(
-                        "comentarios",
-                        comentarioRepository
-                                .listarPorTicket(idTicket));
+                        "horasSLA",
+                        prioridad.getHorasSLA());
+
+                request.setAttribute(
+                        "fechaLimiteSLA",
+                        fechaLimiteSLA.format(FORMATO_SLA));
+
+                request.setAttribute(
+                        "slaVencido",
+                        slaVencido);
             }
 
+            // ==================================================
+            // COMENTARIOS
+            // ==================================================
+            List<Comentario> comentarios
+                    = comentarioRepository
+                            .listarPorTicket(idTicket);
+
+            request.setAttribute(
+                    "comentarios",
+                    comentarios);
+
+            // ==================================================
+            // MOSTRAR JSP
+            // ==================================================
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Agente/detalleTicketAgente.jsp")
                     .forward(request, response);
@@ -213,14 +283,17 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         }
     }
 
+    // ==========================================================
+    // POST
+    // COMENTARIOS Y CAMBIOS DE ESTADO
+    // ==========================================================
     @Override
     protected void doPost(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session
-                = request.getSession(false);
+        HttpSession session = request.getSession(false);
 
         if (session == null
                 || session.getAttribute("idUsuario") == null) {
@@ -231,13 +304,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        int idUsuario
-                = (Integer) session.getAttribute("idUsuario");
+        int idUsuario = (Integer) session.getAttribute("idUsuario");
+        int idRol = (Integer) session.getAttribute("idRol");
 
-        int idRol
-                = (Integer) session.getAttribute("idRol");
-
-        // Solo agentes
+        // ==================================================
+        // SOLO AGENTE
+        // ==================================================
         if (idRol != 2) {
 
             response.sendRedirect(
@@ -246,14 +318,16 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        String idParametro
-                = request.getParameter("id");
-
-        String accion
-                = request.getParameter("accion");
+        // ==================================================
+        // DATOS DEL FORMULARIO
+        // ==================================================
+        String idParametro = request.getParameter("id");
+        String accion = request.getParameter("accion");
 
         if (idParametro == null
-                || idParametro.trim().isEmpty()) {
+                || idParametro.trim().isEmpty()
+                || accion == null
+                || accion.trim().isEmpty()) {
 
             response.sendRedirect(
                     request.getContextPath() + "/tickets");
@@ -265,8 +339,7 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
 
         try {
 
-            idTicket
-                    = Integer.parseInt(idParametro);
+            idTicket = Integer.parseInt(idParametro);
 
         } catch (NumberFormatException e) {
 
@@ -276,22 +349,34 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
+        // ==================================================
+        // SERVICIOS
+        // ==================================================
         TicketService ticketService
                 = (TicketService) getServletContext()
                         .getAttribute(
                                 AppContextListener.TICKET_SERVICE);
 
-        UsuarioRepository usuarioRepository
-                = (UsuarioRepository) getServletContext()
+        ComentarioRepository comentarioRepository
+                = (ComentarioRepository) getServletContext()
                         .getAttribute(
-                                AppContextListener.USUARIO_REPOSITORY);
+                                AppContextListener.COMENTARIO_REPOSITORY);
 
+        if (ticketService == null
+                || comentarioRepository == null) {
+
+            throw new ServletException(
+                    "Servicios o repositorios no configurados");
+        }
+
+        // ==================================================
+        // BUSCAR TICKET
+        // ==================================================
         Ticket ticket;
 
         try {
 
-            ticket
-                    = ticketService.buscarPorId(idTicket);
+            ticket = ticketService.buscarPorId(idTicket);
 
         } catch (IllegalArgumentException e) {
 
@@ -301,106 +386,128 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
+        // ==================================================
+        // SEGURIDAD
+        // SOLO EL AGENTE ASIGNADO
+        // ==================================================
         if (ticket.getIdAgente() == null
                 || ticket.getIdAgente() != idUsuario) {
 
             response.sendError(
                     HttpServletResponse.SC_FORBIDDEN,
-                    "No tienes permiso para modificar este ticket.");
+                    "No puedes modificar este ticket.");
 
             return;
         }
 
-        Usuario solicitante;
+        // ==================================================
+        // COMENTAR
+        // ==================================================
+        if ("comentar".equals(accion)) {
+
+            String texto = request.getParameter("texto");
+
+            if (texto == null
+                    || texto.trim().isEmpty()) {
+
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/detalleTicket?id="
+                        + idTicket);
+
+                return;
+            }
+
+            Comentario comentario
+                    = new Comentario(
+                            idTicket,
+                            idUsuario,
+                            texto.trim());
+
+            comentarioRepository.guardar(comentario);
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/detalleTicket?id="
+                    + idTicket);
+
+            return;
+        }
+
+        // ==================================================
+        // CAMBIAR ESTADO
+        // ==================================================
+        try {
+
+            switch (accion) {
+
+                case "iniciar":
+
+                    ticketService.iniciarAtencion(
+                            idTicket,
+                            obtenerSolicitante(ticket));
+
+                    break;
+
+                case "resolver":
+
+                    ticketService.resolver(
+                            idTicket,
+                            obtenerSolicitante(ticket));
+
+                    break;
+
+                default:
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Acción no válida.");
+
+                    return;
+            }
+
+        } catch (IllegalArgumentException e) {
+
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    e.getMessage());
+
+            return;
+        }
+
+        // ==================================================
+        // VOLVER AL DETALLE
+        // ==================================================
+        response.sendRedirect(
+                request.getContextPath()
+                + "/detalleTicket?id="
+                + idTicket);
+    }
+
+    // ==========================================================
+// OBTENER SOLICITANTE
+// ==========================================================
+    private Usuario obtenerSolicitante(Ticket ticket)
+            throws ServletException {
+
+        UsuarioRepository usuarioRepository
+                = (UsuarioRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.USUARIO_REPOSITORY);
 
         try {
 
-            solicitante
-                    = usuarioRepository
-                            .buscarPorId(
-                                    ticket.getIdSolicitante())
-                            .orElse(null);
+            return usuarioRepository
+                    .buscarPorId(ticket.getIdSolicitante())
+                    .orElseThrow(
+                            () -> new IllegalArgumentException(
+                                    "No se encontró el solicitante del ticket"));
 
         } catch (SQLException e) {
 
             throw new ServletException(
-                    "Error buscando al solicitante",
+                    "Error consultando el solicitante del ticket",
                     e);
-        }
-
-        if (solicitante == null) {
-
-            response.sendError(
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "No se encontró el solicitante del ticket.");
-
-            return;
-        }
-
-        try {
-
-            if ("iniciar".equals(accion)) {
-
-                ticketService.iniciarAtencion(
-                        idTicket,
-                        solicitante);
-
-            } else if ("resolver".equals(accion)) {
-
-                ticketService.resolver(
-                        idTicket,
-                        solicitante);
-
-            } else if ("comentar".equals(accion)) {
-
-                String texto
-                        = request.getParameter("texto");
-
-                if (texto == null
-                        || texto.trim().isEmpty()) {
-
-                    response.sendRedirect(
-                            request.getContextPath()
-                            + "/detalleTicket?id="
-                            + idTicket);
-
-                    return;
-                }
-
-                ComentarioRepository comentarioRepository
-                        = (ComentarioRepository) getServletContext()
-                                .getAttribute(
-                                        AppContextListener.COMENTARIO_REPOSITORY);
-
-                if (comentarioRepository == null) {
-
-                    throw new ServletException(
-                            "ComentarioRepository no está configurado");
-                }
-
-                Comentario comentario
-                        = new Comentario(
-                                idTicket,
-                                idUsuario,
-                                texto.trim());
-
-                comentarioRepository.guardar(comentario);
-            }
-
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/detalleTicket?id="
-                    + idTicket);
-
-        } catch (IllegalArgumentException e) {
-            request.setAttribute(
-                    "error",
-                    e.getMessage());
-
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/detalleTicket?id="
-                    + idTicket);
         }
     }
 }

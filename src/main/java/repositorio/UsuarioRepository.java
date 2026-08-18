@@ -1,14 +1,17 @@
 package repositorio;
 
 import modelo.Usuario;
-
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioRepository {
-    
+
     void actualizar(Usuario usuario) throws SQLException;
 
     Usuario validarLogin(String correo, String contrasena) throws SQLException;
 
-    java.util.Optional<Usuario> buscarPorId(int idUsuario) throws SQLException;
+    Optional<Usuario> buscarPorId(int idUsuario) throws SQLException;
+
+    List<Usuario> listarAgentes() throws SQLException;
 }
