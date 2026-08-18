@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface CategoriaRepository {
 
-    Optional<Categoria> buscarPorId(int idCategoria) throws SQLException;
+    Optional<Categoria> buscarPorId(int idCategoria);
 
     List<Categoria> listarTodas() throws SQLException;
 }

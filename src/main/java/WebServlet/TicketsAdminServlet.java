@@ -123,84 +123,75 @@ public class TicketsAdminServlet extends HttpServlet {
         List<TicketDTO> ticketsDTO
                 = new ArrayList<>();
 
-        try {
+        for (Ticket ticket : tickets) {
 
-            for (Ticket ticket : tickets) {
+            // --------------------------------------------------
+            // CATEGORÍA
+            // --------------------------------------------------
+            String nombreCategoria
+                    = categoriaRepository
+                            .buscarPorId(
+                                    ticket.getIdCategoria())
+                            .map(
+                                    Categoria::getNombreCategoria)
+                            .orElse(
+                                    "Categoria #"
+                                    + ticket.getIdCategoria());
 
-                // --------------------------------------------------
-                // CATEGORÍA
-                // --------------------------------------------------
-                String nombreCategoria
-                        = categoriaRepository
-                                .buscarPorId(
-                                        ticket.getIdCategoria())
-                                .map(
-                                        Categoria::getNombreCategoria)
-                                .orElse(
-                                        "Categoria #"
-                                        + ticket.getIdCategoria());
+            // --------------------------------------------------
+            // PRIORIDAD
+            // --------------------------------------------------
+            String nombrePrioridad
+                    = prioridadRepository
+                            .buscarPorId(
+                                    ticket.getIdPrioridad())
+                            .map(
+                                    Prioridad::getTipo)
+                            .orElse(
+                                    "Prioridad #"
+                                    + ticket.getIdPrioridad());
 
-                // --------------------------------------------------
-                // PRIORIDAD
-                // --------------------------------------------------
-                String nombrePrioridad
-                        = prioridadRepository
-                                .buscarPorId(
-                                        ticket.getIdPrioridad())
-                                .map(
-                                        Prioridad::getTipo)
-                                .orElse(
-                                        "Prioridad #"
-                                        + ticket.getIdPrioridad());
+            // --------------------------------------------------
+            // SOLICITANTE
+            // --------------------------------------------------
+            String nombreSolicitante
+                    = usuarioRepository
+                            .buscarPorId(
+                                    ticket.getIdSolicitante())
+                            .map(
+                                    Usuario::getNombre)
+                            .orElse(
+                                    "Usuario #"
+                                    + ticket.getIdSolicitante());
 
-                // --------------------------------------------------
-                // SOLICITANTE
-                // --------------------------------------------------
-                String nombreSolicitante
+            // --------------------------------------------------
+            // AGENTE
+            // --------------------------------------------------
+            String nombreAgente = null;
+
+            if (ticket.getIdAgente() != null) {
+
+                nombreAgente
                         = usuarioRepository
                                 .buscarPorId(
-                                        ticket.getIdSolicitante())
+                                        ticket.getIdAgente())
                                 .map(
                                         Usuario::getNombre)
                                 .orElse(
                                         "Usuario #"
-                                        + ticket.getIdSolicitante());
-
-                // --------------------------------------------------
-                // AGENTE
-                // --------------------------------------------------
-                String nombreAgente = null;
-
-                if (ticket.getIdAgente() != null) {
-
-                    nombreAgente
-                            = usuarioRepository
-                                    .buscarPorId(
-                                            ticket.getIdAgente())
-                                    .map(
-                                            Usuario::getNombre)
-                                    .orElse(
-                                            "Usuario #"
-                                            + ticket.getIdAgente());
-                }
-
-                // --------------------------------------------------
-                // CREAR DTO
-                // --------------------------------------------------
-                ticketsDTO.add(
-                        TicketMapper.aDTO(
-                                ticket,
-                                nombreCategoria,
-                                nombrePrioridad,
-                                nombreSolicitante,
-                                nombreAgente));
+                                        + ticket.getIdAgente());
             }
 
-        } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Error consultando datos relacionados del ticket.",
-                    e);
+            // --------------------------------------------------
+            // CREAR DTO
+            // --------------------------------------------------
+            ticketsDTO.add(
+                    TicketMapper.aDTO(
+                            ticket,
+                            nombreCategoria,
+                            nombrePrioridad,
+                            nombreSolicitante,
+                            nombreAgente));
         }
 
         // ==========================================================
@@ -534,44 +525,13 @@ public class TicketsAdminServlet extends HttpServlet {
                 return;
             }
 
-            // ======================================================
-            // BUSCAR SOLICITANTE
-            // ======================================================
-            Usuario solicitante
-                    = usuarioRepository
-                            .buscarPorId(
-                                    ticket.getIdSolicitante())
-                            .orElseThrow(
-                                    ()
-                                    -> new IllegalArgumentException(
-                                            "No se encontró el solicitante del ticket."));
-
-            // ======================================================
-            // ASIGNAR AGENTE
-            //
-            // El State Pattern ejecutará:
-            //
-            // NUEVO
-            //   ↓
-            // ASIGNADO
-            // ======================================================
             ticketService.asignarAgente(
                     idTicket,
-                    agente.getIdUsuario(),
-                    solicitante);
+                    agente.getIdUsuario());
 
-            // ======================================================
-            // VOLVER A LA LISTA
-            // ======================================================
             response.sendRedirect(
                     request.getContextPath()
                     + "/tickets");
-
-        } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Error consultando usuarios para asignar el ticket.",
-                    e);
 
         } catch (IllegalArgumentException e) {
 

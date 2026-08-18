@@ -13,17 +13,33 @@ import java.util.Optional;
 public class PrioridadRepositoryJdbc implements PrioridadRepository {
 
     @Override
-    public Optional<Prioridad> buscarPorId(int idPrioridad) throws SQLException {
-        String sql = "SELECT Id, Tipo, HorasSLA FROM Prioridad WHERE Id = ?";
-        try (Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
+    public Optional<Prioridad> buscarPorId(int idPrioridad) {
+
+        String sql = "SELECT Id, Tipo "
+                + "FROM Prioridad "
+                + "WHERE Id = ?";
+
+        try (
+                Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, idPrioridad);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
                     return Optional.of(mapear(rs));
                 }
+
                 return Optional.empty();
             }
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error buscando prioridad con id "
+                    + idPrioridad,
+                    e
+            );
         }
     }
 
@@ -44,7 +60,6 @@ public class PrioridadRepositoryJdbc implements PrioridadRepository {
         Prioridad prioridad = new Prioridad();
         prioridad.setIdPrioridad(rs.getInt("Id"));
         prioridad.setTipo(rs.getString("Tipo"));
-        prioridad.setHorasSLA(rs.getInt("HorasSLA"));
         return prioridad;
     }
 }

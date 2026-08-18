@@ -39,14 +39,14 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
     }
 
     @Override
-    public Optional<Usuario> buscarPorId(int idUsuario)
-            throws SQLException {
+    public Optional<Usuario> buscarPorId(int idUsuario) {
 
         String sql = "SELECT Id, Nombre, Correo, Contrasena, IdRol "
                 + "FROM Usuario "
                 + "WHERE Id = ?";
 
-        try (Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
+        try (
+                Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, idUsuario);
 
@@ -58,6 +58,13 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
 
                 return Optional.empty();
             }
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error buscando el usuario con id " + idUsuario,
+                    e
+            );
         }
     }
 

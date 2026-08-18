@@ -87,9 +87,21 @@
                 </div>
 
                 <div class="barra-acciones">
-                    <button class="btn-notificacion">
-                        🔔<span></span>
-                    </button>
+                    
+                    <a href="${pageContext.request.contextPath}/notificaciones"
+                       class="btn-notificacion"
+                       title="Notificaciones">
+
+                        🔔
+
+                        <c:if test="${notificacionesNoLeidas > 0}">
+                            <span class="contador-notificaciones">
+                                ${notificacionesNoLeidas}
+                            </span>
+                        </c:if>
+
+                    </a>
+
                 </div>
             </header>
 
@@ -168,7 +180,7 @@
 
                                 <c:if test="${empty ticketsRecientes}">
                                     <tr>
-                                        <td colspan="5">No hay tickets recientes.</td>
+                                        <td colspan="6">No hay tickets recientes.</td>
                                     </tr>
                                 </c:if>
 
@@ -221,7 +233,7 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        
+
                                         <td>${ticket.nombreSolicitante}</td>
                                         <td>${ticket.nombreAgente}</td>
                                     </tr>

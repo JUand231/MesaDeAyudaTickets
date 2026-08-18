@@ -83,9 +83,19 @@
 
                 <div class="barra-acciones">
 
-                    <button class="btn-notificacion">
-                        🔔<span></span>
-                    </button>
+                    <a href="${pageContext.request.contextPath}/notificaciones"
+                       class="btn-notificacion"
+                       title="Notificaciones">
+
+                        🔔
+
+                        <c:if test="${notificacionesNoLeidas > 0}">
+                            <span class="contador-notificaciones">
+                                ${notificacionesNoLeidas}
+                            </span>
+                        </c:if>
+
+                    </a>
 
                     <a href="${pageContext.request.contextPath}/ticket/nuevo" class="btn-principal">
                         ＋ Nuevo ticket

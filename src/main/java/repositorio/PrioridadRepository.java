@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface PrioridadRepository {
 
-    Optional<Prioridad> buscarPorId(int idPrioridad) throws SQLException;
+    Optional<Prioridad> buscarPorId(int idPrioridad);
 
     List<Prioridad> listarTodas() throws SQLException;
 }

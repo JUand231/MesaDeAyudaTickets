@@ -9,10 +9,9 @@ import modelo.Usuario;
 import repositorio.CategoriaRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
+import repositorio.NotificacionRepository;
 import servicio.TicketService;
-
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -63,7 +62,7 @@ public class DashboardSolicitanteServlet extends HttpServlet {
         }
 
         // ==========================================
-        // OBTENER SERVICIOS Y REPOSITORIOS
+        // OBTENER REPOSITORIOS Y SERVICIOS
         // ==========================================
         TicketService ticketService
                 = (TicketService) getServletContext()
@@ -85,6 +84,11 @@ public class DashboardSolicitanteServlet extends HttpServlet {
                         .getAttribute(
                                 AppContextListener.USUARIO_REPOSITORY);
 
+        NotificacionRepository notificacionRepository
+                = (NotificacionRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.NOTIFICACION_REPOSITORY);
+
         // ==========================================
         // OBTENER TICKETS DEL SOLICITANTE
         // ==========================================
@@ -97,65 +101,56 @@ public class DashboardSolicitanteServlet extends HttpServlet {
         List<TicketDTO> ticketsDTO
                 = new ArrayList<>();
 
-        try {
+        for (Ticket ticket : tickets) {
 
-            for (Ticket ticket : tickets) {
+            String nombreCategoria
+                    = categoriaRepository
+                            .buscarPorId(ticket.getIdCategoria())
+                            .map(Categoria::getNombreCategoria)
+                            .orElse(
+                                    "Categoria #"
+                                    + ticket.getIdCategoria());
 
-                String nombreCategoria
-                        = categoriaRepository
-                                .buscarPorId(ticket.getIdCategoria())
-                                .map(Categoria::getNombreCategoria)
-                                .orElse(
-                                        "Categoria #"
-                                        + ticket.getIdCategoria());
+            String nombrePrioridad
+                    = prioridadRepository
+                            .buscarPorId(ticket.getIdPrioridad())
+                            .map(Prioridad::getTipo)
+                            .orElse(
+                                    "Prioridad #"
+                                    + ticket.getIdPrioridad());
 
-                String nombrePrioridad
-                        = prioridadRepository
-                                .buscarPorId(ticket.getIdPrioridad())
-                                .map(Prioridad::getTipo)
-                                .orElse(
-                                        "Prioridad #"
-                                        + ticket.getIdPrioridad());
+            String nombreSolicitante
+                    = usuarioRepository
+                            .buscarPorId(
+                                    ticket.getIdSolicitante())
+                            .map(Usuario::getNombre)
+                            .orElse(
+                                    "Usuario #"
+                                    + ticket.getIdSolicitante());
 
-                String nombreSolicitante
+            String nombreAgente = null;
+
+            if (ticket.getIdAgente() != null) {
+
+                nombreAgente
                         = usuarioRepository
                                 .buscarPorId(
-                                        ticket.getIdSolicitante())
+                                        ticket.getIdAgente())
                                 .map(Usuario::getNombre)
                                 .orElse(
                                         "Usuario #"
-                                        + ticket.getIdSolicitante());
-
-                String nombreAgente = null;
-
-                if (ticket.getIdAgente() != null) {
-
-                    nombreAgente
-                            = usuarioRepository
-                                    .buscarPorId(
-                                            ticket.getIdAgente())
-                                    .map(Usuario::getNombre)
-                                    .orElse(
-                                            "Usuario #"
-                                            + ticket.getIdAgente());
-                }
-
-                TicketDTO dto
-                        = TicketMapper.aDTO(
-                                ticket,
-                                nombreCategoria,
-                                nombrePrioridad,
-                                nombreSolicitante,
-                                nombreAgente);
-
-                ticketsDTO.add(dto);
+                                        + ticket.getIdAgente());
             }
 
-        } catch (SQLException e) {
+            TicketDTO dto
+                    = TicketMapper.aDTO(
+                            ticket,
+                            nombreCategoria,
+                            nombrePrioridad,
+                            nombreSolicitante,
+                            nombreAgente);
 
-            throw new ServletException(
-                    "Error consultando datos relacionados de los tickets",
-                    e);
+            ticketsDTO.add(dto);
         }
 
         // ==========================================
@@ -178,7 +173,8 @@ public class DashboardSolicitanteServlet extends HttpServlet {
             }
 
             if (estado.equalsIgnoreCase("NUEVO")
-                    || estado.equalsIgnoreCase("PENDIENTE")) {
+                    || estado.equalsIgnoreCase("PENDIENTE")
+                    || estado.equalsIgnoreCase("ASIGNADO")) {
 
                 pendientes++;
 
@@ -192,6 +188,12 @@ public class DashboardSolicitanteServlet extends HttpServlet {
                 resueltos++;
             }
         }
+
+        // ==========================================
+        // NOTIFICACIONES
+        // ==========================================
+        int notificacionesNoLeidas
+                = notificacionRepository.contarNoLeidas(idUsuario);
 
         // ==========================================
         // ENVIAR DATOS AL JSP
@@ -215,6 +217,10 @@ public class DashboardSolicitanteServlet extends HttpServlet {
         request.setAttribute(
                 "resueltos",
                 resueltos);
+
+        request.setAttribute(
+                "notificacionesNoLeidas",
+                notificacionesNoLeidas);
 
         // ==========================================
         // MOSTRAR DASHBOARD
