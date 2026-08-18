@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/notificaciones")
 public class NotificacionServlet extends HttpServlet {
@@ -28,38 +29,62 @@ public class NotificacionServlet extends HttpServlet {
                         );
 
         if (notificacionRepository == null) {
+
             throw new ServletException(
                     "No se encontró NotificacionRepository en el contexto."
             );
         }
     }
 
+    // ==========================================================
+    // GET
+    // MOSTRAR NOTIFICACIONES
+    // ==========================================================
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        // ======================================================
+        // VALIDAR SESIÓN
+        // ======================================================
+        HttpSession session
+                = request.getSession(false);
 
         if (session == null
-                || session.getAttribute("usuario") == null) {
+                || session.getAttribute("idUsuario") == null
+                || session.getAttribute("idRol") == null) {
 
             response.sendRedirect(
-                    request.getContextPath() + "/login"
+                    request.getContextPath()
+                    + "/login"
             );
 
             return;
         }
 
+        // ======================================================
+        // DATOS DEL USUARIO
+        // ======================================================
         int idUsuario
                 = (Integer) session.getAttribute("idUsuario");
 
+        int idRol
+                = (Integer) session.getAttribute("idRol");
+
+        // ======================================================
+        // OBTENER NOTIFICACIONES
+        // ======================================================
         List<Notificacion> notificaciones
-                = notificacionRepository.listarPorUsuario(idUsuario);
+                = notificacionRepository.listarPorUsuario(
+                        idUsuario
+                );
 
         int noLeidas
-                = notificacionRepository.contarNoLeidas(idUsuario);
+                = notificacionRepository.contarNoLeidas(
+                        idUsuario
+                );
 
         request.setAttribute(
                 "notificaciones",
@@ -71,24 +96,84 @@ public class NotificacionServlet extends HttpServlet {
                 noLeidas
         );
 
+        // ======================================================
+        // DETERMINAR DASHBOARD SEGÚN EL ROL
+        //
+        // 1 = SOLICITANTE
+        // 2 = AGENTE
+        // 3 = ADMINISTRADOR
+        // ======================================================
+        String dashboard;
+
+        switch (idRol) {
+
+            case 1:
+
+                dashboard = "/dashboardSolicitante";
+
+                break;
+
+            case 2:
+
+                dashboard = "/dashboardAgente";
+
+                break;
+
+            case 3:
+
+                dashboard = "/dashboardAdmin";
+
+                break;
+
+            default:
+
+                response.sendError(
+                        HttpServletResponse.SC_FORBIDDEN,
+                        "Rol de usuario no válido."
+                );
+
+                return;
+        }
+
+        request.setAttribute(
+                "dashboard",
+                dashboard
+        );
+
+        // ======================================================
+        // MOSTRAR JSP
+        // ======================================================
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/notificaciones.jsp"
-        ).forward(request, response);
+        ).forward(
+                request,
+                response
+        );
     }
 
+    // ==========================================================
+    // POST
+    // MARCAR NOTIFICACIONES COMO LEÍDAS
+    // ==========================================================
     @Override
     protected void doPost(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        // ======================================================
+        // VALIDAR SESIÓN
+        // ======================================================
+        HttpSession session
+                = request.getSession(false);
 
         if (session == null
-                || session.getAttribute("usuario") == null) {
+                || session.getAttribute("idUsuario") == null
+                || session.getAttribute("idRol") == null) {
 
             response.sendRedirect(
-                    request.getContextPath() + "/login"
+                    request.getContextPath()
+                    + "/login"
             );
 
             return;
@@ -102,26 +187,90 @@ public class NotificacionServlet extends HttpServlet {
 
         try {
 
+            // ==================================================
+            // MARCAR UNA NOTIFICACIÓN
+            // ==================================================
             if ("leer".equals(accion)) {
+
+                String idParametro
+                        = request.getParameter(
+                                "idNotificacion"
+                        );
+
+                if (idParametro == null
+                        || idParametro.trim().isEmpty()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "ID de notificación obligatorio."
+                    );
+
+                    return;
+                }
 
                 int idNotificacion
                         = Integer.parseInt(
-                                request.getParameter(
-                                        "idNotificacion"
-                                )
+                                idParametro
                         );
+
+                // ==============================================
+                // VERIFICAR QUE LA NOTIFICACIÓN SEA DEL USUARIO
+                // ==============================================
+                Optional<Notificacion> resultado
+                        = notificacionRepository.buscarPorId(
+                                idNotificacion
+                        );
+
+                if (!resultado.isPresent()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_NOT_FOUND,
+                            "La notificación no existe."
+                    );
+
+                    return;
+                }
+
+                Notificacion notificacion
+                        = resultado.get();
+
+                if (notificacion.getIdUsuario()
+                        != idUsuario) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_FORBIDDEN,
+                            "No puedes modificar esta notificación."
+                    );
+
+                    return;
+                }
 
                 notificacionRepository.marcarComoLeida(
                         idNotificacion
                 );
 
+                // ==================================================
+                // MARCAR TODAS COMO LEÍDAS
+                // ==================================================
             } else if ("leerTodas".equals(accion)) {
 
                 notificacionRepository.marcarTodasComoLeidas(
                         idUsuario
                 );
+
+            } else {
+
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Acción de notificación no válida."
+                );
+
+                return;
             }
 
+            // ==================================================
+            // VOLVER A NOTIFICACIONES
+            // ==================================================
             response.sendRedirect(
                     request.getContextPath()
                     + "/notificaciones"

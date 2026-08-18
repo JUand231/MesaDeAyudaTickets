@@ -4,21 +4,18 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
 import repositorio.CategoriaRepository;
 import repositorio.ComentarioRepository;
 import repositorio.NotificacionRepository;
 import repositorio.PrioridadRepository;
 import repositorio.TicketRepository;
 import repositorio.UsuarioRepository;
-
 import repositorio.jdbc.CategoriaRepositoryJdbc;
 import repositorio.jdbc.ComentarioRepositoryJdbc;
 import repositorio.jdbc.NotificacionRepositoryJdbc;
 import repositorio.jdbc.PrioridadRepositoryJdbc;
 import repositorio.jdbc.TicketRepositoryJdbc;
 import repositorio.jdbc.UsuarioRepositoryJdbc;
-
 import servicio.TicketService;
 import servicio.asignacion.AsignacionPorTurnoRotativo;
 import servicio.asignacion.EstrategiaAsignacion;
@@ -89,6 +86,7 @@ public class AppContextListener
                 = new TicketService(
                         ticketRepository,
                         usuarioRepository,
+                        comentarioRepository,
                         calculadoraSLA,
                         estrategiaAsignacion,
                         notificador

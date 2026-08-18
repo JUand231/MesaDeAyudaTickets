@@ -185,8 +185,8 @@
 
             <br>
 
-            <a href="${pageContext.request.contextPath}/">
-                Volver
+            <a href="${pageContext.request.contextPath}${dashboard}">
+                ← Volver
             </a>
 
         </div>

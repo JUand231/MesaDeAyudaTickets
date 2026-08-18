@@ -2,8 +2,11 @@ package WebServlet;
 
 import modelo.Comentario;
 import repositorio.ComentarioRepository;
+import servicio.TicketService;
+
 import java.io.IOException;
 import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @WebServlet("/comentarios")
-public class ComentariosSolicitanteServlet extends HttpServlet {
+public class ComentariosSolicitanteServlet
+        extends HttpServlet {
 
     @Override
     protected void doGet(
@@ -24,23 +28,8 @@ public class ComentariosSolicitanteServlet extends HttpServlet {
                 = request.getSession(false);
 
         if (session == null
-                || session.getAttribute("idUsuario") == null) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
-
-            return;
-        }
-
-        int idUsuario
-                = (Integer) session.getAttribute("idUsuario");
-
-        int idRol
-                = (Integer) session.getAttribute("idRol");
-
-        // Esta pantalla es para solicitantes
-        if (idRol != 1) {
+                || session.getAttribute("idUsuario") == null
+                || session.getAttribute("idRol") == null) {
 
             response.sendRedirect(
                     request.getContextPath()
@@ -50,15 +39,36 @@ public class ComentariosSolicitanteServlet extends HttpServlet {
             return;
         }
 
-        ComentarioRepository comentarioRepository
-                = (ComentarioRepository) getServletContext().getAttribute(
-                        AppContextListener.COMENTARIO_REPOSITORY
+        int idUsuario
+                = (Integer) session.getAttribute(
+                        "idUsuario"
                 );
+
+        int idRol
+                = (Integer) session.getAttribute(
+                        "idRol"
+                );
+
+        if (idRol != 1) {
+
+            response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "Solo los solicitantes pueden acceder aquí."
+            );
+
+            return;
+        }
+
+        ComentarioRepository comentarioRepository
+                = (ComentarioRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.COMENTARIO_REPOSITORY
+                        );
 
         if (comentarioRepository == null) {
 
             throw new ServletException(
-                    "ComentarioRepository no está configurado"
+                    "ComentarioRepository no está configurado."
             );
         }
 
@@ -74,7 +84,10 @@ public class ComentariosSolicitanteServlet extends HttpServlet {
 
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/Solicitante/comentariosSolicitante.jsp"
-        ).forward(request, response);
+        ).forward(
+                request,
+                response
+        );
     }
 
     @Override
@@ -83,39 +96,54 @@ public class ComentariosSolicitanteServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding(
+                "UTF-8"
+        );
+
         HttpSession session
                 = request.getSession(false);
 
         if (session == null
-                || session.getAttribute("idUsuario") == null) {
+                || session.getAttribute("idUsuario") == null
+                || session.getAttribute("idRol") == null) {
 
             response.sendRedirect(
-                    request.getContextPath() + "/login"
+                    request.getContextPath()
+                    + "/login"
             );
 
             return;
         }
 
         int idUsuario
-                = (Integer) session.getAttribute("idUsuario");
+                = (Integer) session.getAttribute(
+                        "idUsuario"
+                );
 
         int idRol
-                = (Integer) session.getAttribute("idRol");
+                = (Integer) session.getAttribute(
+                        "idRol"
+                );
 
         if (idRol != 1) {
 
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
+            response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "No tienes permiso para comentar."
             );
 
             return;
         }
 
         String idTicketStr
-                = request.getParameter("idTicket");
+                = request.getParameter(
+                        "idTicket"
+                );
 
         String texto
-                = request.getParameter("texto");
+                = request.getParameter(
+                        "texto"
+                );
 
         if (idTicketStr == null
                 || idTicketStr.trim().isEmpty()
@@ -135,7 +163,9 @@ public class ComentariosSolicitanteServlet extends HttpServlet {
         try {
 
             idTicket
-                    = Integer.parseInt(idTicketStr);
+                    = Integer.parseInt(
+                            idTicketStr
+                    );
 
         } catch (NumberFormatException e) {
 
@@ -147,44 +177,39 @@ public class ComentariosSolicitanteServlet extends HttpServlet {
             return;
         }
 
-        ComentarioRepository comentarioRepository
-                = (ComentarioRepository) getServletContext().getAttribute(
-                        AppContextListener.COMENTARIO_REPOSITORY
-                );
+        TicketService ticketService
+                = (TicketService) getServletContext()
+                        .getAttribute(
+                                AppContextListener.TICKET_SERVICE
+                        );
 
-        if (comentarioRepository == null) {
+        if (ticketService == null) {
 
             throw new ServletException(
-                    "ComentarioRepository no está configurado"
+                    "TicketService no está configurado."
             );
         }
 
-        // Seguridad:
-        // el solicitante solo puede comentar sus propios tickets
-        boolean pertenece
-                = comentarioRepository.ticketPerteneceAUsuario(
-                        idTicket,
-                        idUsuario
-                );
+        try {
 
-        if (!pertenece) {
+            ticketService.agregarComentario(
+                    idTicket,
+                    idUsuario,
+                    idRol,
+                    texto
+            );
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/comentarios"
+            );
+
+        } catch (IllegalArgumentException e) {
 
             response.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "No puedes comentar este ticket."
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    e.getMessage()
             );
-
-            return;
         }
-
-        Comentario comentario
-                = new Comentario(
-                        idTicket,
-                        idUsuario,
-                        texto.trim()
-                );
-        comentarioRepository.guardar(comentario);
-
-        response.sendRedirect(request.getContextPath() + "/comentarios");
     }
 }
