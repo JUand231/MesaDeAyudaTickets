@@ -11,7 +11,7 @@ public interface UsuarioRepository {
 
     Usuario validarLogin(String correo, String contrasena) throws SQLException;
 
-    Optional<Usuario> buscarPorId(int idUsuario) throws SQLException;
+    Optional<Usuario> buscarPorId(int idUsuario);
 
     List<Usuario> listarAgentes() throws SQLException;
 

@@ -8,11 +8,13 @@ import modelo.Usuario;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.TicketService;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,9 +43,20 @@ public class DashboardAgenteServlet extends HttpServlet {
         }
 
         int idUsuario = (Integer) session.getAttribute("idUsuario");
-
         int idRol = (Integer) session.getAttribute("idRol");
-        CategoriaRepository categoriaRepository = (CategoriaRepository) getServletContext().getAttribute(AppContextListener.CATEGORIA_REPOSITORY);
+
+        if (idRol != 2) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login");
+
+            return;
+        }
+
+        CategoriaRepository categoriaRepository
+                = (CategoriaRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.CATEGORIA_REPOSITORY);
 
         PrioridadRepository prioridadRepository
                 = (PrioridadRepository) getServletContext()
@@ -54,14 +67,6 @@ public class DashboardAgenteServlet extends HttpServlet {
                 = (UsuarioRepository) getServletContext()
                         .getAttribute(
                                 AppContextListener.USUARIO_REPOSITORY);
-
-        if (idRol != 2) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/login");
-
-            return;
-        }
 
         TicketService ticketService
                 = (TicketService) getServletContext()
@@ -75,24 +80,29 @@ public class DashboardAgenteServlet extends HttpServlet {
         Map<Integer, String> nombresPrioridades = new HashMap<>();
         Map<Integer, String> nombresUsuarios = new HashMap<>();
 
+        // =========================================================
+        // CATEGORÍAS
+        // =========================================================
         for (Ticket ticket : tickets) {
+
             int idCategoria = ticket.getIdCategoria();
 
             if (!nombresCategorias.containsKey(idCategoria)) {
+
                 String nombre = "Sin categoría";
 
-                try {
-                    nombre = categoriaRepository
-                            .buscarPorId(idCategoria)
-                            .map(Categoria::getNombreCategoria)
-                            .orElse("Sin categoría");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                nombre = categoriaRepository
+                        .buscarPorId(idCategoria)
+                        .map(Categoria::getNombreCategoria)
+                        .orElse("Sin categoría");
 
                 nombresCategorias.put(idCategoria, nombre);
             }
         }
+
+        // =========================================================
+        // PRIORIDADES
+        // =========================================================
         for (Ticket ticket : tickets) {
 
             int idPrioridad = ticket.getIdPrioridad();
@@ -101,18 +111,19 @@ public class DashboardAgenteServlet extends HttpServlet {
 
                 String nombre = "Sin prioridad";
 
-                try {
+
                     nombre = prioridadRepository
                             .buscarPorId(idPrioridad)
                             .map(Prioridad::getTipo)
                             .orElse("Sin prioridad");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
 
                 nombresPrioridades.put(idPrioridad, nombre);
             }
         }
+
+        // =========================================================
+        // SOLICITANTES
+        // =========================================================
         for (Ticket ticket : tickets) {
 
             int idSolicitante = ticket.getIdSolicitante();
@@ -121,31 +132,27 @@ public class DashboardAgenteServlet extends HttpServlet {
 
                 String nombre = "Sin solicitante";
 
-                try {
-                    nombre = usuarioRepository
-                            .buscarPorId(idSolicitante)
-                            .map(Usuario::getNombre)
-                            .orElse("Sin solicitante");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                nombre = usuarioRepository
+                        .buscarPorId(idSolicitante)
+                        .map(Usuario::getNombre)
+                        .orElse("Sin solicitante");
 
                 nombresUsuarios.put(idSolicitante, nombre);
             }
         }
 
+        // =========================================================
+        // ESTADÍSTICAS
+        // =========================================================
         int totalTickets = tickets.size();
 
         int pendientes = 0;
-
         int enProceso = 0;
-
         int resueltos = 0;
 
         for (Ticket ticket : tickets) {
 
-            String estado
-                    = ticket.getEstadoNombre();
+            String estado = ticket.getEstadoNombre();
 
             if (estado == null) {
                 continue;
@@ -169,40 +176,54 @@ public class DashboardAgenteServlet extends HttpServlet {
             }
         }
 
+        // =========================================================
+        // ENVIAR DATOS AL JSP
+        // =========================================================
         request.setAttribute(
                 "tickets",
-                tickets);
+                tickets
+        );
 
         request.setAttribute(
                 "nombresCategorias",
-                nombresCategorias);
+                nombresCategorias
+        );
 
         request.setAttribute(
                 "nombresPrioridades",
-                nombresPrioridades);
+                nombresPrioridades
+        );
 
         request.setAttribute(
                 "nombresUsuarios",
-                nombresUsuarios);
+                nombresUsuarios
+        );
 
         request.setAttribute(
                 "totalTickets",
-                totalTickets);
+                totalTickets
+        );
 
         request.setAttribute(
                 "pendientes",
-                pendientes);
+                pendientes
+        );
 
         request.setAttribute(
                 "enProceso",
-                enProceso);
+                enProceso
+        );
 
         request.setAttribute(
                 "resueltos",
-                resueltos);
+                resueltos
+        );
 
+        // =========================================================
+        // MOSTRAR DASHBOARD
+        // =========================================================
         request.getRequestDispatcher(
-                "/WEB-INF/jsp/Agente/dashboardAgente.jsp")
-                .forward(request, response);
+                "/WEB-INF/jsp/Agente/dashboardAgente.jsp"
+        ).forward(request, response);
     }
 }

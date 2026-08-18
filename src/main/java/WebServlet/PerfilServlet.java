@@ -30,22 +30,24 @@ public class PerfilServlet extends HttpServlet {
         UsuarioRepository usuarioRepository
                 = (UsuarioRepository) getServletContext().getAttribute(AppContextListener.USUARIO_REPOSITORY);
 
-        try {
-            Optional<Usuario> usuarioOpt = usuarioRepository.buscarPorId(idUsuario);
+        Optional<Usuario> usuarioOpt
+                = usuarioRepository.buscarPorId(idUsuario);
 
-            if (usuarioOpt.isEmpty()) {
-                response.sendRedirect(request.getContextPath() + "/login");
-                return;
-            }
-
-            Usuario usuario = usuarioOpt.get();
-
-            request.setAttribute("usuario", usuario);
-            request.setAttribute("nombreRol", nombreRol(usuario.getIdRol()));
-
-        } catch (SQLException e) {
-            throw new ServletException("Error consultando el perfil del usuario", e);
+        if (usuarioOpt.isEmpty()) {
+            response.sendRedirect(
+                    request.getContextPath() + "/login"
+            );
+            return;
         }
+
+        Usuario usuario = usuarioOpt.get();
+
+        request.setAttribute("usuario", usuario);
+
+        request.setAttribute(
+                "nombreRol",
+                nombreRol(usuario.getIdRol())
+        );
 
         request.getRequestDispatcher("/WEB-INF/jsp/perfil.jsp").forward(request, response);
     }

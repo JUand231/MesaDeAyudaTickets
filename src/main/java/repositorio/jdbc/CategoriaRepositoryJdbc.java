@@ -13,17 +13,33 @@ import java.util.Optional;
 public class CategoriaRepositoryJdbc implements CategoriaRepository {
 
     @Override
-    public Optional<Categoria> buscarPorId(int idCategoria) throws SQLException {
-        String sql = "SELECT Id, NombreCategoria FROM Categoria WHERE Id = ?";
-        try (Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
+    public Optional<Categoria> buscarPorId(int idCategoria) {
+
+        String sql = "SELECT Id, NombreCategoria "
+                + "FROM Categoria "
+                + "WHERE Id = ?";
+
+        try (
+                Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setInt(1, idCategoria);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
                     return Optional.of(mapear(rs));
                 }
+
                 return Optional.empty();
             }
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error buscando categoria con id "
+                    + idCategoria,
+                    e
+            );
         }
     }
 

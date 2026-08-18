@@ -12,13 +12,11 @@ import repositorio.ComentarioRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.TicketService;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -160,127 +158,118 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        try {
+        // ==================================================
+        // CATEGORÍA
+        // ==================================================
+        String nombreCategoria
+                = categoriaRepository
+                        .buscarPorId(ticket.getIdCategoria())
+                        .map(Categoria::getNombreCategoria)
+                        .orElse(
+                                "Categoria #"
+                                + ticket.getIdCategoria());
 
-            // ==================================================
-            // CATEGORÍA
-            // ==================================================
-            String nombreCategoria
-                    = categoriaRepository
-                            .buscarPorId(ticket.getIdCategoria())
-                            .map(Categoria::getNombreCategoria)
-                            .orElse(
-                                    "Categoria #"
-                                    + ticket.getIdCategoria());
+        // ==================================================
+        // PRIORIDAD
+        // ==================================================
+        Prioridad prioridad
+                = prioridadRepository
+                        .buscarPorId(ticket.getIdPrioridad())
+                        .orElse(null);
 
-            // ==================================================
-            // PRIORIDAD
-            // ==================================================
-            Prioridad prioridad
-                    = prioridadRepository
-                            .buscarPorId(ticket.getIdPrioridad())
-                            .orElse(null);
+        String nombrePrioridad
+                = prioridad != null
+                        ? prioridad.getTipo()
+                        : "Prioridad #"
+                        + ticket.getIdPrioridad();
 
-            String nombrePrioridad
-                    = prioridad != null
-                            ? prioridad.getTipo()
-                            : "Prioridad #"
-                            + ticket.getIdPrioridad();
+        // ==================================================
+        // SOLICITANTE
+        // ==================================================
+        String nombreSolicitante
+                = usuarioRepository
+                        .buscarPorId(ticket.getIdSolicitante())
+                        .map(Usuario::getNombre)
+                        .orElse(
+                                "Usuario #"
+                                + ticket.getIdSolicitante());
 
-            // ==================================================
-            // SOLICITANTE
-            // ==================================================
-            String nombreSolicitante
+        // ==================================================
+        // AGENTE
+        // ==================================================
+        String nombreAgente = "Sin asignar";
+
+        if (ticket.getIdAgente() != null) {
+
+            nombreAgente
                     = usuarioRepository
-                            .buscarPorId(ticket.getIdSolicitante())
+                            .buscarPorId(ticket.getIdAgente())
                             .map(Usuario::getNombre)
                             .orElse(
                                     "Usuario #"
-                                    + ticket.getIdSolicitante());
-
-            // ==================================================
-            // AGENTE
-            // ==================================================
-            String nombreAgente = "Sin asignar";
-
-            if (ticket.getIdAgente() != null) {
-
-                nombreAgente
-                        = usuarioRepository
-                                .buscarPorId(ticket.getIdAgente())
-                                .map(Usuario::getNombre)
-                                .orElse(
-                                        "Usuario #"
-                                        + ticket.getIdAgente());
-            }
-
-            // ==================================================
-            // DTO
-            // ==================================================
-            TicketDTO ticketDTO
-                    = TicketMapper.aDTO(
-                            ticket,
-                            nombreCategoria,
-                            nombrePrioridad,
-                            nombreSolicitante,
-                            nombreAgente);
-
-            request.setAttribute(
-                    "ticket",
-                    ticketDTO);
-
-            // ==================================================
-            // SLA
-            // ==================================================
-            if (prioridad != null) {
-
-                LocalDateTime fechaLimiteSLA
-                        = ticketService.calcularFechaLimiteSLA(
-                                ticket.getIdTicket(),
-                                prioridad);
-
-                boolean slaVencido
-                        = ticketService.estaVencido(
-                                ticket.getIdTicket(),
-                                prioridad);
-
-                request.setAttribute(
-                        "horasSLA",
-                        prioridad.getHorasSLA());
-
-                request.setAttribute(
-                        "fechaLimiteSLA",
-                        fechaLimiteSLA.format(FORMATO_SLA));
-
-                request.setAttribute(
-                        "slaVencido",
-                        slaVencido);
-            }
-
-            // ==================================================
-            // COMENTARIOS
-            // ==================================================
-            List<Comentario> comentarios
-                    = comentarioRepository
-                            .listarPorTicket(idTicket);
-
-            request.setAttribute(
-                    "comentarios",
-                    comentarios);
-
-            // ==================================================
-            // MOSTRAR JSP
-            // ==================================================
-            request.getRequestDispatcher(
-                    "/WEB-INF/jsp/Agente/detalleTicketAgente.jsp")
-                    .forward(request, response);
-
-        } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Error consultando los datos del ticket",
-                    e);
+                                    + ticket.getIdAgente());
         }
+
+        // ==================================================
+        // DTO
+        // ==================================================
+        TicketDTO ticketDTO
+                = TicketMapper.aDTO(
+                        ticket,
+                        nombreCategoria,
+                        nombrePrioridad,
+                        nombreSolicitante,
+                        nombreAgente);
+
+        request.setAttribute(
+                "ticket",
+                ticketDTO);
+
+        // ==================================================
+        // SLA
+        // ==================================================
+        if (prioridad != null) {
+
+            LocalDateTime fechaLimiteSLA
+                    = ticketService.calcularFechaLimiteSLA(
+                            ticket.getIdTicket(),
+                            prioridad);
+
+            boolean slaVencido
+                    = ticketService.estaVencido(
+                            ticket.getIdTicket(),
+                            prioridad);
+
+            request.setAttribute(
+                    "horasSLA",
+                    prioridad.getHorasSLA());
+
+            request.setAttribute(
+                    "fechaLimiteSLA",
+                    fechaLimiteSLA.format(FORMATO_SLA));
+
+            request.setAttribute(
+                    "slaVencido",
+                    slaVencido);
+        }
+
+        // ==================================================
+        // COMENTARIOS
+        // ==================================================
+        List<Comentario> comentarios
+                = comentarioRepository
+                        .listarPorTicket(idTicket);
+
+        request.setAttribute(
+                "comentarios",
+                comentarios);
+
+        // ==================================================
+        // MOSTRAR JSP
+        // ==================================================
+        request.getRequestDispatcher(
+                "/WEB-INF/jsp/Agente/detalleTicketAgente.jsp")
+                .forward(request, response);
     }
 
     // ==========================================================
@@ -495,19 +484,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                         .getAttribute(
                                 AppContextListener.USUARIO_REPOSITORY);
 
-        try {
-
-            return usuarioRepository
-                    .buscarPorId(ticket.getIdSolicitante())
-                    .orElseThrow(
-                            () -> new IllegalArgumentException(
-                                    "No se encontró el solicitante del ticket"));
-
-        } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Error consultando el solicitante del ticket",
-                    e);
-        }
+        return usuarioRepository
+                .buscarPorId(ticket.getIdSolicitante())
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "No se encontró el solicitante del ticket"
+                        )
+                );
     }
 }

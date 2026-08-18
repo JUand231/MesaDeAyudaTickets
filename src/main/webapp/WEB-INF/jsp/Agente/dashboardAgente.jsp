@@ -34,6 +34,30 @@
                     <span>▣</span>
                     <label>Mis tickets</label>
                 </a>
+                <a href="${pageContext.request.contextPath}/notificaciones"
+                   class="menu-item">
+
+                    <span>🔔</span>
+
+                    <label>
+                        Notificaciones
+
+                        <c:if test="${notificacionesNoLeidas > 0}">
+                            <span style="
+                                  background:#ef4444;
+                                  color:white;
+                                  border-radius:12px;
+                                  padding:2px 7px;
+                                  font-size:11px;
+                                  margin-left:5px;
+                                  ">
+                                ${notificacionesNoLeidas}
+                            </span>
+                        </c:if>
+
+                    </label>
+
+                </a>
             </nav>
 
             <div class="menu-titulo">GESTIÓN</div>
@@ -216,6 +240,7 @@
                     </div>
 
                 </div>
+
             </section>
 
         </main>
