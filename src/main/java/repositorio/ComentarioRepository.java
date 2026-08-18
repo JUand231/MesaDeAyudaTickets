@@ -15,5 +15,9 @@ public interface ComentarioRepository {
 
     List<Comentario> listarPorSolicitante(int idUsuario);
 
+    List<Comentario> listarTodos();
+
+    List<Comentario> buscarAdmin(String buscar, String rol);
+
     boolean ticketPerteneceAUsuario(int idTicket, int idUsuario);
 }

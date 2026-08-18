@@ -2,10 +2,12 @@ package repositorio.jdbc;
 
 import modelo.Usuario;
 import repositorio.UsuarioRepository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,6 +84,36 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         return agentes;
     }
 
+    // ==========================================================
+    // LISTAR TODOS LOS USUARIOS
+    // ==========================================================
+    @Override
+    public List<Usuario> listar() {
+
+        List<Usuario> usuarios = new ArrayList<>();
+
+        String sql = "SELECT Id, Nombre, Correo, Contrasena, IdRol "
+                + "FROM Usuario";
+
+        try (Connection cn = ConexionDB.obtener(); PreparedStatement ps = cn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                usuarios.add(mapear(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(
+                    "Error al listar usuarios", e
+            );
+        }
+
+        return usuarios;
+    }
+
+    // ==========================================================
+    // MAPEAR USUARIO
+    // ==========================================================
     private Usuario mapear(ResultSet rs)
             throws SQLException {
 
@@ -96,6 +128,9 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         return usuario;
     }
 
+    // ==========================================================
+    // ACTUALIZAR USUARIO
+    // ==========================================================
     @Override
     public void actualizar(Usuario usuario)
             throws SQLException {

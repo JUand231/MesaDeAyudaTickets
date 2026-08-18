@@ -31,14 +31,14 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
-                    <span>▣</span><label>Tickets</label>
+                    <span>🏷</span><label>Tickets</label>
                 </a>
             </nav>
 
             <div class="menu-titulo">ADMINISTRACIÓN</div>
 
             <nav class="menu">
-                <a href="${pageContext.request.contextPath}/agentes" class="menu-item">
+                <a href="${pageContext.request.contextPath}/admin/agentes" class="menu-item">
                     <span>♟</span><label>Agentes</label>
                 </a>
 
@@ -50,8 +50,8 @@
                     <span>▥</span><label>Reportes</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/usuarios" class="menu-item">
-                    <span>●️</span><label>Comentarios</label>
+                <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item">
+                    <span>🖂️</span><label>Comentarios</label>
                 </a>
             </nav>
 

@@ -9,6 +9,10 @@ public class Comentario {
     private int idTicket;
     private String texto;
     private LocalDateTime fecha = LocalDateTime.now();
+    // Datos adicionales para consultas
+    private String nombreUsuario;
+    private String nombreRol;
+    private String tituloTicket;
 
     public Comentario() {
     }
@@ -72,5 +76,29 @@ public class Comentario {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getNombreRol() {
+        return nombreRol;
+    }
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
+    public String getTituloTicket() {
+        return tituloTicket;
+    }
+
+    public void setTituloTicket(String tituloTicket) {
+        this.tituloTicket = tituloTicket;
     }
 }

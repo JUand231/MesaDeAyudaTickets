@@ -14,4 +14,6 @@ public interface UsuarioRepository {
     Optional<Usuario> buscarPorId(int idUsuario) throws SQLException;
 
     List<Usuario> listarAgentes() throws SQLException;
+
+    List<Usuario> listar();
 }
