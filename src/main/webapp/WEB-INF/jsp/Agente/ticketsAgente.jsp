@@ -24,7 +24,7 @@
             <div class="marca">
 
                 <div class="marca-icono">
-                    <span>⌁</span>
+                    <span>🌐</span>
                 </div>
 
                 <div class="marca-texto">
@@ -56,7 +56,7 @@
                 <a href="${pageContext.request.contextPath}/tickets"
                    class="menu-item ${empty param.estado ? 'activo' : ''}">
 
-                    <span>▣</span>
+                    <span>🏷</span>
                     <label>Mis tickets</label>
 
                 </a>

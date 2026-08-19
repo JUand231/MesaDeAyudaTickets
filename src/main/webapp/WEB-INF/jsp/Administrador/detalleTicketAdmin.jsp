@@ -187,15 +187,9 @@
                      DATOS
                      ================================================== -->
 
-                <div style="padding: 25px;">
+                <div class="panel-body">
 
-
-                    <div style="
-                         display:grid;
-                         grid-template-columns: repeat(2, 1fr);
-                         gap:20px;
-                         margin-bottom:25px;
-                         ">
+                    <div class="info-grid">
 
                         <div>
                             <strong>Categoría</strong>
@@ -235,10 +229,10 @@
                         <div>
                             <strong>Estado SLA</strong>
                             <p>
-                            <c:choose>
-                                <c:when test="${slaVencido}">VENCIDO</c:when>
-                                <c:otherwise>DENTRO DEL SLA</c:otherwise>
-                            </c:choose>
+                                <c:choose>
+                                    <c:when test="${slaVencido}">VENCIDO</c:when>
+                                    <c:otherwise>DENTRO DEL SLA</c:otherwise>
+                                </c:choose>
                             </p>
                         </div>
 
@@ -251,16 +245,8 @@
 
                         <strong>Descripción</strong>
 
-                        <div style="
-                             margin-top:10px;
-                             padding:15px;
-                             background:#f8fafc;
-                             border-radius:10px;
-                             border:1px solid #e2e8f0;
-                             ">
-
+                        <div class="descripcion-box">
                             ${ticket.descripcion}
-
                         </div>
 
                     </div>
@@ -294,8 +280,7 @@
                 </div>
 
 
-                <div style="padding:25px;">
-
+                <div class="panel-body">
 
                     <!-- ==========================================
                          COMENTARIOS EXISTENTES
@@ -319,21 +304,9 @@
                     <c:forEach var="comentario"
                                items="${comentarios}">
 
-                        <div style="
-                             padding:16px;
-                             margin-bottom:15px;
-                             border:1px solid #e2e8f0;
-                             border-radius:10px;
-                             background:#ffffff;
-                             ">
+                        <div class="comentario-card">
 
-                            <div style="
-                                 display:flex;
-                                 justify-content:space-between;
-                                 align-items:center;
-                                 margin-bottom:8px;
-                                 ">
-
+                            <div class="comentario-header">
                                 <div style="display:flex; align-items:center; gap:8px;">
 
                                     <strong>
@@ -359,14 +332,14 @@
                                 </div>
 
 
-                                <small style="color:#718096;">
+                                <small>
                                     ${comentario.fecha}
                                 </small>
 
                             </div>
 
 
-                            <p style="margin:0; color:#334155;">
+                            <p class="comentario-texto">
                                 ${comentario.texto}
                             </p>
 
@@ -403,16 +376,7 @@
                                 rows="4"
                                 required
                                 placeholder="Escribe un comentario como administrador..."
-                                style="
-                                width:100%;
-                                box-sizing:border-box;
-                                padding:12px;
-                                border:1px solid #d9e0e8;
-                                border-radius:8px;
-                                resize:vertical;
-                                font-family:inherit;
-                                margin-bottom:10px;
-                                "></textarea>
+                                class="textarea-comentario"></textarea>
 
 
                             <button type="submit"

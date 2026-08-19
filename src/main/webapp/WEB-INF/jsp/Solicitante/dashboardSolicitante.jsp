@@ -32,7 +32,7 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
-                    <span>▣</span><label>Mis tickets</label>
+                    <span>🏷</span><label>Mis tickets</label>
                 </a>
 
                 <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="menu-item">
@@ -101,44 +101,39 @@
             </header>
 
             <!-- ACCESOS RÁPIDOS -->
-            <section class="panel accesos">
+            <section class="estadisticas">
 
-                <div class="panel-header">
-
+                <a href="${pageContext.request.contextPath}/ticket/nuevo" class="estadistica acceso">
+                    <div class="estadistica-icono azul">＋</div>
                     <div>
-                        <h2>Accesos rápidos</h2>
-                        <p>Gestiona tus solicitudes de soporte</p>
-                    </div>
-
-                </div>
-
-                <div class="accesos-grid">
-
-                    <a href="${pageContext.request.contextPath}/ticket/nuevo" class="acceso">
-                        <span>＋</span>
                         <strong>Nuevo ticket</strong>
                         <small>Crear una solicitud</small>
-                    </a>
+                    </div>
+                </a>
 
-                    <a href="${pageContext.request.contextPath}/tickets" class="acceso">
-                        <span>▣</span>
+                <a href="${pageContext.request.contextPath}/tickets" class="estadistica acceso">
+                    <div class="estadistica-icono naranja">▣</div>
+                    <div>
                         <strong>Mis tickets</strong>
                         <small>Consultar tus solicitudes</small>
-                    </a>
+                    </div>
+                </a>
 
-                    <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="acceso">
-                        <span>◷</span>
+                <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="estadistica acceso">
+                    <div class="estadistica-icono verde">◷</div>
+                    <div>
                         <strong>En proceso</strong>
                         <small>Consultar tickets activos</small>
-                    </a>
+                    </div>
+                </a>
 
-                    <a href="${pageContext.request.contextPath}/tickets?estado=Resuelto" class="acceso">
-                        <span>✓</span>
+                <a href="${pageContext.request.contextPath}/tickets?estado=Resuelto" class="estadistica acceso">
+                    <div class="estadistica-icono rojo">✓</div>
+                    <div>
                         <strong>Resueltos</strong>
                         <small>Ver solicitudes solucionadas</small>
-                    </a>
-
-                </div>
+                    </div>
+                </a>
 
             </section>
 
