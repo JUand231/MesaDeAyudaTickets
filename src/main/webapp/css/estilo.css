@@ -1028,7 +1028,7 @@ a {
 .barra-acciones {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .btn-notificacion {
@@ -1901,7 +1901,7 @@ a {
     }
 
     .barra-acciones {
-        gap: 5px;
+        gap: 8px;
     }
 
     .btn-principal {
