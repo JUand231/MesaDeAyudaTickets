@@ -1,7 +1,7 @@
 package repositorio.jdbc;
 
 import modelo.Comentario;
-import repositorio.jdbc.ConexionDB;
+import repositorio.ComentarioRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,10 +12,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import repositorio.ComentarioRepository;
 
-public class ComentarioRepositoryJdbc implements ComentarioRepository {
+public class ComentarioRepositoryJdbc
+        implements ComentarioRepository {
 
+    // ==========================================================
+    // GUARDAR
+    // ==========================================================
     @Override
     public Comentario guardar(Comentario comentario) {
 
@@ -28,9 +31,22 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
                 sql,
                 Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, comentario.getIdTicket());
-            stmt.setInt(2, comentario.getIdUsuario());
-            stmt.setString(3, comentario.getTexto());
+            stmt.setInt(
+                    1,
+                    comentario.getIdTicket()
+            );
+
+            stmt.setInt(
+                    2,
+                    comentario.getIdUsuario()
+            );
+
+            // IMPORTANTE:
+            // NVARCHAR en SQL Server
+            stmt.setNString(
+                    3,
+                    comentario.getTexto()
+            );
 
             stmt.setTimestamp(
                     4,
@@ -44,7 +60,10 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
             try (ResultSet rs = stmt.getGeneratedKeys()) {
 
                 if (rs.next()) {
-                    comentario.setIdComentario(rs.getInt(1));
+
+                    comentario.setIdComentario(
+                            rs.getInt(1)
+                    );
                 }
             }
 
@@ -59,21 +78,34 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
         }
     }
 
+    // ==========================================================
+    // BUSCAR POR ID
+    // ==========================================================
     @Override
-    public Optional<Comentario> buscarPorId(int idComentario) {
+    public Optional<Comentario> buscarPorId(
+            int idComentario) {
 
         String sql
-                = "SELECT * FROM Comentarios WHERE Id = ?";
+                = "SELECT * "
+                + "FROM Comentarios "
+                + "WHERE Id = ?";
 
         try (
-                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql)) {
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt
+                = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, idComentario);
+            stmt.setInt(
+                    1,
+                    idComentario
+            );
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs
+                    = stmt.executeQuery()) {
 
                 if (rs.next()) {
-                    return Optional.of(mapear(rs));
+                    return Optional.of(
+                            mapear(rs)
+                    );
                 }
 
                 return Optional.empty();
@@ -89,25 +121,54 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
         }
     }
 
+    // ==========================================================
+    // LISTAR POR TICKET
+    // ==========================================================
     @Override
-    public List<Comentario> listarPorTicket(int idTicket) {
+    public List<Comentario> listarPorTicket(
+            int idTicket) {
 
         String sql
-                = "SELECT * FROM Comentarios "
-                + "WHERE IdTicket = ? "
-                + "ORDER BY Fecha ASC";
+                = "SELECT "
+                + "c.Id, "
+                + "c.IdTicket, "
+                + "c.IdUsuario, "
+                + "c.Texto, "
+                + "c.Fecha, "
+                + "u.Nombre AS NombreUsuario, "
+                + "u.IdRol, "
+                + "t.Titulo AS TituloTicket "
+                + "FROM Comentarios c "
+                + "LEFT JOIN Usuario u "
+                + "ON c.IdUsuario = u.Id "
+                + "LEFT JOIN Ticket t "
+                + "ON c.IdTicket = t.Id "
+                + "WHERE c.IdTicket = ? "
+                + "ORDER BY c.Fecha ASC";
 
-        List<Comentario> comentarios = new ArrayList<>();
+        List<Comentario> comentarios
+                = new ArrayList<>();
 
         try (
-                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql)) {
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt
+                = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, idTicket);
+            stmt.setInt(
+                    1,
+                    idTicket
+            );
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs
+                    = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    comentarios.add(mapear(rs));
+
+                    Comentario comentario
+                            = mapearCompleto(rs);
+
+                    comentarios.add(
+                            comentario
+                    );
                 }
             }
 
@@ -123,28 +184,51 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
         }
     }
 
+    // ==========================================================
+    // LISTAR POR SOLICITANTE
+    // ==========================================================
     @Override
-    public List<Comentario> listarPorSolicitante(int idUsuario) {
+    public List<Comentario> listarPorSolicitante(
+            int idUsuario) {
 
         String sql
-                = "SELECT c.* "
+                = "SELECT "
+                + "c.Id, "
+                + "c.IdTicket, "
+                + "c.IdUsuario, "
+                + "c.Texto, "
+                + "c.Fecha, "
+                + "u.Nombre AS NombreUsuario, "
+                + "u.IdRol, "
+                + "t.Titulo AS TituloTicket "
                 + "FROM Comentarios c "
                 + "INNER JOIN Ticket t "
                 + "ON c.IdTicket = t.Id "
+                + "LEFT JOIN Usuario u "
+                + "ON c.IdUsuario = u.Id "
                 + "WHERE t.IdSolicitante = ? "
                 + "ORDER BY c.Fecha DESC";
 
-        List<Comentario> comentarios = new ArrayList<>();
+        List<Comentario> comentarios
+                = new ArrayList<>();
 
         try (
-                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql)) {
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt
+                = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, idUsuario);
+            stmt.setInt(
+                    1,
+                    idUsuario
+            );
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs
+                    = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    comentarios.add(mapear(rs));
+
+                    comentarios.add(
+                            mapearCompleto(rs)
+                    );
                 }
             }
 
@@ -159,6 +243,9 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
         }
     }
 
+    // ==========================================================
+    // VERIFICAR PROPIETARIO
+    // ==========================================================
     @Override
     public boolean ticketPerteneceAUsuario(
             int idTicket,
@@ -171,12 +258,14 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
                 + "AND IdSolicitante = ?";
 
         try (
-                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql)) {
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt
+                = con.prepareStatement(sql)) {
 
             stmt.setInt(1, idTicket);
             stmt.setInt(2, idUsuario);
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs
+                    = stmt.executeQuery()) {
 
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
@@ -194,10 +283,180 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
         }
     }
 
-    private Comentario mapear(ResultSet rs)
+    // ==========================================================
+    // LISTAR TODOS
+    // ==========================================================
+    @Override
+    public List<Comentario> listarTodos() {
+
+        String sql
+                = "SELECT "
+                + "c.Id, "
+                + "c.IdTicket, "
+                + "c.IdUsuario, "
+                + "c.Texto, "
+                + "c.Fecha, "
+                + "u.Nombre AS NombreUsuario, "
+                + "u.IdRol, "
+                + "t.Titulo AS TituloTicket "
+                + "FROM Comentarios c "
+                + "LEFT JOIN Usuario u "
+                + "ON c.IdUsuario = u.Id "
+                + "LEFT JOIN Ticket t "
+                + "ON c.IdTicket = t.Id "
+                + "ORDER BY c.Fecha DESC";
+
+        List<Comentario> comentarios
+                = new ArrayList<>();
+
+        try (
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt
+                = con.prepareStatement(sql); ResultSet rs
+                = stmt.executeQuery()) {
+
+            while (rs.next()) {
+
+                comentarios.add(
+                        mapearCompleto(rs)
+                );
+            }
+
+            return comentarios;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error listando todos los comentarios",
+                    e
+            );
+        }
+    }
+
+    // ==========================================================
+    // BUSCAR ADMIN
+    // ==========================================================
+    @Override
+    public List<Comentario> buscarAdmin(
+            String buscar,
+            String rol) {
+
+        String sql
+                = "SELECT "
+                + "c.Id, "
+                + "c.IdTicket, "
+                + "c.IdUsuario, "
+                + "c.Texto, "
+                + "c.Fecha, "
+                + "u.Nombre AS NombreUsuario, "
+                + "u.IdRol, "
+                + "t.Titulo AS TituloTicket "
+                + "FROM Comentarios c "
+                + "LEFT JOIN Usuario u "
+                + "ON c.IdUsuario = u.Id "
+                + "LEFT JOIN Ticket t "
+                + "ON c.IdTicket = t.Id "
+                + "WHERE 1 = 1 ";
+
+        if (buscar != null
+                && !buscar.trim().isEmpty()) {
+
+            sql
+                    += "AND ("
+                    + "CAST(c.IdTicket AS VARCHAR) LIKE ? "
+                    + "OR c.Texto LIKE ? "
+                    + "OR u.Nombre LIKE ? "
+                    + "OR t.Titulo LIKE ?"
+                    + ") ";
+        }
+
+        if (rol != null
+                && !rol.trim().isEmpty()) {
+
+            if ("AGENTE".equalsIgnoreCase(rol)) {
+
+                sql += "AND u.IdRol = 2 ";
+
+            } else if ("SOLICITANTE"
+                    .equalsIgnoreCase(rol)) {
+
+                sql += "AND u.IdRol = 1 ";
+
+            } else if ("ADMINISTRADOR"
+                    .equalsIgnoreCase(rol)) {
+
+                sql += "AND u.IdRol = 3 ";
+            }
+        }
+
+        sql += "ORDER BY c.Fecha DESC";
+
+        List<Comentario> comentarios
+                = new ArrayList<>();
+
+        try (
+                Connection con = ConexionDB.obtener(); PreparedStatement stmt
+                = con.prepareStatement(sql)) {
+
+            int posicion = 1;
+
+            if (buscar != null
+                    && !buscar.trim().isEmpty()) {
+
+                String filtro
+                        = "%" + buscar.trim() + "%";
+
+                stmt.setString(
+                        posicion++,
+                        filtro
+                );
+
+                stmt.setString(
+                        posicion++,
+                        filtro
+                );
+
+                stmt.setString(
+                        posicion++,
+                        filtro
+                );
+
+                stmt.setString(
+                        posicion++,
+                        filtro
+                );
+            }
+
+            try (ResultSet rs
+                    = stmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    comentarios.add(
+                            mapearCompleto(rs)
+                    );
+                }
+            }
+
+            return comentarios;
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(
+                    "Error buscando comentarios",
+                    e
+            );
+        }
+    }
+
+    // ==========================================================
+    // MAPEAR BÁSICO
+    // ==========================================================
+    private Comentario mapear(
+            ResultSet rs)
             throws SQLException {
 
-        Comentario comentario = new Comentario();
+        Comentario comentario
+                = new Comentario();
 
         comentario.setIdComentario(
                 rs.getInt("Id")
@@ -228,177 +487,48 @@ public class ComentarioRepositoryJdbc implements ComentarioRepository {
         return comentario;
     }
 
-    @Override
-    public List<Comentario> listarTodos() {
+    // ==========================================================
+    // MAPEAR COMPLETO
+    // ==========================================================
+    private Comentario mapearCompleto(
+            ResultSet rs)
+            throws SQLException {
 
-        String sql
-                = "SELECT "
-                + "c.Id, "
-                + "c.IdTicket, "
-                + "c.IdUsuario, "
-                + "c.Texto, "
-                + "c.Fecha, "
-                + "u.Nombre AS NombreUsuario, "
-                + "t.Titulo AS TituloTicket "
-                + "FROM Comentarios c "
-                + "LEFT JOIN Usuario u "
-                + "ON c.IdUsuario = u.Id "
-                + "LEFT JOIN Ticket t "
-                + "ON c.IdTicket = t.Id "
-                + "ORDER BY c.Fecha DESC";
+        Comentario comentario
+                = mapear(rs);
 
-        List<Comentario> comentarios = new ArrayList<>();
+        comentario.setNombreUsuario(
+                rs.getString("NombreUsuario")
+        );
 
-        try (
-                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        comentario.setTituloTicket(
+                rs.getString("TituloTicket")
+        );
 
-            while (rs.next()) {
+        int idRol
+                = rs.getInt("IdRol");
 
-                Comentario comentario = mapear(rs);
+        switch (idRol) {
 
-                comentario.setNombreUsuario(
-                        rs.getString("NombreUsuario")
+            case 1:
+                comentario.setNombreRol(
+                        "SOLICITANTE"
                 );
+                break;
 
-                comentario.setTituloTicket(
-                        rs.getString("TituloTicket")
+            case 2:
+                comentario.setNombreRol(
+                        "AGENTE"
                 );
+                break;
 
-                comentarios.add(comentario);
-            }
-
-            return comentarios;
-
-        } catch (SQLException e) {
-
-            throw new RuntimeException(
-                    "Error listando todos los comentarios",
-                    e
-            );
+            case 3:
+                comentario.setNombreRol(
+                        "ADMINISTRADOR"
+                );
+                break;
         }
+        return comentario;
     }
 
-    @Override
-    public List<Comentario> buscarAdmin(String buscar, String rol) {
-
-        String sql
-                = "SELECT "
-                + "c.Id, "
-                + "c.IdTicket, "
-                + "c.IdUsuario, "
-                + "c.Texto, "
-                + "c.Fecha, "
-                + "u.Nombre AS NombreUsuario, "
-                + "u.IdRol, "
-                + "t.Titulo AS TituloTicket "
-                + "FROM Comentarios c "
-                + "LEFT JOIN Usuario u "
-                + "ON c.IdUsuario = u.Id "
-                + "LEFT JOIN Ticket t "
-                + "ON c.IdTicket = t.Id "
-                + "WHERE 1 = 1 ";
-
-        // ==========================================
-        // FILTRO DE BÚSQUEDA
-        // ==========================================
-        if (buscar != null && !buscar.trim().isEmpty()) {
-
-            sql += "AND ("
-                    + "CAST(c.IdTicket AS VARCHAR) LIKE ? "
-                    + "OR c.Texto LIKE ? "
-                    + "OR u.Nombre LIKE ? "
-                    + "OR t.Titulo LIKE ?"
-                    + ") ";
-        }
-
-        // ==========================================
-        // FILTRO POR ROL
-        // ==========================================
-        if (rol != null && !rol.trim().isEmpty()) {
-
-            if ("AGENTE".equalsIgnoreCase(rol)) {
-
-                sql += "AND u.IdRol = 2 ";
-
-            } else if ("SOLICITANTE".equalsIgnoreCase(rol)) {
-
-                sql += "AND u.IdRol = 1 ";
-            }
-        }
-
-        sql += "ORDER BY c.Fecha DESC";
-
-        List<Comentario> comentarios = new ArrayList<>();
-
-        try (
-                Connection con = ConexionDB.obtener(); PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            int posicion = 1;
-
-            // ==========================================
-            // PARÁMETROS DE BÚSQUEDA
-            // ==========================================
-            if (buscar != null && !buscar.trim().isEmpty()) {
-
-                String filtro = "%" + buscar.trim() + "%";
-
-                stmt.setString(posicion++, filtro);
-                stmt.setString(posicion++, filtro);
-                stmt.setString(posicion++, filtro);
-                stmt.setString(posicion++, filtro);
-            }
-
-            // ==========================================
-            // EJECUTAR
-            // ==========================================
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Comentario comentario = mapear(rs);
-
-                    comentario.setNombreUsuario(
-                            rs.getString("NombreUsuario")
-                    );
-
-                    comentario.setTituloTicket(
-                            rs.getString("TituloTicket")
-                    );
-
-                    // ==========================================
-                    // MAPEO DE ROL
-                    // ==========================================
-                    int idRolUsuario = rs.getInt("IdRol");
-
-                    String nombreRol;
-                    switch (idRolUsuario) {
-                        case 1:
-                            nombreRol = "SOLICITANTE";
-                            break;
-                        case 2:
-                            nombreRol = "AGENTE";
-                            break;
-                        case 3:
-                            nombreRol = "ADMINISTRADOR";
-                            break;
-                        default:
-                            nombreRol = "SOLICITANTE";
-                    }
-
-                    comentario.setNombreRol(nombreRol);
-
-                    comentarios.add(comentario);
-                }
-            }
-
-            return comentarios;
-
-        } catch (SQLException e) {
-
-            throw new RuntimeException(
-                    "Error buscando comentarios",
-                    e
-            );
-        }
-    }
 }

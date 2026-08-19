@@ -88,11 +88,6 @@
                     <button class="btn-guardar" onclick="abrirModalCategoria()">
                         + Nueva Categoría
                     </button>
-
-                    <button class="btn-notificacion">
-                        ♧
-                        <span></span>
-                    </button>
                 </div>
             </header>
 

@@ -35,11 +35,6 @@
                     <span>▣</span><label>Mis tickets</label>
                 </a>
 
-                <a href="${pageContext.request.contextPath}/comentarios"
-                   class="menu-item">
-                    <span>🧑‍💻</span><label>Comentarios</label>
-                </a>
-
                 <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="menu-item">
                     <span>◷</span><label>Estado</label>
                 </a>

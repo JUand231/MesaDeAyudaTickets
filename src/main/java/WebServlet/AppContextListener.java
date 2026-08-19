@@ -43,32 +43,88 @@ public class AppContextListener implements ServletContextListener {
 
         ServletContext contexto = evento.getServletContext();
 
-        TicketRepository ticketRepository = new TicketRepositoryJdbc();
-        UsuarioRepository usuarioRepository = new UsuarioRepositoryJdbc();
-        CategoriaRepository categoriaRepository = new CategoriaRepositoryJdbc();
-        PrioridadRepository prioridadRepository = new PrioridadRepositoryJdbc();
-        ComentarioRepository comentarioRepository = new ComentarioRepositoryJdbc();
-        NotificacionRepository notificacionRepository = new NotificacionRepositoryJdbc();
+        // ==========================================================
+        // REPOSITORIOS
+        // ==========================================================
+        TicketRepository ticketRepository
+                = new TicketRepositoryJdbc();
 
-        CalculadoraSLA calculadoraSLA = new CalculadoraSLAPorPrioridad();
-        EstrategiaAsignacion estrategiaAsignacion = new AsignacionPorTurnoRotativo();
-        Notificador notificador = new NotificadorEnAplicacion(notificacionRepository);
+        UsuarioRepository usuarioRepository
+                = new UsuarioRepositoryJdbc();
 
-        TicketService ticketService = new TicketService(
-                ticketRepository,
-                usuarioRepository,
-                calculadoraSLA,
-                estrategiaAsignacion,
-                notificador
+        CategoriaRepository categoriaRepository
+                = new CategoriaRepositoryJdbc();
+
+        PrioridadRepository prioridadRepository
+                = new PrioridadRepositoryJdbc();
+
+        ComentarioRepository comentarioRepository
+                = new ComentarioRepositoryJdbc();
+
+        NotificacionRepository notificacionRepository
+                = new NotificacionRepositoryJdbc();
+
+        // ==========================================================
+        // SERVICIOS
+        // ==========================================================
+        CalculadoraSLA calculadoraSLA
+                = new CalculadoraSLAPorPrioridad();
+
+        EstrategiaAsignacion estrategiaAsignacion
+                = new AsignacionPorTurnoRotativo();
+
+        Notificador notificador
+                = new NotificadorEnAplicacion(
+                        notificacionRepository
+                );
+
+        TicketService ticketService
+                = new TicketService(
+                        ticketRepository,
+                        usuarioRepository,
+                        comentarioRepository,
+                        calculadoraSLA,
+                        estrategiaAsignacion,
+                        notificador
+                );
+
+        // ==========================================================
+        // REGISTRAR EN EL CONTEXTO
+        // ==========================================================
+        contexto.setAttribute(
+                TICKET_SERVICE,
+                ticketService
         );
 
-        contexto.setAttribute(TICKET_SERVICE, ticketService);
-        contexto.setAttribute(USUARIO_REPOSITORY, usuarioRepository);
-        contexto.setAttribute(CATEGORIA_REPOSITORY, categoriaRepository);
-        contexto.setAttribute(PRIORIDAD_REPOSITORY, prioridadRepository);
-        contexto.setAttribute(COMENTARIO_REPOSITORY, comentarioRepository);
-        contexto.setAttribute(NOTIFICACION_REPOSITORY, notificacionRepository);
-        contexto.setAttribute(TICKET_REPOSITORY, ticketRepository);
+        contexto.setAttribute(
+                USUARIO_REPOSITORY,
+                usuarioRepository
+        );
+
+        contexto.setAttribute(
+                CATEGORIA_REPOSITORY,
+                categoriaRepository
+        );
+
+        contexto.setAttribute(
+                PRIORIDAD_REPOSITORY,
+                prioridadRepository
+        );
+
+        contexto.setAttribute(
+                COMENTARIO_REPOSITORY,
+                comentarioRepository
+        );
+
+        contexto.setAttribute(
+                NOTIFICACION_REPOSITORY,
+                notificacionRepository
+        );
+
+        contexto.setAttribute(
+                TICKET_REPOSITORY,
+                ticketRepository
+        );
     }
 
     @Override

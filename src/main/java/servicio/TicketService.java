@@ -4,14 +4,12 @@ import modelo.Comentario;
 import modelo.Prioridad;
 import modelo.Ticket;
 import modelo.Usuario;
-
+import repositorio.ComentarioRepository;
 import repositorio.TicketRepository;
 import repositorio.UsuarioRepository;
-
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
 import servicio.sla.CalculadoraSLA;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,16 +21,19 @@ public class TicketService {
     private final CalculadoraSLA calculadoraSLA;
     private final EstrategiaAsignacion estrategiaAsignacion;
     private final Notificador notificador;
+    private final ComentarioRepository comentarioRepository;
 
     public TicketService(
             TicketRepository ticketRepository,
             UsuarioRepository usuarioRepository,
+            ComentarioRepository comentarioRepository,
             CalculadoraSLA calculadoraSLA,
             EstrategiaAsignacion estrategiaAsignacion,
             Notificador notificador) {
 
         this.ticketRepository = ticketRepository;
         this.usuarioRepository = usuarioRepository;
+        this.comentarioRepository = comentarioRepository;
         this.calculadoraSLA = calculadoraSLA;
         this.estrategiaAsignacion = estrategiaAsignacion;
         this.notificador = notificador;
@@ -65,7 +66,38 @@ public class TicketService {
         ticket.setIdPrioridad(idPrioridad);
         ticket.setIdSolicitante(idSolicitante);
 
-        return ticketRepository.guardar(ticket);
+        Ticket creado
+                = ticketRepository.guardar(ticket);
+
+// ==========================================================
+// NOTIFICAR A LOS ADMINISTRADORES
+// ==========================================================
+        try {
+
+            List<Usuario> administradores
+                    = usuarioRepository.listarAdministradores();
+
+            for (Usuario administrador : administradores) {
+
+                notificador.notificar(
+                        administrador,
+                        creado,
+                        "Se creó un nuevo ticket #"
+                        + creado.getIdTicket()
+                        + ": "
+                        + creado.getTitulo()
+                );
+            }
+
+        } catch (Exception e) {
+
+            // El ticket ya fue creado.
+            // No debemos perder la creación por un fallo
+            // secundario de notificaciones.
+            e.printStackTrace();
+        }
+
+        return creado;
     }
 
     public List<Ticket> listarTodos() {
@@ -306,9 +338,10 @@ public class TicketService {
         return actualizado;
     }
 
-    public Ticket agregarComentario(
+    public Comentario agregarComentario(
             int idTicket,
             int idUsuario,
+            int idRol,
             String texto) {
 
         if (texto == null || texto.isBlank()) {
@@ -320,16 +353,126 @@ public class TicketService {
 
         Ticket ticket = buscarPorId(idTicket);
 
-        ticket.agregarComentario(
-                new Comentario(
-                        0,
-                        idUsuario,
+        // ==========================================================
+        // VALIDAR PERMISOS
+        // ==========================================================
+        if (idRol == 1) {
+
+            // SOLICITANTE
+            if (ticket.getIdSolicitante() != idUsuario) {
+
+                throw new IllegalArgumentException(
+                        "No puedes comentar este ticket."
+                );
+            }
+
+        } else if (idRol == 2) {
+
+            // AGENTE
+            if (ticket.getIdAgente() == null
+                    || ticket.getIdAgente() != idUsuario) {
+
+                throw new IllegalArgumentException(
+                        "No puedes comentar este ticket."
+                );
+            }
+
+        } else if (idRol != 3) {
+
+            throw new IllegalArgumentException(
+                    "No tienes permiso para comentar."
+            );
+        }
+
+        // ==========================================================
+        // CREAR COMENTARIO
+        // ==========================================================
+        Comentario comentario
+                = new Comentario(
                         idTicket,
+                        idUsuario,
                         texto.trim()
-                )
+                );
+
+        comentarioRepository.guardar(
+                comentario
         );
 
-        return ticketRepository.actualizar(ticket);
+        // ==========================================================
+        // NOTIFICAR
+        // ==========================================================
+        if (idRol == 1) {
+
+            // El solicitante comentó.
+            // Avisar al agente asignado.
+            if (ticket.getIdAgente() != null) {
+
+                Usuario agente
+                        = obtenerUsuario(
+                                ticket.getIdAgente()
+                        );
+
+                notificador.notificar(
+                        agente,
+                        ticket,
+                        "El solicitante agregó un comentario al ticket #"
+                        + ticket.getIdTicket()
+                        + "."
+                );
+            }
+
+        } else if (idRol == 2) {
+
+            // El agente comentó.
+            // Avisar al solicitante.
+            Usuario solicitante
+                    = obtenerUsuario(
+                            ticket.getIdSolicitante()
+                    );
+
+            notificador.notificar(
+                    solicitante,
+                    ticket,
+                    "El agente agregó un comentario al ticket #"
+                    + ticket.getIdTicket()
+                    + "."
+            );
+
+        } else if (idRol == 3) {
+
+            // ADMINISTRADOR
+            // Avisar a solicitante y agente.
+            Usuario solicitante
+                    = obtenerUsuario(
+                            ticket.getIdSolicitante()
+                    );
+
+            notificador.notificar(
+                    solicitante,
+                    ticket,
+                    "El administrador agregó un comentario al ticket #"
+                    + ticket.getIdTicket()
+                    + "."
+            );
+
+            if (ticket.getIdAgente() != null) {
+
+                Usuario agente
+                        = obtenerUsuario(
+                                ticket.getIdAgente()
+                        );
+
+                notificador.notificar(
+                        agente,
+                        ticket,
+                        "El administrador agregó un comentario al ticket #"
+                        + ticket.getIdTicket()
+                        + "."
+                );
+            }
+        }
+
+        return comentario;
     }
 
     private Usuario obtenerUsuario(int idUsuario) {

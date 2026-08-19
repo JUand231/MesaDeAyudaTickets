@@ -334,19 +334,6 @@
 
                 </div>
 
-
-                <div class="barra-acciones">
-
-                    <button class="btn-notificacion">
-
-                        ♧
-
-                        <span></span>
-
-                    </button>
-
-                </div>
-
             </header>
 
 

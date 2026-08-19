@@ -45,15 +45,13 @@
 
             </div>
 
-
             <div class="menu-titulo">
                 PRINCIPAL
             </div>
 
-
             <nav class="menu">
 
-                <a href="${pageContext.request.contextPath}/dashboardAgente"
+                <a href="${pageContext.request.contextPath}/dashboardSolicitante"
                    class="menu-item">
 
                     <span>⌂</span>
@@ -61,7 +59,6 @@
                     <label>Dashboard</label>
 
                 </a>
-
 
                 <a href="${pageContext.request.contextPath}/tickets"
                    class="menu-item activo">
@@ -74,50 +71,9 @@
 
             </nav>
 
-
-            <div class="menu-titulo">
-                GESTIÓN
-            </div>
-
-
-            <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO"
-                   class="menu-item">
-
-                    <span>●</span>
-
-                    <label>Pendientes</label>
-
-                </a>
-
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=EN_PROCESO"
-                   class="menu-item">
-
-                    <span>◷</span>
-
-                    <label>En proceso</label>
-
-                </a>
-
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=RESUELTO"
-                   class="menu-item">
-
-                    <span>✓</span>
-
-                    <label>Resueltos</label>
-
-                </a>
-
-            </nav>
-
-
             <div class="menu-titulo">
                 SISTEMA
             </div>
-
 
             <nav class="menu">
 
@@ -130,7 +86,6 @@
 
                 </a>
 
-
                 <a href="${pageContext.request.contextPath}/CerrarSesion"
                    class="menu-item">
 
@@ -142,19 +97,18 @@
 
             </nav>
 
-
             <div class="usuario-sidebar">
 
                 <div class="usuario-avatar">
-                    A
+                    S
                 </div>
 
                 <div>
 
-                    <strong>Agente</strong>
+                    <strong>Solicitante</strong>
 
                     <small>
-                        Agente de soporte
+                        Usuario
                     </small>
 
                 </div>
@@ -170,9 +124,6 @@
 
         <main class="contenido">
 
-
-            <!-- CABECERA -->
-
             <header class="barra-superior">
 
                 <div>
@@ -182,11 +133,10 @@
                     </h1>
 
                     <p>
-                        Consulta la información y gestiona la solicitud.
+                        Consulta la información de tu solicitud.
                     </p>
 
                 </div>
-
 
                 <div class="barra-acciones">
 
@@ -208,7 +158,6 @@
 
             <section class="panel">
 
-
                 <div class="panel-header">
 
                     <div>
@@ -223,7 +172,6 @@
 
                     </div>
 
-
                     <div>
 
                         <c:choose>
@@ -236,7 +184,6 @@
 
                             </c:when>
 
-
                             <c:when test="${ticket.estado == 'ASIGNADO'}">
 
                                 <span class="badge estado-nuevo">
@@ -244,7 +191,6 @@
                                 </span>
 
                             </c:when>
-
 
                             <c:when test="${ticket.estado == 'EN_PROCESO'}">
 
@@ -254,7 +200,6 @@
 
                             </c:when>
 
-
                             <c:when test="${ticket.estado == 'RESUELTO'}">
 
                                 <span class="badge estado-resuelto">
@@ -263,7 +208,6 @@
 
                             </c:when>
 
-
                             <c:when test="${ticket.estado == 'CANCELADO'}">
 
                                 <span class="badge estado-cancelado">
@@ -271,7 +215,6 @@
                                 </span>
 
                             </c:when>
-
 
                             <c:otherwise>
 
@@ -289,21 +232,19 @@
 
 
                 <!-- ==================================================
-                     DATOS
+                     DATOS DEL TICKET
                      ================================================== -->
 
                 <div style="
-                     padding: 25px;
+                     padding:25px;
                      ">
-
 
                     <div style="
                          display:grid;
-                         grid-template-columns: repeat(2, 1fr);
+                         grid-template-columns:repeat(2, 1fr);
                          gap:20px;
                          margin-bottom:25px;
                          ">
-
 
                         <div>
 
@@ -368,6 +309,8 @@
                             </p>
 
                         </div>
+
+
                         <div>
 
                             <strong>
@@ -421,7 +364,9 @@
                     </div>
 
 
-                    <!-- DESCRIPCIÓN -->
+                    <!-- ==================================================
+                         DESCRIPCIÓN
+                         ================================================== -->
 
                     <div>
 
@@ -449,120 +394,134 @@
 
 
             <!-- ==================================================
-                 ACCIONES DEL AGENTE
+                 ESTADO
                  ================================================== -->
 
             <section class="panel">
-
 
                 <div class="panel-header">
 
                     <div>
 
                         <h2>
-                            Gestión del ticket
+                            Estado de la solicitud
                         </h2>
 
                         <p>
-                            Acciones disponibles para el agente.
+                            Consulta el estado actual de tu ticket.
                         </p>
 
                     </div>
 
                 </div>
 
-
                 <div style="
                      padding:25px;
-                     display:flex;
-                     gap:12px;
-                     flex-wrap:wrap;
                      ">
 
+                    <c:choose>
 
-                    <!-- ==========================================
-                         INICIAR ATENCIÓN
-                         ASIGNADO -> EN_PROCESO
-                         ========================================== -->
+                        <c:when test="${ticket.estado == 'NUEVO'}">
 
-                    <c:if test="${ticket.estado == 'NUEVO' || ticket.estado == 'ASIGNADO'}">
+                            <div style="
+                                 padding:15px;
+                                 background:#f8fafc;
+                                 border:1px solid #e2e8f0;
+                                 border-radius:10px;
+                                 ">
 
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/detalleTicket">
+                                Tu solicitud fue registrada y está
+                                pendiente de atención.
 
-                            <input type="hidden"
-                                   name="id"
-                                   value="${ticket.idTicket}">
+                            </div>
 
-                            <input type="hidden"
-                                   name="accion"
-                                   value="iniciar">
-
-                            <button type="submit"
-                                    class="btn-principal"
-                                    style="border:none;cursor:pointer;">
-
-                                Iniciar atención
-
-                            </button>
-
-                        </form>
-
-                    </c:if>
+                        </c:when>
 
 
-                    <!-- ==========================================
-                         RESOLVER
-                         EN_PROCESO -> RESUELTO
-                         ========================================== -->
+                        <c:when test="${ticket.estado == 'ASIGNADO'}">
 
-                    <c:if test="${ticket.estado == 'EN_PROCESO'}">
+                            <div style="
+                                 padding:15px;
+                                 background:#f8fafc;
+                                 border:1px solid #e2e8f0;
+                                 border-radius:10px;
+                                 ">
 
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/detalleTicket">
+                                Tu solicitud fue asignada a un agente
+                                de soporte.
 
-                            <input type="hidden"
-                                   name="id"
-                                   value="${ticket.idTicket}">
+                            </div>
 
-                            <input type="hidden"
-                                   name="accion"
-                                   value="resolver">
-
-                            <button type="submit"
-                                    class="btn-principal"
-                                    style="border:none;cursor:pointer;">
-
-                                ✓ Resolver ticket
-
-                            </button>
-
-                        </form>
-
-                    </c:if>
+                        </c:when>
 
 
-                    <!-- ==========================================
-                         INFORMACIÓN CUANDO YA ESTÁ RESUELTO
-                         ========================================== -->
+                        <c:when test="${ticket.estado == 'EN_PROCESO'}">
 
-                    <c:if test="${ticket.estado == 'RESUELTO'}">
+                            <div style="
+                                 padding:15px;
+                                 background:#f8fafc;
+                                 border:1px solid #e2e8f0;
+                                 border-radius:10px;
+                                 ">
 
-                        <div style="
-                             padding:12px 16px;
-                             background:#f0fff4;
-                             border:1px solid #c6f6d5;
-                             border-radius:8px;
-                             ">
+                                Un agente está trabajando actualmente
+                                en tu solicitud.
 
-                            El ticket fue resuelto.
-                            El solicitante puede confirmarlo
-                            o reabrirlo.
+                            </div>
 
-                        </div>
+                        </c:when>
 
-                    </c:if>
 
+                        <c:when test="${ticket.estado == 'RESUELTO'}">
+
+                            <div style="
+                                 padding:15px;
+                                 background:#f0fff4;
+                                 border:1px solid #c6f6d5;
+                                 border-radius:10px;
+                                 ">
+
+                                Tu solicitud ha sido marcada como
+                                resuelta.
+
+                            </div>
+
+                        </c:when>
+
+
+                        <c:when test="${ticket.estado == 'CANCELADO'}">
+
+                            <div style="
+                                 padding:15px;
+                                 background:#fff5f5;
+                                 border:1px solid #fed7d7;
+                                 border-radius:10px;
+                                 ">
+
+                                Esta solicitud fue cancelada.
+
+                            </div>
+
+                        </c:when>
+
+
+                        <c:otherwise>
+
+                            <div style="
+                                 padding:15px;
+                                 background:#f8fafc;
+                                 border:1px solid #e2e8f0;
+                                 border-radius:10px;
+                                 ">
+
+                                Estado actual:
+                                <strong>${ticket.estado}</strong>
+
+                            </div>
+
+                        </c:otherwise>
+
+                    </c:choose>
 
                 </div>
 
@@ -575,7 +534,6 @@
 
             <section class="panel">
 
-
                 <div class="panel-header">
 
                     <div>
@@ -585,7 +543,7 @@
                         </h2>
 
                         <p>
-                            Comunicación entre el agente y el solicitante.
+                            Comunicación con el equipo de soporte.
                         </p>
 
                     </div>
@@ -593,12 +551,10 @@
                 </div>
 
 
-                <div style="padding:25px;">
+                <div style="
+                     padding:25px;
+                     ">
 
-
-                    <!-- ==========================================
-                         COMENTARIOS EXISTENTES
-                         ========================================== -->
 
                     <c:if test="${empty comentarios}">
 
@@ -608,7 +564,8 @@
                              color:#718096;
                              ">
 
-                            Todavía no hay comentarios en este ticket.
+                            Todavía no hay comentarios
+                            en este ticket.
 
                         </div>
 
@@ -657,8 +614,9 @@
 
                                 </div>
 
-
-                                <small style="color:#718096;">
+                                <small style="
+                                       color:#718096;
+                                       ">
 
                                     ${comentario.fecha}
 
@@ -681,9 +639,9 @@
                     </c:forEach>
 
 
-                    <!-- ==========================================
+                    <!-- ==================================================
                          NUEVO COMENTARIO
-                         ========================================== -->
+                         ================================================== -->
 
                     <div style="
                          margin-top:25px;
@@ -710,7 +668,7 @@
                                 name="texto"
                                 rows="4"
                                 required
-                                placeholder="Escribe un comentario para el solicitante..."
+                                placeholder="Escribe un comentario para el equipo de soporte..."
                                 style="
                                 width:100%;
                                 box-sizing:border-box;
@@ -725,7 +683,10 @@
 
                             <button type="submit"
                                     class="btn-principal"
-                                    style="border:none;cursor:pointer;">
+                                    style="
+                                    border:none;
+                                    cursor:pointer;
+                                    ">
 
                                 Agregar comentario
 
@@ -738,7 +699,6 @@
                 </div>
 
             </section>
-
 
         </main>
 

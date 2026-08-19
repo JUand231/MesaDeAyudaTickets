@@ -27,138 +27,62 @@
              SIDEBAR
              ================================================== -->
 
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
 
             <div class="marca">
-
-                <div class="marca-icono">
-                    <span>⌁</span>
-                </div>
-
+                <div class="marca-icono"><span>🌐</span></div>
                 <div class="marca-texto">
-
                     <strong>MESA DE AYUDA</strong>
-
                     <small>CIMM · SENA</small>
-
                 </div>
-
             </div>
 
-
-            <div class="menu-titulo">
-                PRINCIPAL
-            </div>
-
+            <div class="menu-titulo">PRINCIPAL</div>
 
             <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/dashboardAgente"
-                   class="menu-item">
-
-                    <span>⌂</span>
-
-                    <label>Dashboard</label>
-
+                <a href="${pageContext.request.contextPath}/dashboardAdmin" class="menu-item">
+                    <span>⌂</span><label>Dashboard</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/tickets"
-                   class="menu-item activo">
-
-                    <span>▣</span>
-
-                    <label>Mis tickets</label>
-
+                <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
+                    <span>🏷</span><label>Tickets</label>
                 </a>
-
             </nav>
 
-
-            <div class="menu-titulo">
-                GESTIÓN
-            </div>
-
+            <div class="menu-titulo">ADMINISTRACIÓN</div>
 
             <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO"
-                   class="menu-item">
-
-                    <span>●</span>
-
-                    <label>Pendientes</label>
-
+                <a href="${pageContext.request.contextPath}/admin/agentes" class="menu-item">
+                    <span>♟</span><label>Agentes</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=EN_PROCESO"
-                   class="menu-item">
-
-                    <span>◷</span>
-
-                    <label>En proceso</label>
-
+                <a href="${pageContext.request.contextPath}/categorias" class="menu-item">
+                    <span>▥</span><label>Categorías</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=RESUELTO"
-                   class="menu-item">
-
-                    <span>✓</span>
-
-                    <label>Resueltos</label>
-
+                <a href="${pageContext.request.contextPath}/comentariosAdmin" class="menu-item activo">
+                    <span>🖂️</span><label>Comentarios</label>
                 </a>
-
             </nav>
 
-
-            <div class="menu-titulo">
-                SISTEMA
-            </div>
-
+            <div class="menu-titulo">SISTEMA</div>
 
             <nav class="menu">
-
-                <a href="${pageContext.request.contextPath}/perfil"
-                   class="menu-item">
-
-                    <span>⚙</span>
-
-                    <label>Mi Perfil</label>
-
+                <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
+                    <span>⚙</span><label>Mi Perfil</label>
                 </a>
 
-
-                <a href="${pageContext.request.contextPath}/CerrarSesion"
-                   class="menu-item">
-
-                    <span>↪</span>
-
-                    <label>Cerrar sesión</label>
-
+                <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
+                    <span>↪</span><label>Cerrar sesión</label>
                 </a>
-
             </nav>
-
 
             <div class="usuario-sidebar">
-
-                <div class="usuario-avatar">
-                    A
-                </div>
-
+                <div class="usuario-avatar">A</div>
                 <div>
-
-                    <strong>Agente</strong>
-
-                    <small>
-                        Agente de soporte
-                    </small>
-
+                    <strong>Administrador</strong>
+                    <small>Administrador</small>
                 </div>
-
             </div>
 
         </aside>
@@ -182,7 +106,7 @@
                     </h1>
 
                     <p>
-                        Consulta la información y gestiona la solicitud.
+                        Consulta la información y la conversación del ticket.
                     </p>
 
                 </div>
@@ -190,10 +114,10 @@
 
                 <div class="barra-acciones">
 
-                    <a href="${pageContext.request.contextPath}/tickets"
+                    <a href="${pageContext.request.contextPath}/comentariosAdmin"
                        class="btn-principal">
 
-                        ← Volver a mis tickets
+                        ← Volver a comentarios
 
                     </a>
 
@@ -229,56 +153,27 @@
                         <c:choose>
 
                             <c:when test="${ticket.estado == 'NUEVO'}">
-
-                                <span class="badge estado-nuevo">
-                                    NUEVO
-                                </span>
-
+                                <span class="badge estado-nuevo">NUEVO</span>
                             </c:when>
-
 
                             <c:when test="${ticket.estado == 'ASIGNADO'}">
-
-                                <span class="badge estado-nuevo">
-                                    ASIGNADO
-                                </span>
-
+                                <span class="badge estado-nuevo">ASIGNADO</span>
                             </c:when>
-
 
                             <c:when test="${ticket.estado == 'EN_PROCESO'}">
-
-                                <span class="badge estado-proceso">
-                                    EN PROCESO
-                                </span>
-
+                                <span class="badge estado-proceso">EN PROCESO</span>
                             </c:when>
-
 
                             <c:when test="${ticket.estado == 'RESUELTO'}">
-
-                                <span class="badge estado-resuelto">
-                                    RESUELTO
-                                </span>
-
+                                <span class="badge estado-resuelto">RESUELTO</span>
                             </c:when>
-
 
                             <c:when test="${ticket.estado == 'CANCELADO'}">
-
-                                <span class="badge estado-cancelado">
-                                    CANCELADO
-                                </span>
-
+                                <span class="badge estado-cancelado">CANCELADO</span>
                             </c:when>
 
-
                             <c:otherwise>
-
-                                <span class="badge">
-                                    ${ticket.estado}
-                                </span>
-
+                                <span class="badge">${ticket.estado}</span>
                             </c:otherwise>
 
                         </c:choose>
@@ -292,9 +187,7 @@
                      DATOS
                      ================================================== -->
 
-                <div style="
-                     padding: 25px;
-                     ">
+                <div style="padding: 25px;">
 
 
                     <div style="
@@ -304,118 +197,49 @@
                          margin-bottom:25px;
                          ">
 
-
                         <div>
-
-                            <strong>
-                                Categoría
-                            </strong>
-
-                            <p>
-                                ${ticket.nombreCategoria}
-                            </p>
-
+                            <strong>Categoría</strong>
+                            <p>${ticket.nombreCategoria}</p>
                         </div>
 
-
                         <div>
-
-                            <strong>
-                                Prioridad
-                            </strong>
-
-                            <p>
-                                ${ticket.nombrePrioridad}
-                            </p>
-
+                            <strong>Prioridad</strong>
+                            <p>${ticket.nombrePrioridad}</p>
                         </div>
 
-
                         <div>
-
-                            <strong>
-                                Solicitante
-                            </strong>
-
-                            <p>
-                                ${ticket.nombreSolicitante}
-                            </p>
-
+                            <strong>Solicitante</strong>
+                            <p>${ticket.nombreSolicitante}</p>
                         </div>
 
-
                         <div>
-
-                            <strong>
-                                Agente asignado
-                            </strong>
-
-                            <p>
-                                ${ticket.nombreAgente}
-                            </p>
-
+                            <strong>Agente asignado</strong>
+                            <p>${ticket.nombreAgente}</p>
                         </div>
 
-
                         <div>
-
-                            <strong>
-                                Fecha de creación
-                            </strong>
-
-                            <p>
-                                ${ticket.fechaCreacion}
-                            </p>
-
-                        </div>
-                        <div>
-
-                            <strong>
-                                SLA
-                            </strong>
-
-                            <p>
-                                ${horasSLA} horas
-                            </p>
-
+                            <strong>Fecha de creación</strong>
+                            <p>${ticket.fechaCreacion}</p>
                         </div>
 
-
                         <div>
-
-                            <strong>
-                                Fecha límite SLA
-                            </strong>
-
-                            <p>
-                                ${fechaLimiteSLA}
-                            </p>
-
+                            <strong>SLA</strong>
+                            <p>${horasSLA} horas</p>
                         </div>
 
+                        <div>
+                            <strong>Fecha límite SLA</strong>
+                            <p>${fechaLimiteSLA}</p>
+                        </div>
 
                         <div>
-
-                            <strong>
-                                Estado SLA
-                            </strong>
-
+                            <strong>Estado SLA</strong>
                             <p>
-
-                                <c:choose>
-
-                                    <c:when test="${slaVencido}">
-                                        VENCIDO
-                                    </c:when>
-
-                                    <c:otherwise>
-                                        DENTRO DEL SLA
-                                    </c:otherwise>
-
-                                </c:choose>
-
+                            <c:choose>
+                                <c:when test="${slaVencido}">VENCIDO</c:when>
+                                <c:otherwise>DENTRO DEL SLA</c:otherwise>
+                            </c:choose>
                             </p>
-
                         </div>
 
                     </div>
@@ -425,9 +249,7 @@
 
                     <div>
 
-                        <strong>
-                            Descripción
-                        </strong>
+                        <strong>Descripción</strong>
 
                         <div style="
                              margin-top:10px;
@@ -442,127 +264,6 @@
                         </div>
 
                     </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- ==================================================
-                 ACCIONES DEL AGENTE
-                 ================================================== -->
-
-            <section class="panel">
-
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <h2>
-                            Gestión del ticket
-                        </h2>
-
-                        <p>
-                            Acciones disponibles para el agente.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div style="
-                     padding:25px;
-                     display:flex;
-                     gap:12px;
-                     flex-wrap:wrap;
-                     ">
-
-
-                    <!-- ==========================================
-                         INICIAR ATENCIÓN
-                         ASIGNADO -> EN_PROCESO
-                         ========================================== -->
-
-                    <c:if test="${ticket.estado == 'NUEVO' || ticket.estado == 'ASIGNADO'}">
-
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/detalleTicket">
-
-                            <input type="hidden"
-                                   name="id"
-                                   value="${ticket.idTicket}">
-
-                            <input type="hidden"
-                                   name="accion"
-                                   value="iniciar">
-
-                            <button type="submit"
-                                    class="btn-principal"
-                                    style="border:none;cursor:pointer;">
-
-                                Iniciar atención
-
-                            </button>
-
-                        </form>
-
-                    </c:if>
-
-
-                    <!-- ==========================================
-                         RESOLVER
-                         EN_PROCESO -> RESUELTO
-                         ========================================== -->
-
-                    <c:if test="${ticket.estado == 'EN_PROCESO'}">
-
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/detalleTicket">
-
-                            <input type="hidden"
-                                   name="id"
-                                   value="${ticket.idTicket}">
-
-                            <input type="hidden"
-                                   name="accion"
-                                   value="resolver">
-
-                            <button type="submit"
-                                    class="btn-principal"
-                                    style="border:none;cursor:pointer;">
-
-                                ✓ Resolver ticket
-
-                            </button>
-
-                        </form>
-
-                    </c:if>
-
-
-                    <!-- ==========================================
-                         INFORMACIÓN CUANDO YA ESTÁ RESUELTO
-                         ========================================== -->
-
-                    <c:if test="${ticket.estado == 'RESUELTO'}">
-
-                        <div style="
-                             padding:12px 16px;
-                             background:#f0fff4;
-                             border:1px solid #c6f6d5;
-                             border-radius:8px;
-                             ">
-
-                            El ticket fue resuelto.
-                            El solicitante puede confirmarlo
-                            o reabrirlo.
-
-                        </div>
-
-                    </c:if>
-
 
                 </div>
 
@@ -585,7 +286,7 @@
                         </h2>
 
                         <p>
-                            Comunicación entre el agente y el solicitante.
+                            Conversación completa entre solicitante y agente.
                         </p>
 
                     </div>
@@ -659,21 +360,14 @@
 
 
                                 <small style="color:#718096;">
-
                                     ${comentario.fecha}
-
                                 </small>
 
                             </div>
 
 
-                            <p style="
-                               margin:0;
-                               color:#334155;
-                               ">
-
+                            <p style="margin:0; color:#334155;">
                                 ${comentario.texto}
-
                             </p>
 
                         </div>
@@ -685,9 +379,7 @@
                          NUEVO COMENTARIO
                          ========================================== -->
 
-                    <div style="
-                         margin-top:25px;
-                         ">
+                    <div style="margin-top:25px;">
 
                         <h3>
                             Agregar comentario
@@ -710,7 +402,7 @@
                                 name="texto"
                                 rows="4"
                                 required
-                                placeholder="Escribe un comentario para el solicitante..."
+                                placeholder="Escribe un comentario como administrador..."
                                 style="
                                 width:100%;
                                 box-sizing:border-box;

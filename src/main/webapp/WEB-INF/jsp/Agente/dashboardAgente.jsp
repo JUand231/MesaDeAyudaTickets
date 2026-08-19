@@ -34,30 +34,7 @@
                     <span>▣</span>
                     <label>Mis tickets</label>
                 </a>
-                <a href="${pageContext.request.contextPath}/notificaciones"
-                   class="menu-item">
 
-                    <span>🔔</span>
-
-                    <label>
-                        Notificaciones
-
-                        <c:if test="${notificacionesNoLeidas > 0}">
-                            <span style="
-                                  background:#ef4444;
-                                  color:white;
-                                  border-radius:12px;
-                                  padding:2px 7px;
-                                  font-size:11px;
-                                  margin-left:5px;
-                                  ">
-                                ${notificacionesNoLeidas}
-                            </span>
-                        </c:if>
-
-                    </label>
-
-                </a>
             </nav>
 
             <div class="menu-titulo">GESTIÓN</div>
@@ -107,6 +84,32 @@
 
         </aside>
         <main class="contenido">
+            <header class="barra-superior">
+
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Consulta y gestiona tus solicitudes de soporte.</p>
+                </div>
+
+                <div class="barra-acciones">
+
+                    <a href="${pageContext.request.contextPath}/notificaciones"
+                       class="btn-notificacion"
+                       title="Notificaciones">
+
+                        🔔
+
+                        <c:if test="${notificacionesNoLeidas > 0}">
+                            <span class="contador-notificaciones">
+                                ${notificacionesNoLeidas}
+                            </span>
+                        </c:if>
+
+                    </a>
+
+                </div>
+
+            </header>
 
             <!-- ESTADÍSTICAS -->
             <section class="estadisticas">

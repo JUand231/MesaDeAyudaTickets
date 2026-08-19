@@ -54,15 +54,6 @@
 
                 </a>
 
-                <!-- COMENTARIOS -->
-                <a href="${pageContext.request.contextPath}/tickets?estado=Nuevo"
-                   class="${param.estado == 'Nuevo' ? 'menu-item activo' : 'menu-item'}">
-
-                    <span>●</span>
-                    <label>Comentarios</label>
-
-                </a>
-
                 <!-- ESTADO -->
                 <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso"
                    class="${param.estado == 'En Proceso' ? 'menu-item activo' : 'menu-item'}">
@@ -224,9 +215,9 @@
                             <c:forEach var="ticket"
                                        items="${tickets}">
 
-                                <tr>
+                                <tr onclick="window.location.href = '${pageContext.request.contextPath}/detalleTicket?id=${ticket.idTicket}'"
+                                    style="cursor:pointer;">
 
-                                    <!-- TICKET -->
                                     <td>
 
                                         <strong class="ticket-id">
@@ -239,92 +230,68 @@
 
                                     </td>
 
-
-                                    <!-- CATEGORÍA -->
                                     <td>
-
                                         ${ticket.nombreCategoria}
-
                                     </td>
 
-
-                                    <!-- PRIORIDAD -->
                                     <td>
-
                                         ${ticket.nombrePrioridad}
-
                                     </td>
 
-
-                                    <!-- ESTADO -->
                                     <td>
 
                                         <c:choose>
 
                                             <c:when test="${ticket.estado == 'NUEVO'}">
-
                                                 <span class="badge estado-nuevo">
                                                     NUEVO
                                                 </span>
-
                                             </c:when>
 
+                                            <c:when test="${ticket.estado == 'ASIGNADO'}">
+                                                <span class="badge estado-nuevo">
+                                                    ASIGNADO
+                                                </span>
+                                            </c:when>
 
                                             <c:when test="${ticket.estado == 'EN_PROCESO'}">
-
                                                 <span class="badge estado-proceso">
                                                     EN PROCESO
                                                 </span>
-
                                             </c:when>
 
-
                                             <c:when test="${ticket.estado == 'RESUELTO'}">
-
                                                 <span class="badge estado-resuelto">
                                                     RESUELTO
                                                 </span>
-
                                             </c:when>
 
-
                                             <c:when test="${ticket.estado == 'CANCELADO'}">
-
                                                 <span class="badge estado-cancelado">
                                                     CANCELADO
                                                 </span>
-
                                             </c:when>
 
-
                                             <c:otherwise>
-
                                                 <span class="badge">
                                                     ${ticket.estado}
                                                 </span>
-
                                             </c:otherwise>
 
                                         </c:choose>
 
                                     </td>
 
-
-                                    <!-- AGENTE -->
                                     <td>
 
                                         <c:choose>
 
                                             <c:when test="${not empty ticket.nombreAgente}">
-
                                                 ${ticket.nombreAgente}
-
                                             </c:when>
 
                                             <c:otherwise>
-
                                                 Sin asignar
-
                                             </c:otherwise>
 
                                         </c:choose>
