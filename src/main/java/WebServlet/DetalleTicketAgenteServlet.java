@@ -68,8 +68,9 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         //
         // 1 = SOLICITANTE
         // 2 = AGENTE
+        // 3 = ADMINISTRADOR
         // ==========================================================
-        if (idRol != 1 && idRol != 2) {
+        if (idRol != 1 && idRol != 2 && idRol != 3) {
 
             response.sendError(
                     HttpServletResponse.SC_FORBIDDEN,
@@ -173,6 +174,9 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         //
         // SOLICITANTE:
         // Solo puede ver tickets creados por él.
+        //
+        // ADMINISTRADOR:
+        // Puede ver cualquier ticket, sin restricción.
         // ==========================================================
         if (idRol == 2) {
 
@@ -318,11 +322,20 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         //
         // ROL 1 → SOLICITANTE
         // ROL 2 → AGENTE
+        // ROL 3 → ADMINISTRADOR
         // ==========================================================
         if (idRol == 1) {
 
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Solicitante/detalleTicketSolicitante.jsp")
+                    .forward(
+                            request,
+                            response);
+
+        } else if (idRol == 3) {
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/jsp/Administrador/detalleTicketAdmin.jsp")
                     .forward(
                             request,
                             response);
@@ -346,6 +359,14 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
+
+        // ==========================================================
+        // CODIFICACIÓN
+        //
+        // Sin esto, tildes/ñ/etc. del textarea llegan mal
+        // decodificadas y quedan corruptas en la base de datos.
+        // ==========================================================
+        request.setCharacterEncoding("UTF-8");
 
         // ==========================================================
         // VALIDAR SESIÓN
@@ -374,8 +395,9 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         //
         // 1 = SOLICITANTE
         // 2 = AGENTE
+        // 3 = ADMINISTRADOR (solo puede comentar, no cambiar estado)
         // ==========================================================
-        if (idRol != 1 && idRol != 2) {
+        if (idRol != 1 && idRol != 2 && idRol != 3) {
 
             response.sendError(
                     HttpServletResponse.SC_FORBIDDEN,
@@ -428,16 +450,10 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                         .getAttribute(
                                 AppContextListener.TICKET_SERVICE);
 
-        ComentarioRepository comentarioRepository
-                = (ComentarioRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.COMENTARIO_REPOSITORY);
-
-        if (ticketService == null
-                || comentarioRepository == null) {
+        if (ticketService == null) {
 
             throw new ServletException(
-                    "Servicios o repositorios no configurados.");
+                    "TicketService no está configurado.");
         }
 
         // ==========================================================
@@ -494,8 +510,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         // ==========================================================
         // COMENTAR
         //
-        // TANTO EL SOLICITANTE COMO EL AGENTE
+        // SOLICITANTE, AGENTE Y ADMINISTRADOR
         // PUEDEN AGREGAR COMENTARIOS.
+        //
+        // Se delega en TicketService.agregarComentario() en vez de
+        // guardar directo en el repositorio, porque ahí es donde
+        // vive la lógica que notifica al agente/solicitante.
         // ==========================================================
         if ("comentar".equals(accion)) {
 
@@ -513,14 +533,22 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                 return;
             }
 
-            Comentario comentario
-                    = new Comentario(
-                            idTicket,
-                            idUsuario,
-                            texto.trim());
+            try {
 
-            comentarioRepository.guardar(
-                    comentario);
+                ticketService.agregarComentario(
+                        idTicket,
+                        idUsuario,
+                        idRol,
+                        texto.trim());
+
+            } catch (IllegalArgumentException e) {
+
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        e.getMessage());
+
+                return;
+            }
 
             response.sendRedirect(
                     request.getContextPath()

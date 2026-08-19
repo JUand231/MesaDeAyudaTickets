@@ -345,17 +345,17 @@
 
                             <p>
 
-                            <c:choose>
+                                <c:choose>
 
-                                <c:when test="${slaVencido}">
-                                    VENCIDO
-                                </c:when>
+                                    <c:when test="${slaVencido}">
+                                        VENCIDO
+                                    </c:when>
 
-                                <c:otherwise>
-                                    DENTRO DEL SLA
-                                </c:otherwise>
+                                    <c:otherwise>
+                                        DENTRO DEL SLA
+                                    </c:otherwise>
 
-                            </c:choose>
+                                </c:choose>
 
                             </p>
 
@@ -586,14 +586,33 @@
                             <div style="
                                  display:flex;
                                  justify-content:space-between;
+                                 align-items:center;
                                  margin-bottom:8px;
                                  ">
 
-                                <strong>
+                                <div style="display:flex; align-items:center; gap:8px;">
 
-                                    Usuario #${comentario.idUsuario}
+                                    <strong>
+                                        ${comentario.nombreUsuario}
+                                    </strong>
 
-                                </strong>
+                                    <c:choose>
+
+                                        <c:when test="${comentario.nombreRol == 'ADMINISTRADOR'}">
+                                            <span class="badge estado-resuelto">ADMINISTRADOR</span>
+                                        </c:when>
+
+                                        <c:when test="${comentario.nombreRol == 'AGENTE'}">
+                                            <span class="badge estado-proceso">AGENTE</span>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <span class="badge estado-nuevo">SOLICITANTE</span>
+                                        </c:otherwise>
+
+                                    </c:choose>
+
+                                </div>
 
                                 <small style="
                                        color:#718096;

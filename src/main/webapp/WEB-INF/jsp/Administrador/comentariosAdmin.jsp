@@ -204,7 +204,12 @@
                             <!-- COMENTARIOS -->
                             <c:forEach var="comentario" items="${comentarios}">
                                 <tr>
-                                    <td><strong class="ticket-id">#TK-${comentario.idTicket}</strong></td>
+                                    <td>
+                                        <a href="${pageContext.request.contextPath}/detalleTicket?id=${comentario.idTicket}"
+                                           style="text-decoration:none;">
+                                            <strong class="ticket-id">#TK-${comentario.idTicket}</strong>
+                                        </a>
+                                    </td>
                                     <td>
                                         <div class="persona">
                                             <span>${comentario.nombreUsuario}</span>
@@ -227,7 +232,7 @@
                                     <td>${comentario.fecha}</td>
                                     <td>
                                         <div class="acciones-ticket">
-                                            <a href="${pageContext.request.contextPath}/tickets?id=${comentario.idTicket}" class="accion ver" title="Ver ticket">+</a>
+                                            <a href="${pageContext.request.contextPath}/detalleTicket?id=${comentario.idTicket}" class="accion ver" title="Ver ticket">+</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -247,39 +252,6 @@
                         <button class="pagina">›</button>
                     </div>
                 </div>
-            </section>
-
-
-            <!-- NUEVO COMENTARIO -->
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Agregar comentario</h2>
-                        <p>Escribe un comentario en un ticket.</p>
-                    </div>
-                </div>
-
-                <form method="post" action="${pageContext.request.contextPath}/comentarios">
-                    <!-- TICKET -->
-                    <div class="campo-filtro" style="margin-bottom:20px;">
-                        <label>Ticket</label>
-                        <select name="idTicket" required>
-                            <option value="">Selecciona un ticket</option>
-                            <c:forEach var="ticket" items="${tickets}">
-                                <option value="${ticket.idTicket}">#TK-${ticket.idTicket} - ${ticket.titulo}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-
-                    <!-- COMENTARIO -->
-                    <div class="campo-filtro" style="margin-bottom:20px;">
-                        <label>Comentario</label>
-                        <textarea name="contenido" rows="5" maxlength="1000" required placeholder="Escribe tu comentario..."></textarea>
-                    </div>
-
-                    <!-- BOTÓN -->
-                    <button type="submit" class="btn-filtrar">✎ Publicar comentario</button>
-                </form>
             </section>
 
         </main>

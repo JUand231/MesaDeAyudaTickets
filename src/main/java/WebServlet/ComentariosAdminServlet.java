@@ -11,9 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import repositorio.TicketRepository;
-import modelo.Ticket;
-import repositorio.TicketRepository;
 
 @WebServlet("/comentariosAdmin")
 public class ComentariosAdminServlet extends HttpServlet {
@@ -60,22 +57,6 @@ public class ComentariosAdminServlet extends HttpServlet {
                     "ComentarioRepository no está configurado"
             );
         }
-
-// ==========================================
-// TICKETS (para el select "Agregar comentario")
-// ==========================================
-        TicketRepository ticketRepository
-                = (TicketRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.TICKET_REPOSITORY );
-        if (ticketRepository == null) {
-            throw new ServletException(
-                    "TicketRepository no está configurado"
-            );
-        }
-
-        List<Ticket> tickets = ticketRepository.listarTodos();
-        request.setAttribute("tickets", tickets);
 
         // ==========================================
         // FILTROS
