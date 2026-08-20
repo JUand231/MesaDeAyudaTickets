@@ -118,67 +118,47 @@
                         </div>
 
 
-                        <!-- PRIORIDAD -->
-                        <div class="campo-ticket">
+                        <p style="
+                           color:#718096;
+                           font-size:0.9rem;
+                           margin-top:-10px;
+                           ">
 
-                            <label for="idPrioridad">
-                                Prioridad
-                            </label>
+                            La prioridad se calcula automáticamente según la
+                            categoría y la descripción del problema.
 
-                            <select
-                                id="idPrioridad"
-                                name="idPrioridad"
-                                required
-                                >
-
-                                <option value="">
-                                    Selecciona una prioridad
-                                </option>
-
-                                <c:forEach
-                                    var="prioridad"
-                                    items="${prioridades}"
-                                    >
-
-                                    <option value="${prioridad.idPrioridad}">
-                                        ${prioridad.tipo}
-                                    </option>
-
-                                </c:forEach>
-
-                            </select>
-
-                        </div>
+                        </p>
+                </div>
 
 
-                        <!-- BOTONES -->
-                        <div class="acciones-ticket">
+                <!-- BOTONES -->
+                <div class="acciones-ticket">
 
-                            <button
-                                type="submit"
-                                class="btn-crear-ticket"
-                                >
-                                Crear ticket
-                            </button>
+                    <button
+                        type="submit"
+                        class="btn-crear-ticket"
+                        >
+                        Crear ticket
+                    </button>
 
 
-                            <a
-                                href="${pageContext.request.contextPath}/dashboardSolicitante"
-                                class="btn-secundario"
-                                >
-                                Cancelar
-                            </a>
-
-                        </div>
-
-                    </form>
+                    <a
+                        href="${pageContext.request.contextPath}/dashboardSolicitante"
+                        class="btn-secundario"
+                        >
+                        Cancelar
+                    </a>
 
                 </div>
 
+                </form>
+
             </div>
 
-        </main>
+        </div>
 
-    </body>
+    </main>
+
+</body>
 
 </html>

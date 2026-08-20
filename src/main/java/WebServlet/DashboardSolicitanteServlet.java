@@ -10,7 +10,7 @@ import repositorio.CategoriaRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import repositorio.NotificacionRepository;
-import servicio.TicketService;
+import servicio.roles.AccionesSolicitante;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +64,8 @@ public class DashboardSolicitanteServlet extends HttpServlet {
         // ==========================================
         // OBTENER REPOSITORIOS Y SERVICIOS
         // ==========================================
-        TicketService ticketService
-                = (TicketService) getServletContext()
+        AccionesSolicitante ticketService
+                = (AccionesSolicitante) getServletContext()
                         .getAttribute(
                                 AppContextListener.TICKET_SERVICE);
 

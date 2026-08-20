@@ -1,24 +1,44 @@
 package servicio;
 
+import modelo.Categoria;
 import modelo.Comentario;
 import modelo.Prioridad;
 import modelo.Ticket;
 import modelo.Usuario;
+import repositorio.CategoriaRepository;
 import repositorio.ComentarioRepository;
+import repositorio.PrioridadRepository;
 import repositorio.TicketRepository;
 import repositorio.UsuarioRepository;
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
+import servicio.prioridad.CalculadoraPrioridad;
+import servicio.roles.AccionesAdministrador;
+import servicio.roles.AccionesAgente;
+import servicio.roles.AccionesSolicitante;
 import servicio.sla.CalculadoraSLA;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public class TicketService {
+/**
+ * Implementación única de las tres interfaces de rol (ISP-01).
+ *
+ * Sigue siendo UNA clase por simplicidad de la capa de negocio (comparte
+ * repositorios, Strategies y Notificador), pero cada Servlet la recibe casteada
+ * a la interfaz de SU rol nada más -- así un Servlet de solicitante ni siquiera
+ * puede ver en su tipo el método cancelar() o asignarAgente(), porque no forman
+ * parte de AccionesSolicitante.
+ */
+public class TicketService implements AccionesSolicitante, AccionesAgente, AccionesAdministrador {
 
     private final TicketRepository ticketRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CategoriaRepository categoriaRepository;
+    private final PrioridadRepository prioridadRepository;
     private final CalculadoraSLA calculadoraSLA;
+    private final CalculadoraPrioridad calculadoraPrioridad;
     private final EstrategiaAsignacion estrategiaAsignacion;
     private final Notificador notificador;
     private final ComentarioRepository comentarioRepository;
@@ -26,24 +46,30 @@ public class TicketService {
     public TicketService(
             TicketRepository ticketRepository,
             UsuarioRepository usuarioRepository,
+            CategoriaRepository categoriaRepository,
+            PrioridadRepository prioridadRepository,
             ComentarioRepository comentarioRepository,
             CalculadoraSLA calculadoraSLA,
+            CalculadoraPrioridad calculadoraPrioridad,
             EstrategiaAsignacion estrategiaAsignacion,
             Notificador notificador) {
 
         this.ticketRepository = ticketRepository;
         this.usuarioRepository = usuarioRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.prioridadRepository = prioridadRepository;
         this.comentarioRepository = comentarioRepository;
         this.calculadoraSLA = calculadoraSLA;
+        this.calculadoraPrioridad = calculadoraPrioridad;
         this.estrategiaAsignacion = estrategiaAsignacion;
         this.notificador = notificador;
     }
 
+    @Override
     public Ticket crearTicket(
             String titulo,
             String descripcion,
             int idCategoria,
-            int idPrioridad,
             int idSolicitante) {
 
         if (titulo == null || titulo.isBlank()) {
@@ -58,6 +84,27 @@ public class TicketService {
             );
         }
 
+        Categoria categoria
+                = categoriaRepository
+                        .buscarPorId(idCategoria)
+                        .orElseThrow(
+                                ()
+                                -> new IllegalArgumentException(
+                                        "No existe la categoria con id "
+                                        + idCategoria));
+
+        // ==========================================================
+        // RF-03: PRIORIDAD AUTOMÁTICA
+        //
+        // El solicitante ya no la elige: se calcula según la
+        // categoría y palabras clave del título/descripción.
+        // ==========================================================
+        int idPrioridad
+                = calcularIdPrioridad(
+                        titulo,
+                        descripcion,
+                        categoria.getNombreCategoria());
+
         Ticket ticket = new Ticket();
 
         ticket.setTitulo(titulo.trim());
@@ -68,6 +115,34 @@ public class TicketService {
 
         Ticket creado
                 = ticketRepository.guardar(ticket);
+
+// ==========================================================
+// RF-04 / OCP-02: ASIGNACIÓN AUTOMÁTICA DE AGENTE
+//
+// Se usa la Strategy configurada en AppContextListener (turno
+// rotativo, menor carga, etc.) para asignar un agente apenas
+// se crea el ticket. Si no hay agentes o la estrategia falla,
+// el ticket simplemente queda en NUEVO para que un admin lo
+// asigne manualmente después (no debe romper la creación).
+// ==========================================================
+        try {
+
+            List<Usuario> agentesDisponibles
+                    = usuarioRepository.listarAgentes();
+
+            if (!agentesDisponibles.isEmpty()) {
+
+                creado = asignarAgenteAutomatico(
+                        creado.getIdTicket(),
+                        agentesDisponibles);
+            }
+
+        } catch (Exception e) {
+
+            // El ticket ya fue creado; que no haya agente
+            // disponible no debe impedir su creación.
+            e.printStackTrace();
+        }
 
 // ==========================================================
 // NOTIFICAR A LOS ADMINISTRADORES
@@ -100,18 +175,63 @@ public class TicketService {
         return creado;
     }
 
+    /**
+     * Usa la Strategy de prioridad (calculadoraPrioridad) para decidir el tipo
+     * ("BAJA"/"MEDIA"/"ALTA"/"CRITICA") y lo traduce al id correspondiente de
+     * la tabla Prioridad.
+     */
+    private int calcularIdPrioridad(
+            String titulo,
+            String descripcion,
+            String nombreCategoria) {
+
+        String tipoCalculado
+                = calculadoraPrioridad.calcular(
+                        titulo,
+                        descripcion,
+                        nombreCategoria);
+
+        List<Prioridad> prioridades;
+
+        try {
+
+            prioridades = prioridadRepository.listarTodas();
+
+        } catch (SQLException e) {
+
+            throw new IllegalStateException(
+                    "No se pudieron cargar las prioridades disponibles",
+                    e);
+        }
+
+        return prioridades.stream()
+                .filter(p -> p.getTipo().equalsIgnoreCase(tipoCalculado))
+                .findFirst()
+                .orElseThrow(
+                        ()
+                        -> new IllegalStateException(
+                                "La prioridad calculada \""
+                                + tipoCalculado
+                                + "\" no existe en la tabla Prioridad"))
+                .getIdPrioridad();
+    }
+
+    @Override
     public List<Ticket> listarTodos() {
         return ticketRepository.listarTodos();
     }
 
+    @Override
     public List<Ticket> listarPorSolicitante(int idSolicitante) {
         return ticketRepository.listarPorSolicitante(idSolicitante);
     }
 
+    @Override
     public List<Ticket> listarPorAgente(int idAgente) {
         return ticketRepository.listarPorAgente(idAgente);
     }
 
+    @Override
     public Ticket buscarPorId(int idTicket) {
 
         Optional<Ticket> encontrado
@@ -126,6 +246,7 @@ public class TicketService {
         return encontrado.get();
     }
 
+    @Override
     public LocalDateTime calcularFechaLimiteSLA(
             int idTicket,
             Prioridad prioridad) {
@@ -138,6 +259,7 @@ public class TicketService {
         );
     }
 
+    @Override
     public boolean estaVencido(
             int idTicket,
             Prioridad prioridad) {
@@ -150,6 +272,7 @@ public class TicketService {
         );
     }
 
+    @Override
     public Ticket asignarAgenteAutomatico(
             int idTicket,
             List<Usuario> agentesDisponibles) {
@@ -165,6 +288,7 @@ public class TicketService {
         return asignarAgente(idTicket, idAgente);
     }
 
+    @Override
     public Ticket asignarAgente(int idTicket, int idAgente) {
 
         Ticket ticket = buscarPorId(idTicket);
@@ -186,9 +310,21 @@ public class TicketService {
                 + actualizado.getTitulo()
         );
 
+        Usuario solicitante = obtenerUsuario(actualizado.getIdSolicitante());
+
+        notificador.notificar(
+                solicitante,
+                actualizado,
+                "Tu ticket #"
+                + actualizado.getIdTicket()
+                + " fue asignado al agente "
+                + agente.getNombre()
+        );
+
         return actualizado;
     }
 
+    @Override
     public Ticket iniciarAtencion(
             int idTicket,
             Usuario solicitante) {
@@ -212,6 +348,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket resolver(
             int idTicket,
             Usuario solicitante) {
@@ -235,6 +372,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket cerrar(
             int idTicket,
             Usuario solicitante) {
@@ -258,6 +396,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket reabrir(
             int idTicket,
             Usuario solicitante) {
@@ -288,6 +427,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket cancelar(
             int idTicket,
             Usuario solicitante) {
@@ -311,6 +451,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket reasignarAgente(
             int idTicket,
             int nuevoIdAgente,
@@ -338,6 +479,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Comentario agregarComentario(
             int idTicket,
             int idUsuario,

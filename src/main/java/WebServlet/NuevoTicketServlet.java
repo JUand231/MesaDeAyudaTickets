@@ -1,11 +1,8 @@
 package WebServlet;
 
 import modelo.Categoria;
-import modelo.Prioridad;
 import repositorio.CategoriaRepository;
-import repositorio.PrioridadRepository;
-import servicio.TicketService;
-
+import servicio.roles.AccionesSolicitante;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -51,15 +48,13 @@ public class NuevoTicketServlet extends HttpServlet {
         String titulo = request.getParameter("titulo");
         String descripcion = request.getParameter("descripcion");
         String idCategoriaStr = request.getParameter("idCategoria");
-        String idPrioridadStr = request.getParameter("idPrioridad");
 
-        TicketService ticketService = (TicketService) getServletContext().getAttribute(AppContextListener.TICKET_SERVICE);
+        AccionesSolicitante ticketService = (AccionesSolicitante) getServletContext().getAttribute(AppContextListener.TICKET_SERVICE);
 
         try {
             int idCategoria = Integer.parseInt(idCategoriaStr);
-            int idPrioridad = Integer.parseInt(idPrioridadStr);
 
-            ticketService.crearTicket(titulo, descripcion, idCategoria, idPrioridad, idSolicitante);
+            ticketService.crearTicket(titulo, descripcion, idCategoria, idSolicitante);
 
             response.sendRedirect(request.getContextPath() + "/dashboardSolicitante");
 
@@ -74,15 +69,12 @@ public class NuevoTicketServlet extends HttpServlet {
 
     private void cargarListas(HttpServletRequest request) throws ServletException {
         CategoriaRepository categoriaRepository = (CategoriaRepository) getServletContext().getAttribute(AppContextListener.CATEGORIA_REPOSITORY);
-        PrioridadRepository prioridadRepository = (PrioridadRepository) getServletContext().getAttribute(AppContextListener.PRIORIDAD_REPOSITORY);
 
         try {
             List<Categoria> categorias = categoriaRepository.listarTodas();
-            List<Prioridad> prioridades = prioridadRepository.listarTodas();
             request.setAttribute("categorias", categorias);
-            request.setAttribute("prioridades", prioridades);
         } catch (SQLException e) {
-            throw new ServletException("Error cargando categorias/prioridades", e);
+            throw new ServletException("Error cargando categorias", e);
         }
     }
 }
