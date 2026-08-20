@@ -216,26 +216,6 @@
                             <p>${ticket.fechaCreacion}</p>
                         </div>
 
-                        <div>
-                            <strong>SLA</strong>
-                            <p>${horasSLA} horas</p>
-                        </div>
-
-                        <div>
-                            <strong>Fecha límite SLA</strong>
-                            <p>${fechaLimiteSLA}</p>
-                        </div>
-
-                        <div>
-                            <strong>Estado SLA</strong>
-                            <p>
-                                <c:choose>
-                                    <c:when test="${slaVencido}">VENCIDO</c:when>
-                                    <c:otherwise>DENTRO DEL SLA</c:otherwise>
-                                </c:choose>
-                            </p>
-                        </div>
-
                     </div>
 
 

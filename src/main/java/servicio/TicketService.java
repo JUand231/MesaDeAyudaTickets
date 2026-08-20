@@ -6,6 +6,7 @@ import modelo.Ticket;
 import modelo.Usuario;
 import repositorio.ComentarioRepository;
 import repositorio.TicketRepository;
+import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
@@ -20,12 +21,14 @@ public class TicketService {
     private final UsuarioRepository usuarioRepository;
     private final CalculadoraSLA calculadoraSLA;
     private final EstrategiaAsignacion estrategiaAsignacion;
+    private final PrioridadRepository prioridadRepository;
     private final Notificador notificador;
     private final ComentarioRepository comentarioRepository;
 
     public TicketService(
             TicketRepository ticketRepository,
             UsuarioRepository usuarioRepository,
+            PrioridadRepository prioridadRepository,
             ComentarioRepository comentarioRepository,
             CalculadoraSLA calculadoraSLA,
             EstrategiaAsignacion estrategiaAsignacion,
@@ -33,6 +36,7 @@ public class TicketService {
 
         this.ticketRepository = ticketRepository;
         this.usuarioRepository = usuarioRepository;
+        this.prioridadRepository = prioridadRepository;
         this.comentarioRepository = comentarioRepository;
         this.calculadoraSLA = calculadoraSLA;
         this.estrategiaAsignacion = estrategiaAsignacion;
@@ -43,7 +47,6 @@ public class TicketService {
             String titulo,
             String descripcion,
             int idCategoria,
-            int idPrioridad,
             int idSolicitante) {
 
         if (titulo == null || titulo.isBlank()) {
@@ -63,9 +66,17 @@ public class TicketService {
         ticket.setTitulo(titulo.trim());
         ticket.setDescripcion(descripcion.trim());
         ticket.setIdCategoria(idCategoria);
-        ticket.setIdPrioridad(idPrioridad);
         ticket.setIdSolicitante(idSolicitante);
 
+        Prioridad prioridad = determinarPrioridad(
+                titulo,
+                descripcion,
+                idCategoria
+        );
+
+        ticket.setIdPrioridad(
+                prioridad.getIdPrioridad()
+        );
         Ticket creado
                 = ticketRepository.guardar(ticket);
 
@@ -92,12 +103,79 @@ public class TicketService {
         } catch (Exception e) {
 
             // El ticket ya fue creado.
-            // No debemos perder la creación por un fallo
-            // secundario de notificaciones.
             e.printStackTrace();
         }
 
         return creado;
+    }
+
+    public Prioridad determinarPrioridad(
+            String titulo,
+            String descripcion,
+            int idCategoria) {
+
+        String texto = (titulo + " " + descripcion).toLowerCase();
+
+        // ==========================================================
+        // PRIORIDAD CRÍTICA
+        // ==========================================================
+        if (texto.contains("error")
+                || texto.contains("fallo")
+                || texto.contains("sistema caído")
+                || texto.contains("sistema caido")
+                || texto.contains("urgente")) {
+
+            return prioridadRepository.buscarPorId(4)
+                    .orElseThrow(()
+                            -> new IllegalArgumentException(
+                            "No existe la prioridad CRITICA"
+                    ));
+        }
+
+        // ==========================================================
+        // PRIORIDAD ALTA
+        // ==========================================================
+        if (texto.contains("caído")
+                || texto.contains("caido")
+                || texto.contains("bloqueado")
+                || texto.contains("no funciona")
+                || texto.contains("no puedo acceder")
+                || texto.contains("no inicia")) {
+
+            return prioridadRepository.buscarPorId(3)
+                    .orElseThrow(()
+                            -> new IllegalArgumentException(
+                            "No existe la prioridad ALTA"
+                    ));
+        }
+
+        // ==========================================================
+        // PRIORIDAD MEDIA
+        // ==========================================================
+        if (texto.contains("lento")
+                || texto.contains("no hay internet")
+                || texto.contains("sin internet")
+                || texto.contains("red caida")
+                || texto.contains("problema")
+                || texto.contains("configuración")
+                || texto.contains("configuracion")) {
+
+            return prioridadRepository.buscarPorId(2)
+                    .orElseThrow(()
+                            -> new IllegalArgumentException(
+                            "No existe la prioridad MEDIA"
+                    ));
+        }
+
+        // ==========================================================
+        // PRIORIDAD BAJA
+        // ==========================================================
+        return prioridadRepository.buscarPorId(1)
+                .orElseThrow(()
+                        -> new IllegalArgumentException(
+                        "No existe la prioridad BAJA"
+                ));
+
     }
 
     public List<Ticket> listarTodos() {

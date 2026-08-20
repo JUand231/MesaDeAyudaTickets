@@ -87,49 +87,6 @@
                 </div>
             </header>
 
-            <!-- ESTADÍSTICAS -->
-            <section class="estadisticas">
-                <!-- TOTAL -->
-                <div class="estadistica">
-                    <div class="estadistica-icono azul">🖂</div>
-                    <div>
-                        <span>TOTAL COMENTARIOS</span>
-                        <strong>${totalComentarios}</strong>
-                        <small>Comentarios registrados</small>
-                    </div>
-                </div>
-
-                <!-- HOY -->
-                <div class="estadistica">
-                    <div class="estadistica-icono naranja">◷</div>
-                    <div>
-                        <span>COMENTARIOS HOY</span>
-                        <strong>${comentariosHoy}</strong>
-                        <small>Actividad del día</small>
-                    </div>
-                </div>
-
-                <!-- AGENTES -->
-                <div class="estadistica">
-                    <div class="estadistica-icono verde">♟</div>
-                    <div>
-                        <span>AGENTES</span>
-                        <strong>${comentariosAgentes}</strong>
-                        <small>Comentarios realizados</small>
-                    </div>
-                </div>
-
-                <!-- SOLICITANTES -->
-                <div class="estadistica">
-                    <div class="estadistica-icono rojo">●</div>
-                    <div>
-                        <span>SOLICITANTES</span>
-                        <strong>${comentariosSolicitantes}</strong>
-                        <small>Comentarios realizados</small>
-                    </div>
-                </div>
-            </section>
-
             <!-- FILTROS -->
             <section class="panel filtros-panel">
                 <div class="panel-header">

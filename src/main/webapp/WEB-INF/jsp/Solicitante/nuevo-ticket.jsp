@@ -117,40 +117,6 @@
 
                         </div>
 
-
-                        <!-- PRIORIDAD -->
-                        <div class="campo-ticket">
-
-                            <label for="idPrioridad">
-                                Prioridad
-                            </label>
-
-                            <select
-                                id="idPrioridad"
-                                name="idPrioridad"
-                                required
-                                >
-
-                                <option value="">
-                                    Selecciona una prioridad
-                                </option>
-
-                                <c:forEach
-                                    var="prioridad"
-                                    items="${prioridades}"
-                                    >
-
-                                    <option value="${prioridad.idPrioridad}">
-                                        ${prioridad.tipo}
-                                    </option>
-
-                                </c:forEach>
-
-                            </select>
-
-                        </div>
-
-
                         <!-- BOTONES -->
                         <div class="acciones-ticket">
 

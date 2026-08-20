@@ -424,10 +424,11 @@ public class TicketsAdminServlet extends HttpServlet {
         String idAgenteStr
                 = request.getParameter("idAgente");
 
+        String tipoAsignacion
+                = request.getParameter("tipoAsignacion");
+
         if (idTicketStr == null
-                || idAgenteStr == null
-                || idTicketStr.trim().isEmpty()
-                || idAgenteStr.trim().isEmpty()) {
+                || idTicketStr.trim().isEmpty()) {
 
             response.sendRedirect(
                     request.getContextPath()
@@ -437,23 +438,16 @@ public class TicketsAdminServlet extends HttpServlet {
         }
 
         int idTicket;
-        int idAgente;
 
         try {
 
-            idTicket
-                    = Integer.parseInt(
-                            idTicketStr);
-
-            idAgente
-                    = Integer.parseInt(
-                            idAgenteStr);
+            idTicket = Integer.parseInt(idTicketStr);
 
         } catch (NumberFormatException e) {
 
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "El ID del ticket o del agente no es válido.");
+                    "El ID del ticket no es válido.");
 
             return;
         }
@@ -502,33 +496,78 @@ public class TicketsAdminServlet extends HttpServlet {
             }
 
             // ======================================================
-            // BUSCAR AGENTE
+               // ASIGNACIÓN AUTOMÁTICA
             // ======================================================
-            Usuario agente
-                    = usuarioRepository
-                            .buscarPorId(
-                                    idAgente)
-                            .orElseThrow(
-                                    ()
-                                    -> new IllegalArgumentException(
-                                            "No existe el agente seleccionado."));
+            if ("automatico".equalsIgnoreCase(tipoAsignacion)) {
 
-            // ======================================================
-            // VALIDAR QUE REALMENTE SEA AGENTE
-            // ======================================================
-            if (agente.getIdRol() != 2) {
+                List<Usuario> agentesDisponibles
+                        = usuarioRepository.listarAgentes();
 
-                response.sendError(
-                        HttpServletResponse.SC_BAD_REQUEST,
-                        "El usuario seleccionado no es un agente.");
+                if (agentesDisponibles == null
+                        || agentesDisponibles.isEmpty()) {
 
-                return;
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "No hay agentes disponibles para asignar.");
+
+                    return;
+                }
+
+                ticketService.asignarAgenteAutomatico(
+                        idTicket,
+                        agentesDisponibles);
+
+            } else {
+
+                // ==================================================
+                // ASIGNACIÓN MANUAL
+                // ==================================================
+                if (idAgenteStr == null
+                        || idAgenteStr.trim().isEmpty()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Debes seleccionar un agente.");
+
+                    return;
+                }
+
+                int idAgente;
+
+                try {
+
+                    idAgente = Integer.parseInt(idAgenteStr);
+
+                } catch (NumberFormatException e) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "El ID del agente no es válido.");
+
+                    return;
+                }
+
+                Usuario agente
+                        = usuarioRepository
+                                .buscarPorId(idAgente)
+                                .orElseThrow(
+                                        ()
+                                        -> new IllegalArgumentException(
+                                                "No existe el agente seleccionado."));
+
+                if (agente.getIdRol() != 2) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "El usuario seleccionado no es un agente.");
+
+                    return;
+                }
+
+                ticketService.asignarAgente(
+                        idTicket,
+                        agente.getIdUsuario());
             }
-
-            ticketService.asignarAgente(
-                    idTicket,
-                    agente.getIdUsuario());
-
             response.sendRedirect(
                     request.getContextPath()
                     + "/tickets");
@@ -538,7 +577,10 @@ public class TicketsAdminServlet extends HttpServlet {
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
                     e.getMessage());
+        } catch (SQLException ex) {
+            System.getLogger(TicketsAdminServlet.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
+        
     }
 
     // ==========================================================

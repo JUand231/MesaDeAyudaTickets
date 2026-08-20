@@ -20,7 +20,7 @@ import repositorio.jdbc.TicketRepositoryJdbc;
 import repositorio.jdbc.UsuarioRepositoryJdbc;
 
 import servicio.TicketService;
-import servicio.asignacion.AsignacionPorTurnoRotativo;
+import servicio.asignacion.AsignacionPorMenorCarga;
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
 import servicio.notificacion.NotificadorEnAplicacion;
@@ -71,7 +71,7 @@ public class AppContextListener implements ServletContextListener {
                 = new CalculadoraSLAPorPrioridad();
 
         EstrategiaAsignacion estrategiaAsignacion
-                = new AsignacionPorTurnoRotativo();
+                = new AsignacionPorMenorCarga();
 
         Notificador notificador
                 = new NotificadorEnAplicacion(
@@ -82,6 +82,7 @@ public class AppContextListener implements ServletContextListener {
                 = new TicketService(
                         ticketRepository,
                         usuarioRepository,
+                        prioridadRepository,
                         comentarioRepository,
                         calculadoraSLA,
                         estrategiaAsignacion,
