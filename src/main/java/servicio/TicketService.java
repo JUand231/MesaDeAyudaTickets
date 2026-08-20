@@ -1,48 +1,65 @@
 package servicio;
 
+import modelo.Categoria;
 import modelo.Comentario;
 import modelo.Prioridad;
 import modelo.Ticket;
 import modelo.Usuario;
+import repositorio.CategoriaRepository;
 import repositorio.ComentarioRepository;
-import repositorio.TicketRepository;
 import repositorio.PrioridadRepository;
+import repositorio.TicketRepository;
 import repositorio.UsuarioRepository;
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
+import servicio.prioridad.CalculadoraPrioridad;
+import servicio.roles.AccionesAdministrador;
+import servicio.roles.AccionesAgente;
+import servicio.roles.AccionesSolicitante;
 import servicio.sla.CalculadoraSLA;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public class TicketService {
+/**
+ * Implementación única de las tres interfaces de rol (ISP-01).
+ */
+public class TicketService implements AccionesSolicitante, AccionesAgente, AccionesAdministrador {
 
     private final TicketRepository ticketRepository;
     private final UsuarioRepository usuarioRepository;
-    private final CalculadoraSLA calculadoraSLA;
-    private final EstrategiaAsignacion estrategiaAsignacion;
+    private final CategoriaRepository categoriaRepository;
     private final PrioridadRepository prioridadRepository;
+    private final CalculadoraSLA calculadoraSLA;
+    private final CalculadoraPrioridad calculadoraPrioridad;
+    private final EstrategiaAsignacion estrategiaAsignacion;
     private final Notificador notificador;
     private final ComentarioRepository comentarioRepository;
 
     public TicketService(
             TicketRepository ticketRepository,
             UsuarioRepository usuarioRepository,
+            CategoriaRepository categoriaRepository,
             PrioridadRepository prioridadRepository,
             ComentarioRepository comentarioRepository,
             CalculadoraSLA calculadoraSLA,
+            CalculadoraPrioridad calculadoraPrioridad,
             EstrategiaAsignacion estrategiaAsignacion,
             Notificador notificador) {
 
         this.ticketRepository = ticketRepository;
         this.usuarioRepository = usuarioRepository;
+        this.categoriaRepository = categoriaRepository;
         this.prioridadRepository = prioridadRepository;
         this.comentarioRepository = comentarioRepository;
         this.calculadoraSLA = calculadoraSLA;
+        this.calculadoraPrioridad = calculadoraPrioridad;
         this.estrategiaAsignacion = estrategiaAsignacion;
         this.notificador = notificador;
     }
 
+    @Override
     public Ticket crearTicket(
             String titulo,
             String descripcion,
@@ -61,35 +78,50 @@ public class TicketService {
             );
         }
 
-        Ticket ticket = new Ticket();
+        Categoria categoria = categoriaRepository
+                .buscarPorId(idCategoria)
+                .orElseThrow(() -> new IllegalArgumentException(
+                "No existe la categoria con id " + idCategoria));
 
+        // ==========================================================
+        // RF-03: PRIORIDAD AUTOMÁTICA
+        // ==========================================================
+        int idPrioridad = calcularIdPrioridad(
+                titulo,
+                descripcion,
+                categoria.getNombreCategoria());
+
+        Ticket ticket = new Ticket();
         ticket.setTitulo(titulo.trim());
         ticket.setDescripcion(descripcion.trim());
         ticket.setIdCategoria(idCategoria);
         ticket.setIdSolicitante(idSolicitante);
+        ticket.setIdPrioridad(idPrioridad);
 
-        Prioridad prioridad = determinarPrioridad(
-                titulo,
-                descripcion,
-                idCategoria
-        );
+        Ticket creado = ticketRepository.guardar(ticket);
 
-        ticket.setIdPrioridad(
-                prioridad.getIdPrioridad()
-        );
-        Ticket creado
-                = ticketRepository.guardar(ticket);
-
-// ==========================================================
-// NOTIFICAR A LOS ADMINISTRADORES
-// ==========================================================
+        // ==========================================================
+        // RF-04 / OCP-02: ASIGNACIÓN AUTOMÁTICA DE AGENTE
+        // ==========================================================
         try {
+            List<Usuario> agentesDisponibles = usuarioRepository.listarAgentes();
 
-            List<Usuario> administradores
-                    = usuarioRepository.listarAdministradores();
+            if (!agentesDisponibles.isEmpty()) {
+                creado = asignarAgenteAutomatico(
+                        creado.getIdTicket(),
+                        agentesDisponibles);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // ==========================================================
+        // NOTIFICAR A LOS ADMINISTRADORES
+        // ==========================================================
+        try {
+            List<Usuario> administradores = usuarioRepository.listarAdministradores();
 
             for (Usuario administrador : administradores) {
-
                 notificador.notificar(
                         administrador,
                         creado,
@@ -99,101 +131,66 @@ public class TicketService {
                         + creado.getTitulo()
                 );
             }
-
         } catch (Exception e) {
-
-            // El ticket ya fue creado.
             e.printStackTrace();
         }
 
         return creado;
     }
 
-    public Prioridad determinarPrioridad(
+    /**
+     * Usa la Strategy de prioridad (calculadoraPrioridad) para decidir el tipo
+     * ("BAJA"/"MEDIA"/"ALTA"/"CRITICA") y lo traduce al id correspondiente de
+     * la tabla Prioridad.
+     */
+    private int calcularIdPrioridad(
             String titulo,
             String descripcion,
-            int idCategoria) {
+            String nombreCategoria) {
 
-        String texto = (titulo + " " + descripcion).toLowerCase();
+        String tipoCalculado = calculadoraPrioridad.calcular(
+                titulo,
+                descripcion,
+                nombreCategoria);
 
-        // ==========================================================
-        // PRIORIDAD CRÍTICA
-        // ==========================================================
-        if (texto.contains("error")
-                || texto.contains("fallo")
-                || texto.contains("sistema caído")
-                || texto.contains("sistema caido")
-                || texto.contains("urgente")) {
+        List<Prioridad> prioridades;
 
-            return prioridadRepository.buscarPorId(4)
-                    .orElseThrow(()
-                            -> new IllegalArgumentException(
-                            "No existe la prioridad CRITICA"
-                    ));
+        try {
+            prioridades = prioridadRepository.listarTodas();
+        } catch (SQLException e) {
+            throw new IllegalStateException(
+                    "No se pudieron cargar las prioridades disponibles",
+                    e);
         }
 
-        // ==========================================================
-        // PRIORIDAD ALTA
-        // ==========================================================
-        if (texto.contains("caído")
-                || texto.contains("caido")
-                || texto.contains("bloqueado")
-                || texto.contains("no funciona")
-                || texto.contains("no puedo acceder")
-                || texto.contains("no inicia")) {
-
-            return prioridadRepository.buscarPorId(3)
-                    .orElseThrow(()
-                            -> new IllegalArgumentException(
-                            "No existe la prioridad ALTA"
-                    ));
-        }
-
-        // ==========================================================
-        // PRIORIDAD MEDIA
-        // ==========================================================
-        if (texto.contains("lento")
-                || texto.contains("no hay internet")
-                || texto.contains("sin internet")
-                || texto.contains("red caida")
-                || texto.contains("problema")
-                || texto.contains("configuración")
-                || texto.contains("configuracion")) {
-
-            return prioridadRepository.buscarPorId(2)
-                    .orElseThrow(()
-                            -> new IllegalArgumentException(
-                            "No existe la prioridad MEDIA"
-                    ));
-        }
-
-        // ==========================================================
-        // PRIORIDAD BAJA
-        // ==========================================================
-        return prioridadRepository.buscarPorId(1)
-                .orElseThrow(()
-                        -> new IllegalArgumentException(
-                        "No existe la prioridad BAJA"
-                ));
-
+        return prioridades.stream()
+                .filter(p -> p.getTipo().equalsIgnoreCase(tipoCalculado))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                "La prioridad calculada \""
+                + tipoCalculado
+                + "\" no existe en la tabla Prioridad"))
+                .getIdPrioridad();
     }
 
+    @Override
     public List<Ticket> listarTodos() {
         return ticketRepository.listarTodos();
     }
 
+    @Override
     public List<Ticket> listarPorSolicitante(int idSolicitante) {
         return ticketRepository.listarPorSolicitante(idSolicitante);
     }
 
+    @Override
     public List<Ticket> listarPorAgente(int idAgente) {
         return ticketRepository.listarPorAgente(idAgente);
     }
 
+    @Override
     public Ticket buscarPorId(int idTicket) {
-
-        Optional<Ticket> encontrado
-                = ticketRepository.buscarPorId(idTicket);
+        Optional<Ticket> encontrado = ticketRepository.buscarPorId(idTicket);
 
         if (encontrado.isEmpty()) {
             throw new IllegalArgumentException(
@@ -204,6 +201,7 @@ public class TicketService {
         return encontrado.get();
     }
 
+    @Override
     public LocalDateTime calcularFechaLimiteSLA(
             int idTicket,
             Prioridad prioridad) {
@@ -216,6 +214,7 @@ public class TicketService {
         );
     }
 
+    @Override
     public boolean estaVencido(
             int idTicket,
             Prioridad prioridad) {
@@ -228,6 +227,7 @@ public class TicketService {
         );
     }
 
+    @Override
     public Ticket asignarAgenteAutomatico(
             int idTicket,
             List<Usuario> agentesDisponibles) {
@@ -243,12 +243,12 @@ public class TicketService {
         return asignarAgente(idTicket, idAgente);
     }
 
+    @Override
     public Ticket asignarAgente(int idTicket, int idAgente) {
 
         Ticket ticket = buscarPorId(idTicket);
 
         ticket.setIdAgente(idAgente);
-
         ticket.asignar();
 
         Ticket actualizado = ticketRepository.actualizar(ticket);
@@ -264,9 +264,21 @@ public class TicketService {
                 + actualizado.getTitulo()
         );
 
+        Usuario solicitante = obtenerUsuario(actualizado.getIdSolicitante());
+
+        notificador.notificar(
+                solicitante,
+                actualizado,
+                "Tu ticket #"
+                + actualizado.getIdTicket()
+                + " fue asignado al agente "
+                + agente.getNombre()
+        );
+
         return actualizado;
     }
 
+    @Override
     public Ticket iniciarAtencion(
             int idTicket,
             Usuario solicitante) {
@@ -275,11 +287,9 @@ public class TicketService {
 
         ticket.iniciar();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -290,6 +300,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket resolver(
             int idTicket,
             Usuario solicitante) {
@@ -298,11 +309,9 @@ public class TicketService {
 
         ticket.resolver();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -313,6 +322,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket cerrar(
             int idTicket,
             Usuario solicitante) {
@@ -321,11 +331,9 @@ public class TicketService {
 
         ticket.cerrar();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -336,6 +344,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket reabrir(
             int idTicket,
             Usuario solicitante) {
@@ -344,15 +353,10 @@ public class TicketService {
 
         ticket.reabrir();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (actualizado.getIdAgente() != 0) {
-
-            Usuario agente
-                    = obtenerUsuario(
-                            actualizado.getIdAgente()
-                    );
+            Usuario agente = obtenerUsuario(actualizado.getIdAgente());
 
             notificador.notificar(
                     agente,
@@ -366,6 +370,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket cancelar(
             int idTicket,
             Usuario solicitante) {
@@ -374,11 +379,9 @@ public class TicketService {
 
         ticket.cancelar();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -389,6 +392,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Ticket reasignarAgente(
             int idTicket,
             int nuevoIdAgente,
@@ -398,11 +402,9 @@ public class TicketService {
 
         ticket.setIdAgente(nuevoIdAgente);
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
-        Usuario nuevoAgente
-                = obtenerUsuario(nuevoIdAgente);
+        Usuario nuevoAgente = obtenerUsuario(nuevoIdAgente);
 
         notificador.notificar(
                 nuevoAgente,
@@ -416,6 +418,7 @@ public class TicketService {
         return actualizado;
     }
 
+    @Override
     public Comentario agregarComentario(
             int idTicket,
             int idUsuario,
@@ -423,7 +426,6 @@ public class TicketService {
             String texto) {
 
         if (texto == null || texto.isBlank()) {
-
             throw new IllegalArgumentException(
                     "El comentario no puede estar vacio"
             );
@@ -438,7 +440,6 @@ public class TicketService {
 
             // SOLICITANTE
             if (ticket.getIdSolicitante() != idUsuario) {
-
                 throw new IllegalArgumentException(
                         "No puedes comentar este ticket."
                 );
@@ -465,30 +466,21 @@ public class TicketService {
         // ==========================================================
         // CREAR COMENTARIO
         // ==========================================================
-        Comentario comentario
-                = new Comentario(
-                        idTicket,
-                        idUsuario,
-                        texto.trim()
-                );
-
-        comentarioRepository.guardar(
-                comentario
+        Comentario comentario = new Comentario(
+                idTicket,
+                idUsuario,
+                texto.trim()
         );
+
+        comentarioRepository.guardar(comentario);
 
         // ==========================================================
         // NOTIFICAR
         // ==========================================================
         if (idRol == 1) {
 
-            // El solicitante comentó.
-            // Avisar al agente asignado.
             if (ticket.getIdAgente() != null) {
-
-                Usuario agente
-                        = obtenerUsuario(
-                                ticket.getIdAgente()
-                        );
+                Usuario agente = obtenerUsuario(ticket.getIdAgente());
 
                 notificador.notificar(
                         agente,
@@ -501,12 +493,7 @@ public class TicketService {
 
         } else if (idRol == 2) {
 
-            // El agente comentó.
-            // Avisar al solicitante.
-            Usuario solicitante
-                    = obtenerUsuario(
-                            ticket.getIdSolicitante()
-                    );
+            Usuario solicitante = obtenerUsuario(ticket.getIdSolicitante());
 
             notificador.notificar(
                     solicitante,
@@ -518,12 +505,7 @@ public class TicketService {
 
         } else if (idRol == 3) {
 
-            // ADMINISTRADOR
-            // Avisar a solicitante y agente.
-            Usuario solicitante
-                    = obtenerUsuario(
-                            ticket.getIdSolicitante()
-                    );
+            Usuario solicitante = obtenerUsuario(ticket.getIdSolicitante());
 
             notificador.notificar(
                     solicitante,
@@ -534,11 +516,7 @@ public class TicketService {
             );
 
             if (ticket.getIdAgente() != null) {
-
-                Usuario agente
-                        = obtenerUsuario(
-                                ticket.getIdAgente()
-                        );
+                Usuario agente = obtenerUsuario(ticket.getIdAgente());
 
                 notificador.notificar(
                         agente,
@@ -555,8 +533,7 @@ public class TicketService {
 
     private Usuario obtenerUsuario(int idUsuario) {
 
-        Optional<Usuario> usuario
-                = usuarioRepository.buscarPorId(idUsuario);
+        Optional<Usuario> usuario = usuarioRepository.buscarPorId(idUsuario);
 
         if (usuario.isEmpty()) {
             throw new IllegalArgumentException(

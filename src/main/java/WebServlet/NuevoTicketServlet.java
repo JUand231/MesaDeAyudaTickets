@@ -2,8 +2,7 @@ package WebServlet;
 
 import modelo.Categoria;
 import repositorio.CategoriaRepository;
-import servicio.TicketService;
-
+import servicio.roles.AccionesSolicitante;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -54,32 +53,16 @@ public class NuevoTicketServlet extends HttpServlet {
         int idSolicitante
                 = (Integer) session.getAttribute("idUsuario");
 
-        String titulo
-                = request.getParameter("titulo");
+        String titulo = request.getParameter("titulo");
+        String descripcion = request.getParameter("descripcion");
+        String idCategoriaStr = request.getParameter("idCategoria");
 
-        String descripcion
-                = request.getParameter("descripcion");
-
-        String idCategoriaStr
-                = request.getParameter("idCategoria");
-
-        TicketService ticketService
-                = (TicketService) getServletContext()
-                        .getAttribute(
-                                AppContextListener.TICKET_SERVICE
-                        );
+        AccionesSolicitante ticketService = (AccionesSolicitante) getServletContext().getAttribute(AppContextListener.TICKET_SERVICE);
 
         try {
+            int idCategoria = Integer.parseInt(idCategoriaStr);
 
-            int idCategoria
-                    = Integer.parseInt(idCategoriaStr);
-
-            ticketService.crearTicket(
-                    titulo,
-                    descripcion,
-                    idCategoria,
-                    idSolicitante
-            );
+            ticketService.crearTicket(titulo, descripcion, idCategoria, idSolicitante);
 
             response.sendRedirect(
                     request.getContextPath()
@@ -101,32 +84,14 @@ public class NuevoTicketServlet extends HttpServlet {
         }
     }
 
-    private void cargarListas(
-            HttpServletRequest request)
-            throws ServletException {
-
-        CategoriaRepository categoriaRepository
-                = (CategoriaRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.CATEGORIA_REPOSITORY
-                        );
+    private void cargarListas(HttpServletRequest request) throws ServletException {
+        CategoriaRepository categoriaRepository = (CategoriaRepository) getServletContext().getAttribute(AppContextListener.CATEGORIA_REPOSITORY);
 
         try {
-
-            List<Categoria> categorias
-                    = categoriaRepository.listarTodas();
-
-            request.setAttribute(
-                    "categorias",
-                    categorias
-            );
-
+            List<Categoria> categorias = categoriaRepository.listarTodas();
+            request.setAttribute("categorias", categorias);
         } catch (SQLException e) {
-
-            throw new ServletException(
-                    "Error cargando categorias",
-                    e
-            );
+            throw new ServletException("Error cargando categorias", e);
         }
     }
 }

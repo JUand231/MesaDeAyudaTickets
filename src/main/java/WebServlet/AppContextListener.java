@@ -24,6 +24,8 @@ import servicio.asignacion.AsignacionPorMenorCarga;
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
 import servicio.notificacion.NotificadorEnAplicacion;
+import servicio.prioridad.CalculadoraPrioridad;
+import servicio.prioridad.CalculadoraPrioridadPorPalabrasClave;
 import servicio.sla.CalculadoraSLA;
 import servicio.sla.CalculadoraSLAPorPrioridad;
 
@@ -70,6 +72,9 @@ public class AppContextListener implements ServletContextListener {
         CalculadoraSLA calculadoraSLA
                 = new CalculadoraSLAPorPrioridad();
 
+        CalculadoraPrioridad calculadoraPrioridad
+                = new CalculadoraPrioridadPorPalabrasClave();
+
         EstrategiaAsignacion estrategiaAsignacion
                 = new AsignacionPorMenorCarga();
 
@@ -82,9 +87,11 @@ public class AppContextListener implements ServletContextListener {
                 = new TicketService(
                         ticketRepository,
                         usuarioRepository,
+                        categoriaRepository,
                         prioridadRepository,
                         comentarioRepository,
                         calculadoraSLA,
+                        calculadoraPrioridad,
                         estrategiaAsignacion,
                         notificador
                 );

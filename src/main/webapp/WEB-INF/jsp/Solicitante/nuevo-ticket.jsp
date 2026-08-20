@@ -120,6 +120,22 @@
                         <!-- BOTONES -->
                         <div class="acciones-ticket">
 
+                            <p style="
+                               color:#718096;
+                               font-size:0.9rem;
+                               margin-top:-10px;
+                               ">
+
+                                La prioridad se calcula automáticamente según la
+                                categoría y la descripción del problema.
+
+                            </p>
+                        </div>
+
+
+                        <!-- BOTONES -->
+                        <div class="acciones-ticket">
+
                             <button
                                 type="submit"
                                 class="btn-crear-ticket"

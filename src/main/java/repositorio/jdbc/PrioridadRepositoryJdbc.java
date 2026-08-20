@@ -15,7 +15,7 @@ public class PrioridadRepositoryJdbc implements PrioridadRepository {
     @Override
     public Optional<Prioridad> buscarPorId(int idPrioridad) {
 
-        String sql = "SELECT Id, Tipo "
+        String sql = "SELECT Id, Tipo, HorasSLA "
                 + "FROM Prioridad "
                 + "WHERE Id = ?";
 
@@ -60,6 +60,7 @@ public class PrioridadRepositoryJdbc implements PrioridadRepository {
         Prioridad prioridad = new Prioridad();
         prioridad.setIdPrioridad(rs.getInt("Id"));
         prioridad.setTipo(rs.getString("Tipo"));
+        prioridad.setHorasSLA(rs.getInt("HorasSLA"));
         return prioridad;
     }
 }

@@ -7,14 +7,12 @@ import modelo.Prioridad;
 import modelo.Usuario;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
-import servicio.TicketService;
-
+import servicio.roles.AccionesAgente;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -68,8 +66,8 @@ public class DashboardAgenteServlet extends HttpServlet {
                         .getAttribute(
                                 AppContextListener.USUARIO_REPOSITORY);
 
-        TicketService ticketService
-                = (TicketService) getServletContext()
+        AccionesAgente ticketService
+                = (AccionesAgente) getServletContext()
                         .getAttribute(
                                 AppContextListener.TICKET_SERVICE);
 
@@ -111,11 +109,10 @@ public class DashboardAgenteServlet extends HttpServlet {
 
                 String nombre = "Sin prioridad";
 
-
-                    nombre = prioridadRepository
-                            .buscarPorId(idPrioridad)
-                            .map(Prioridad::getTipo)
-                            .orElse("Sin prioridad");
+                nombre = prioridadRepository
+                        .buscarPorId(idPrioridad)
+                        .map(Prioridad::getTipo)
+                        .orElse("Sin prioridad");
 
                 nombresPrioridades.put(idPrioridad, nombre);
             }

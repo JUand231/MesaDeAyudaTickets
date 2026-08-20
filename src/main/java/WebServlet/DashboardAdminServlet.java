@@ -10,7 +10,7 @@ import repositorio.CategoriaRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import repositorio.NotificacionRepository;
-import servicio.TicketService;
+import servicio.roles.AccionesAdministrador;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,7 +34,6 @@ public class DashboardAdminServlet extends HttpServlet {
         // ==========================================
         // VERIFICAR SESIÓN
         // ==========================================
-
         HttpSession session = request.getSession(false);
 
         if (session == null
@@ -46,16 +45,15 @@ public class DashboardAdminServlet extends HttpServlet {
             return;
         }
 
-        int idUsuario =
-                (Integer) session.getAttribute("idUsuario");
+        int idUsuario
+                = (Integer) session.getAttribute("idUsuario");
 
-        int idRol =
-                (Integer) session.getAttribute("idRol");
+        int idRol
+                = (Integer) session.getAttribute("idRol");
 
         // ==========================================
         // VERIFICAR QUE SEA ADMINISTRADOR
         // ==========================================
-
         if (idRol != 3) {
 
             response.sendRedirect(
@@ -67,43 +65,40 @@ public class DashboardAdminServlet extends HttpServlet {
         // ==========================================
         // OBTENER SERVICIOS Y REPOSITORIOS
         // ==========================================
-
-        TicketService ticketService =
-                (TicketService) getServletContext()
+        AccionesAdministrador ticketService
+                = (AccionesAdministrador) getServletContext()
                         .getAttribute(
                                 AppContextListener.TICKET_SERVICE);
 
-        CategoriaRepository categoriaRepository =
-                (CategoriaRepository) getServletContext()
+        CategoriaRepository categoriaRepository
+                = (CategoriaRepository) getServletContext()
                         .getAttribute(
                                 AppContextListener.CATEGORIA_REPOSITORY);
 
-        PrioridadRepository prioridadRepository =
-                (PrioridadRepository) getServletContext()
+        PrioridadRepository prioridadRepository
+                = (PrioridadRepository) getServletContext()
                         .getAttribute(
                                 AppContextListener.PRIORIDAD_REPOSITORY);
 
-        UsuarioRepository usuarioRepository =
-                (UsuarioRepository) getServletContext()
+        UsuarioRepository usuarioRepository
+                = (UsuarioRepository) getServletContext()
                         .getAttribute(
                                 AppContextListener.USUARIO_REPOSITORY);
 
-        NotificacionRepository notificacionRepository =
-                (NotificacionRepository) getServletContext()
+        NotificacionRepository notificacionRepository
+                = (NotificacionRepository) getServletContext()
                         .getAttribute(
                                 AppContextListener.NOTIFICACION_REPOSITORY);
 
         // ==========================================
         // TODOS LOS TICKETS
         // ==========================================
-
-        List<Ticket> tickets =
-                ticketService.listarTodos();
+        List<Ticket> tickets
+                = ticketService.listarTodos();
 
         // ==========================================
         // ESTADÍSTICAS
         // ==========================================
-
         int total = tickets.size();
 
         int pendientes = 0;
@@ -114,8 +109,8 @@ public class DashboardAdminServlet extends HttpServlet {
 
         for (Ticket ticket : tickets) {
 
-            String estado =
-                    ticket.getEstadoNombre();
+            String estado
+                    = ticket.getEstadoNombre();
 
             if (estado == null) {
                 continue;
@@ -123,8 +118,8 @@ public class DashboardAdminServlet extends HttpServlet {
 
             estado = estado.trim();
 
-            boolean esFinal =
-                    estado.equalsIgnoreCase("RESUELTO")
+            boolean esFinal
+                    = estado.equalsIgnoreCase("RESUELTO")
                     || estado.equalsIgnoreCase("CERRADO")
                     || estado.equalsIgnoreCase("CANCELADO");
 
@@ -143,9 +138,8 @@ public class DashboardAdminServlet extends HttpServlet {
             // ======================================
             // TICKETS CRÍTICOS
             // ======================================
-
-            Prioridad prioridad =
-                    prioridadRepository
+            Prioridad prioridad
+                    = prioridadRepository
                             .buscarPorId(
                                     ticket.getIdPrioridad())
                             .orElse(null);
@@ -162,18 +156,16 @@ public class DashboardAdminServlet extends HttpServlet {
         // ==========================================
         // PORCENTAJE DE RESOLUCIÓN
         // ==========================================
-
-        int porcentajeResolucion =
-                total == 0
-                ? 0
-                : (resueltos * 100) / total;
+        int porcentajeResolucion
+                = total == 0
+                        ? 0
+                        : (resueltos * 100) / total;
 
         // ==========================================
         // TICKETS MÁS RECIENTES
         // ==========================================
-
-        List<Ticket> masRecientes =
-                new ArrayList<>(tickets);
+        List<Ticket> masRecientes
+                = new ArrayList<>(tickets);
 
         masRecientes.sort(
                 Comparator.comparing(
@@ -183,8 +175,8 @@ public class DashboardAdminServlet extends HttpServlet {
 
         if (masRecientes.size() > 4) {
 
-            masRecientes =
-                    new ArrayList<>(
+            masRecientes
+                    = new ArrayList<>(
                             masRecientes.subList(0, 4)
                     );
         }
@@ -192,14 +184,13 @@ public class DashboardAdminServlet extends HttpServlet {
         // ==========================================
         // CONVERTIR A DTO
         // ==========================================
-
-        List<TicketDTO> ticketsRecientes =
-                new ArrayList<>();
+        List<TicketDTO> ticketsRecientes
+                = new ArrayList<>();
 
         for (Ticket ticket : masRecientes) {
 
-            String nombreCategoria =
-                    categoriaRepository
+            String nombreCategoria
+                    = categoriaRepository
                             .buscarPorId(
                                     ticket.getIdCategoria())
                             .map(
@@ -209,8 +200,8 @@ public class DashboardAdminServlet extends HttpServlet {
                                     + ticket.getIdCategoria()
                             );
 
-            String nombrePrioridad =
-                    prioridadRepository
+            String nombrePrioridad
+                    = prioridadRepository
                             .buscarPorId(
                                     ticket.getIdPrioridad())
                             .map(
@@ -220,8 +211,8 @@ public class DashboardAdminServlet extends HttpServlet {
                                     + ticket.getIdPrioridad()
                             );
 
-            String nombreSolicitante =
-                    usuarioRepository
+            String nombreSolicitante
+                    = usuarioRepository
                             .buscarPorId(
                                     ticket.getIdSolicitante())
                             .map(
@@ -235,8 +226,8 @@ public class DashboardAdminServlet extends HttpServlet {
 
             if (ticket.getIdAgente() != null) {
 
-                nombreAgente =
-                        usuarioRepository
+                nombreAgente
+                        = usuarioRepository
                                 .buscarPorId(
                                         ticket.getIdAgente())
                                 .map(
@@ -261,15 +252,13 @@ public class DashboardAdminServlet extends HttpServlet {
         // ==========================================
         // NOTIFICACIONES DEL ADMIN
         // ==========================================
-
-        int notificacionesNoLeidas =
-                notificacionRepository
+        int notificacionesNoLeidas
+                = notificacionRepository
                         .contarNoLeidas(idUsuario);
 
         // ==========================================
         // ENVIAR DATOS AL JSP
         // ==========================================
-
         request.setAttribute(
                 "totalTickets",
                 total);
@@ -301,10 +290,8 @@ public class DashboardAdminServlet extends HttpServlet {
         // ==========================================
         // MOSTRAR DASHBOARD
         // ==========================================
-
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/Administrador/dashboardAdmin.jsp")
                 .forward(request, response);
     }
 }
-
