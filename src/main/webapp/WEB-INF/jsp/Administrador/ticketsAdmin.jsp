@@ -406,83 +406,69 @@
                                     <td>
                                         <div class="acciones-ticket">
 
-                                            <c:if test="${ticket.estado == 'NUEVO'}">
+                                            <!-- ASIGNAR AGENTE -->
+                                            <c:if test="${ticket.estado == 'NUEVO'
+                                                          || ticket.estado == 'ASIGNADO'
+                                                          || ticket.estado == 'EN_PROCESO'}">
 
-                                                <!-- BOTÓN + -->
-                                                <button type="button"
-                                                        class="accion ver"
-                                                        onclick="mostrarAsignacion(${ticket.idTicket}, this)"
-                                                        title="Asignar agente">
-                                                    +
-                                                </button>
+                                                  <!-- BOTÓN + -->
+                                                  <button type="button"
+                                                          class="accion ver"
+                                                          onclick="mostrarAsignacion(${ticket.idTicket}, this)"
+                                                          title="Asignar agente">
+                                                      +
+                                                  </button>
 
-                                                <!-- MENÚ DE ASIGNACIÓN -->
-                                                <div id="menu-${ticket.idTicket}"
-                                                     class="menu-asignar">
+                                                  <!-- MENÚ DE ASIGNACIÓN -->
+                                                  <div id="menu-${ticket.idTicket}"
+                                                       class="menu-asignar">
 
-                                                    <h4>Asignar agente</h4>
+                                                      <h4>Asignar agente</h4>
 
-                                                    <form method="post"
-                                                          action="${pageContext.request.contextPath}/tickets">
+                                                      <form method="post"
+                                                            action="${pageContext.request.contextPath}/tickets">
 
-                                                        <!-- ID DEL TICKET -->
-                                                        <input type="hidden"
-                                                               name="idTicket"
-                                                               value="${ticket.idTicket}">
+                                                          <!-- ID DEL TICKET -->
+                                                          <input type="hidden"
+                                                                 name="idTicket"
+                                                                 value="${ticket.idTicket}">
 
-                                                        <!-- TIPO DE ASIGNACIÓN -->
-                                                        <select name="tipoAsignacion"
-                                                                id="tipoAsignacion-${ticket.idTicket}"
-                                                                onchange="cambiarTipoAsignacion(${ticket.idTicket})"
-                                                                required>
+                                                          <!-- AGENTE -->
+                                                          <select name="idAgente"
+                                                                  id="idAgente-${ticket.idTicket}">
 
-                                                            <option value="">
-                                                                Seleccionar tipo
-                                                            </option>
+                                                              <option value="">
+                                                                  Seleccionar agente
+                                                              </option>
 
-                                                            <option value="manual">
-                                                                Asignación manual
-                                                            </option>
+                                                              <c:forEach var="agente"
+                                                                         items="${agentes}">
 
-                                                            <option value="automatico">
-                                                                Asignación automática
-                                                            </option>
+                                                                  <option value="${agente.idUsuario}">
+                                                                      ${agente.nombre}
+                                                                  </option>
 
-                                                        </select>
+                                                              </c:forEach>
 
-                                                        <!-- AGENTE -->
-                                                        <select name="idAgente"
-                                                                id="idAgente-${ticket.idTicket}">
+                                                          </select>
 
-                                                            <option value="">
-                                                                Seleccionar agente
-                                                            </option>
+                                                          <!-- BOTÓN ASIGNAR -->
+                                                          <button type="submit"
+                                                                  class="btn-asignar">
+                                                              Asignar
+                                                          </button>
 
-                                                            <c:forEach var="agente"
-                                                                       items="${agentes}">
+                                                      </form>
 
-                                                                <option value="${agente.idUsuario}">
-                                                                    ${agente.nombre}
-                                                                </option>
-
-                                                            </c:forEach>
-
-                                                        </select>
-                                                        <!-- BOTÓN -->
-                                                        <button type="submit"
-                                                                class="btn-asignar">
-
-                                                            Asignar
-
-                                                        </button>
-
-                                                    </form>
-
-                                                </div>
+                                                  </div>
 
                                             </c:if>
-                                            <c:if test="${ticket.estado != 'CERRADO' 
-                                                          && ticket.estado != 'CANCELADO'}">
+
+
+                                            <!-- CANCELAR TICKET -->
+                                            <c:if test="${ticket.estado == 'NUEVO'
+                                                          || ticket.estado == 'ASIGNADO'
+                                                          || ticket.estado == 'EN_PROCESO'}">
 
                                                   <form method="post"
                                                         action="${pageContext.request.contextPath}/tickets"
@@ -507,11 +493,14 @@
 
                                             </c:if>
 
-                                            <c:if test="${ticket.estado != 'NUEVO'}">
 
-                                                <span style="color:#94a3b8; font-size:14px;">
-                                                    —
-                                                </span>
+                                            <!-- RAYA PARA CERRADO O CANCELADO -->
+                                            <c:if test="${ticket.estado == 'CERRADO'
+                                                          || ticket.estado == 'CANCELADO'}">
+
+                                                  <span style="color:#94a3b8; font-size:14px;">
+                                                      —
+                                                  </span>
 
                                             </c:if>
 

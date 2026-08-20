@@ -191,8 +191,6 @@
 
                                 <th>ROL</th>
 
-                                <th>ACCIONES</th>
-
                             </tr>
 
                         </thead>
@@ -263,25 +261,6 @@
                                         <span class="badge estado-proceso">
                                             Agente
                                         </span>
-
-                                    </td>
-
-
-                                    <!-- ACCIONES -->
-
-                                    <td>
-
-                                        <div class="acciones-ticket">
-
-                                            <a href="${pageContext.request.contextPath}/admin/agentes/ver?id=${agente.idUsuario}"
-                                               class="accion ver"
-                                               title="Ver agente">
-
-                                                +
-
-                                            </a>
-
-                                        </div>
 
                                     </td>
 

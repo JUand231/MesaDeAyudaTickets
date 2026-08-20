@@ -4,7 +4,7 @@ public class Asignado implements EstadoTicket {
 
     @Override
     public EstadoTicket asignar() {
-        throw new TransicionInvalidaException(nombre(), "asignar");
+        return new Asignado();
     }
 
     @Override
@@ -36,5 +36,4 @@ public class Asignado implements EstadoTicket {
     public String nombre() {
         return "ASIGNADO";
     }
-
 }

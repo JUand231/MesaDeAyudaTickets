@@ -528,12 +528,13 @@ public class TicketsAdminServlet extends HttpServlet {
             // VALIDAR ESTADO
             // SOLO NUEVO PUEDE SER ASIGNADO
             // ======================================================
-            if (!"NUEVO".equals(
-                    ticket.getEstadoNombre())) {
+            if (!"NUEVO".equals(ticket.getEstadoNombre())
+                    && !"EN_PROCESO".equals(ticket.getEstadoNombre())
+                    && !"ASIGNADO".equals(ticket.getEstadoNombre())) {
 
                 response.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Solo se pueden asignar agentes a tickets NUEVO.");
+                        "Solo se pueden asignar agentes a tickets NUEVO, EN_PROCESO o ASIGNADO.");
 
                 return;
             }

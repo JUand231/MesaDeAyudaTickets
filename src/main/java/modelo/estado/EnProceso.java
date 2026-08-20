@@ -1,10 +1,10 @@
 package modelo.estado;
 
-public class EnProceso implements EstadoTicket{
+public class EnProceso implements EstadoTicket {
 
     @Override
     public EstadoTicket asignar() {
-        throw new TransicionInvalidaException(nombre(), "asignar");
+        return new EnProceso();
     }
 
     @Override
