@@ -373,7 +373,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
     @Override
     public Ticket cancelar(
             int idTicket,
-            Usuario solicitante) {
+            Usuario administrador) {
 
         Ticket ticket = buscarPorId(idTicket);
 
@@ -381,13 +381,18 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         Ticket actualizado = ticketRepository.actualizar(ticket);
 
-        if (solicitante != null) {
-            notificador.notificar(
-                    solicitante,
-                    actualizado,
-                    "Tu ticket fue cancelado por un administrador."
-            );
-        }
+        // Notificar al solicitante
+        Usuario solicitante = obtenerUsuario(
+                actualizado.getIdSolicitante()
+        );
+
+        notificador.notificar(
+                solicitante,
+                actualizado,
+                "Tu ticket #"
+                + actualizado.getIdTicket()
+                + " fue cancelado por un administrador."
+        );
 
         return actualizado;
     }

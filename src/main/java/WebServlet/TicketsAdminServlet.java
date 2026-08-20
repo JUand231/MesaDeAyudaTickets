@@ -427,6 +427,9 @@ public class TicketsAdminServlet extends HttpServlet {
         String tipoAsignacion
                 = request.getParameter("tipoAsignacion");
 
+        String accion
+                = request.getParameter("accion");
+
         if (idTicketStr == null
                 || idTicketStr.trim().isEmpty()) {
 
@@ -478,8 +481,48 @@ public class TicketsAdminServlet extends HttpServlet {
             // BUSCAR TICKET
             // ======================================================
             Ticket ticket
-                    = ticketService.buscarPorId(
-                            idTicket);
+                    = ticketService.buscarPorId(idTicket);
+
+            // ======================================================
+// CANCELACIÓN POR ADMINISTRADOR
+// ======================================================
+            if ("cancelar".equalsIgnoreCase(accion)) {
+
+                // No permitir cancelar un ticket cerrado
+                if ("CERRADO".equals(ticket.getEstadoNombre())) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Un ticket cerrado no puede ser cancelado."
+                    );
+
+                    return;
+                }
+
+                int idAdministrador
+                        = (Integer) session.getAttribute("idUsuario");
+
+                Usuario administrador
+                        = usuarioRepository
+                                .buscarPorId(idAdministrador)
+                                .orElseThrow(
+                                        () -> new IllegalArgumentException(
+                                                "No existe el administrador."
+                                        )
+                                );
+
+                ticketService.cancelar(
+                        idTicket,
+                        administrador
+                );
+
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/tickets"
+                );
+
+                return;
+            }
 
             // ======================================================
             // VALIDAR ESTADO
@@ -496,7 +539,7 @@ public class TicketsAdminServlet extends HttpServlet {
             }
 
             // ======================================================
-               // ASIGNACIÓN AUTOMÁTICA
+            // ASIGNACIÓN AUTOMÁTICA
             // ======================================================
             if ("automatico".equalsIgnoreCase(tipoAsignacion)) {
 
@@ -580,7 +623,7 @@ public class TicketsAdminServlet extends HttpServlet {
         } catch (SQLException ex) {
             System.getLogger(TicketsAdminServlet.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-        
+
     }
 
     // ==========================================================

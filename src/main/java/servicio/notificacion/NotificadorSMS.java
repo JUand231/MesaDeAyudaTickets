@@ -2,13 +2,8 @@ package servicio.notificacion;
 
 import modelo.Ticket;
 import modelo.Usuario;
-import repositorio.NotificacionRepository;
 
-public class NotificadorCorreo implements Notificador {
-
-    public NotificadorCorreo(NotificacionRepository notificacionRepository) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+public class NotificadorSMS implements Notificador {
 
     @Override
     public void notificar(
@@ -35,7 +30,7 @@ public class NotificadorCorreo implements Notificador {
         }
 
         System.out.println(
-                "[Simulando envio de correo a "
+                "[Simulando envio de SMS a "
                 + destinatario.getCorreo()
                 + "] Ticket #"
                 + ticket.getIdTicket()

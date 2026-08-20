@@ -128,6 +128,34 @@
             .sin-agente {
                 color: #94a3b8;
             }
+            .acciones-ticket {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .acciones-ticket .cancelar {
+                width: 34px;
+                height: 34px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #fecaca;
+                border-radius: 7px;
+                background: #fef2f2;
+                color: #dc2626;
+                font-size: 20px;
+                line-height: 1;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .acciones-ticket .cancelar:hover {
+                background: #dc2626;
+                color: white;
+                border-color: #dc2626;
+            }
         </style>
     </head>
 
@@ -440,7 +468,6 @@
                                                             </c:forEach>
 
                                                         </select>
-
                                                         <!-- BOTÓN -->
                                                         <button type="submit"
                                                                 class="btn-asignar">
@@ -452,6 +479,31 @@
                                                     </form>
 
                                                 </div>
+
+                                            </c:if>
+                                            <c:if test="${ticket.estado != 'CERRADO' 
+                                                          && ticket.estado != 'CANCELADO'}">
+
+                                                  <form method="post"
+                                                        action="${pageContext.request.contextPath}/tickets"
+                                                        style="display:inline;">
+
+                                                      <input type="hidden"
+                                                             name="idTicket"
+                                                             value="${ticket.idTicket}">
+
+                                                      <input type="hidden"
+                                                             name="accion"
+                                                             value="cancelar">
+
+                                                      <button type="submit"
+                                                              class="accion cancelar"
+                                                              title="Cancelar ticket"
+                                                              onclick="return confirmarCancelacion();">
+                                                          ×
+                                                      </button>
+
+                                                  </form>
 
                                             </c:if>
 
@@ -602,8 +654,12 @@
                     }
                 }
             }
+            function confirmarCancelacion() {
 
-
+                return confirm(
+                        "¿Estás seguro de que deseas cancelar este ticket?"
+                        );
+            }
             // ==========================================================
             // CERRAR AL HACER CLIC FUERA
             // ==========================================================
