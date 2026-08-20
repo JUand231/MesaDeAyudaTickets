@@ -262,7 +262,8 @@
                     <div class="menu-titulo">PRINCIPAL</div>
 
                     <nav class="menu">
-                        <a href="${pageContext.request.contextPath}/dashboardSolicitante" class="menu-item">
+
+                        <a href="${pageContext.request.contextPath}/dashboardSolicitante" class="menu-item ">
                             <span>⌂</span><label>Dashboard</label>
                         </a>
 
@@ -270,31 +271,31 @@
                             <span>🏷</span><label>Mis tickets</label>
                         </a>
 
-                        <a href="${pageContext.request.contextPath}/tickets?estado=Nuevo" class="menu-item">
-                            <span>🖂</span><label>Comentarios</label>
-                        </a>
-
                         <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="menu-item">
                             <span>◷</span><label>Estado</label>
                         </a>
+
                     </nav>
 
                     <div class="menu-titulo">SISTEMA</div>
 
                     <nav class="menu">
+
                         <a href="${pageContext.request.contextPath}/perfil" class="menu-item activo">
                             <span>⚙</span><label>Mi Perfil</label>
                         </a>
 
                         <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
-                            <span>↪</span><label>Cerrar sesión</label>
+                            <span>↪</span>
+                            <label> Cerrar sesión </label>
                         </a>
+
                     </nav>
 
                     <div class="usuario-sidebar">
                         <div class="usuario-avatar">S</div>
                         <div>
-                            <strong>${usuario.nombre}</strong>
+                            <strong>Solicitante</strong>
                             <small>Usuario solicitante</small>
                         </div>
                     </div>

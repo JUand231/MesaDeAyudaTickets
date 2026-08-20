@@ -117,48 +117,50 @@
 
                         </div>
 
+                        <!-- BOTONES -->
+                        <div class="acciones-ticket">
 
-                        <p style="
-                           color:#718096;
-                           font-size:0.9rem;
-                           margin-top:-10px;
-                           ">
+                            <p style="
+                               color:#718096;
+                               font-size:0.9rem;
+                               margin-top:-10px;
+                               ">
 
-                            La prioridad se calcula automáticamente según la
-                            categoría y la descripción del problema.
+                                La prioridad se calcula automáticamente según la
+                                categoría y la descripción del problema.
 
-                        </p>
+                            </p>
+                        </div>
+
+
+                        <!-- BOTONES -->
+                        <div class="acciones-ticket">
+
+                            <button
+                                type="submit"
+                                class="btn-crear-ticket"
+                                >
+                                Crear ticket
+                            </button>
+
+
+                            <a
+                                href="${pageContext.request.contextPath}/dashboardSolicitante"
+                                class="btn-secundario"
+                                >
+                                Cancelar
+                            </a>
+
+                        </div>
+
+                    </form>
+
                 </div>
-
-
-                <!-- BOTONES -->
-                <div class="acciones-ticket">
-
-                    <button
-                        type="submit"
-                        class="btn-crear-ticket"
-                        >
-                        Crear ticket
-                    </button>
-
-
-                    <a
-                        href="${pageContext.request.contextPath}/dashboardSolicitante"
-                        class="btn-secundario"
-                        >
-                        Cancelar
-                    </a>
-
-                </div>
-
-                </form>
 
             </div>
 
-        </div>
+        </main>
 
-    </main>
-
-</body>
+    </body>
 
 </html>

@@ -24,12 +24,6 @@ import java.util.Optional;
 
 /**
  * Implementación única de las tres interfaces de rol (ISP-01).
- *
- * Sigue siendo UNA clase por simplicidad de la capa de negocio (comparte
- * repositorios, Strategies y Notificador), pero cada Servlet la recibe casteada
- * a la interfaz de SU rol nada más -- así un Servlet de solicitante ni siquiera
- * puede ver en su tipo el método cancelar() o asignarAgente(), porque no forman
- * parte de AccionesSolicitante.
  */
 public class TicketService implements AccionesSolicitante, AccionesAgente, AccionesAdministrador {
 
@@ -84,76 +78,50 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
             );
         }
 
-        Categoria categoria
-                = categoriaRepository
-                        .buscarPorId(idCategoria)
-                        .orElseThrow(
-                                ()
-                                -> new IllegalArgumentException(
-                                        "No existe la categoria con id "
-                                        + idCategoria));
+        Categoria categoria = categoriaRepository
+                .buscarPorId(idCategoria)
+                .orElseThrow(() -> new IllegalArgumentException(
+                "No existe la categoria con id " + idCategoria));
 
         // ==========================================================
         // RF-03: PRIORIDAD AUTOMÁTICA
-        //
-        // El solicitante ya no la elige: se calcula según la
-        // categoría y palabras clave del título/descripción.
         // ==========================================================
-        int idPrioridad
-                = calcularIdPrioridad(
-                        titulo,
-                        descripcion,
-                        categoria.getNombreCategoria());
+        int idPrioridad = calcularIdPrioridad(
+                titulo,
+                descripcion,
+                categoria.getNombreCategoria());
 
         Ticket ticket = new Ticket();
-
         ticket.setTitulo(titulo.trim());
         ticket.setDescripcion(descripcion.trim());
         ticket.setIdCategoria(idCategoria);
-        ticket.setIdPrioridad(idPrioridad);
         ticket.setIdSolicitante(idSolicitante);
+        ticket.setIdPrioridad(idPrioridad);
 
-        Ticket creado
-                = ticketRepository.guardar(ticket);
+        Ticket creado = ticketRepository.guardar(ticket);
 
-// ==========================================================
-// RF-04 / OCP-02: ASIGNACIÓN AUTOMÁTICA DE AGENTE
-//
-// Se usa la Strategy configurada en AppContextListener (turno
-// rotativo, menor carga, etc.) para asignar un agente apenas
-// se crea el ticket. Si no hay agentes o la estrategia falla,
-// el ticket simplemente queda en NUEVO para que un admin lo
-// asigne manualmente después (no debe romper la creación).
-// ==========================================================
+        // ==========================================================
+        // RF-04 / OCP-02: ASIGNACIÓN AUTOMÁTICA DE AGENTE
+        // ==========================================================
         try {
-
-            List<Usuario> agentesDisponibles
-                    = usuarioRepository.listarAgentes();
+            List<Usuario> agentesDisponibles = usuarioRepository.listarAgentes();
 
             if (!agentesDisponibles.isEmpty()) {
-
                 creado = asignarAgenteAutomatico(
                         creado.getIdTicket(),
                         agentesDisponibles);
             }
-
         } catch (Exception e) {
-
-            // El ticket ya fue creado; que no haya agente
-            // disponible no debe impedir su creación.
             e.printStackTrace();
         }
 
-// ==========================================================
-// NOTIFICAR A LOS ADMINISTRADORES
-// ==========================================================
+        // ==========================================================
+        // NOTIFICAR A LOS ADMINISTRADORES
+        // ==========================================================
         try {
-
-            List<Usuario> administradores
-                    = usuarioRepository.listarAdministradores();
+            List<Usuario> administradores = usuarioRepository.listarAdministradores();
 
             for (Usuario administrador : administradores) {
-
                 notificador.notificar(
                         administrador,
                         creado,
@@ -163,12 +131,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
                         + creado.getTitulo()
                 );
             }
-
         } catch (Exception e) {
-
-            // El ticket ya fue creado.
-            // No debemos perder la creación por un fallo
-            // secundario de notificaciones.
             e.printStackTrace();
         }
 
@@ -185,20 +148,16 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
             String descripcion,
             String nombreCategoria) {
 
-        String tipoCalculado
-                = calculadoraPrioridad.calcular(
-                        titulo,
-                        descripcion,
-                        nombreCategoria);
+        String tipoCalculado = calculadoraPrioridad.calcular(
+                titulo,
+                descripcion,
+                nombreCategoria);
 
         List<Prioridad> prioridades;
 
         try {
-
             prioridades = prioridadRepository.listarTodas();
-
         } catch (SQLException e) {
-
             throw new IllegalStateException(
                     "No se pudieron cargar las prioridades disponibles",
                     e);
@@ -207,12 +166,10 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
         return prioridades.stream()
                 .filter(p -> p.getTipo().equalsIgnoreCase(tipoCalculado))
                 .findFirst()
-                .orElseThrow(
-                        ()
-                        -> new IllegalStateException(
-                                "La prioridad calculada \""
-                                + tipoCalculado
-                                + "\" no existe en la tabla Prioridad"))
+                .orElseThrow(() -> new IllegalStateException(
+                "La prioridad calculada \""
+                + tipoCalculado
+                + "\" no existe en la tabla Prioridad"))
                 .getIdPrioridad();
     }
 
@@ -233,9 +190,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
     @Override
     public Ticket buscarPorId(int idTicket) {
-
-        Optional<Ticket> encontrado
-                = ticketRepository.buscarPorId(idTicket);
+        Optional<Ticket> encontrado = ticketRepository.buscarPorId(idTicket);
 
         if (encontrado.isEmpty()) {
             throw new IllegalArgumentException(
@@ -294,7 +249,6 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
         Ticket ticket = buscarPorId(idTicket);
 
         ticket.setIdAgente(idAgente);
-
         ticket.asignar();
 
         Ticket actualizado = ticketRepository.actualizar(ticket);
@@ -333,11 +287,9 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         ticket.iniciar();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -357,11 +309,9 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         ticket.resolver();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -381,11 +331,9 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         ticket.cerrar();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (solicitante != null) {
-
             notificador.notificar(
                     solicitante,
                     actualizado,
@@ -405,15 +353,10 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         ticket.reabrir();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
         if (actualizado.getIdAgente() != 0) {
-
-            Usuario agente
-                    = obtenerUsuario(
-                            actualizado.getIdAgente()
-                    );
+            Usuario agente = obtenerUsuario(actualizado.getIdAgente());
 
             notificador.notificar(
                     agente,
@@ -430,23 +373,26 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
     @Override
     public Ticket cancelar(
             int idTicket,
-            Usuario solicitante) {
+            Usuario administrador) {
 
         Ticket ticket = buscarPorId(idTicket);
 
         ticket.cancelar();
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
-        if (solicitante != null) {
+        // Notificar al solicitante
+        Usuario solicitante = obtenerUsuario(
+                actualizado.getIdSolicitante()
+        );
 
-            notificador.notificar(
-                    solicitante,
-                    actualizado,
-                    "Tu ticket fue cancelado por un administrador."
-            );
-        }
+        notificador.notificar(
+                solicitante,
+                actualizado,
+                "Tu ticket #"
+                + actualizado.getIdTicket()
+                + " fue cancelado por un administrador."
+        );
 
         return actualizado;
     }
@@ -461,11 +407,9 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         ticket.setIdAgente(nuevoIdAgente);
 
-        Ticket actualizado
-                = ticketRepository.actualizar(ticket);
+        Ticket actualizado = ticketRepository.actualizar(ticket);
 
-        Usuario nuevoAgente
-                = obtenerUsuario(nuevoIdAgente);
+        Usuario nuevoAgente = obtenerUsuario(nuevoIdAgente);
 
         notificador.notificar(
                 nuevoAgente,
@@ -487,7 +431,6 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
             String texto) {
 
         if (texto == null || texto.isBlank()) {
-
             throw new IllegalArgumentException(
                     "El comentario no puede estar vacio"
             );
@@ -502,7 +445,6 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
             // SOLICITANTE
             if (ticket.getIdSolicitante() != idUsuario) {
-
                 throw new IllegalArgumentException(
                         "No puedes comentar este ticket."
                 );
@@ -529,30 +471,21 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
         // ==========================================================
         // CREAR COMENTARIO
         // ==========================================================
-        Comentario comentario
-                = new Comentario(
-                        idTicket,
-                        idUsuario,
-                        texto.trim()
-                );
-
-        comentarioRepository.guardar(
-                comentario
+        Comentario comentario = new Comentario(
+                idTicket,
+                idUsuario,
+                texto.trim()
         );
+
+        comentarioRepository.guardar(comentario);
 
         // ==========================================================
         // NOTIFICAR
         // ==========================================================
         if (idRol == 1) {
 
-            // El solicitante comentó.
-            // Avisar al agente asignado.
             if (ticket.getIdAgente() != null) {
-
-                Usuario agente
-                        = obtenerUsuario(
-                                ticket.getIdAgente()
-                        );
+                Usuario agente = obtenerUsuario(ticket.getIdAgente());
 
                 notificador.notificar(
                         agente,
@@ -565,12 +498,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         } else if (idRol == 2) {
 
-            // El agente comentó.
-            // Avisar al solicitante.
-            Usuario solicitante
-                    = obtenerUsuario(
-                            ticket.getIdSolicitante()
-                    );
+            Usuario solicitante = obtenerUsuario(ticket.getIdSolicitante());
 
             notificador.notificar(
                     solicitante,
@@ -582,12 +510,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
         } else if (idRol == 3) {
 
-            // ADMINISTRADOR
-            // Avisar a solicitante y agente.
-            Usuario solicitante
-                    = obtenerUsuario(
-                            ticket.getIdSolicitante()
-                    );
+            Usuario solicitante = obtenerUsuario(ticket.getIdSolicitante());
 
             notificador.notificar(
                     solicitante,
@@ -598,11 +521,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
             );
 
             if (ticket.getIdAgente() != null) {
-
-                Usuario agente
-                        = obtenerUsuario(
-                                ticket.getIdAgente()
-                        );
+                Usuario agente = obtenerUsuario(ticket.getIdAgente());
 
                 notificador.notificar(
                         agente,
@@ -619,8 +538,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
 
     private Usuario obtenerUsuario(int idUsuario) {
 
-        Optional<Usuario> usuario
-                = usuarioRepository.buscarPorId(idUsuario);
+        Optional<Usuario> usuario = usuarioRepository.buscarPorId(idUsuario);
 
         if (usuario.isEmpty()) {
             throw new IllegalArgumentException(

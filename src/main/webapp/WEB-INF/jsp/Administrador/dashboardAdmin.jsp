@@ -243,58 +243,6 @@
 
                 </div>
 
-                <!-- ACTIVIDAD -->
-                <div class="panel">
-
-                    <div class="panel-header">
-                        <div>
-                            <h2>Actividad reciente</h2>
-                            <p>Últimos movimientos</p>
-                        </div>
-                    </div>
-
-                    <div class="actividad">
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon azul">+</div>
-                            <div>
-                                <strong>Nuevo ticket</strong>
-                                <p>Sofia creó el ticket #TK-0248</p>
-                                <small>Hace 5 minutos</small>
-                            </div>
-                        </div>
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon verde">✓</div>
-                            <div>
-                                <strong>Ticket resuelto</strong>
-                                <p>#TK-0246 fue resuelto</p>
-                                <small>Hace 18 minutos</small>
-                            </div>
-                        </div>
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon naranja">→</div>
-                            <div>
-                                <strong>Ticket asignado</strong>
-                                <p>#TK-0248 → Carlos M.</p>
-                                <small>Hace 32 minutos</small>
-                            </div>
-                        </div>
-
-                        <div class="actividad-item">
-                            <div class="actividad-icon rojo">!</div>
-                            <div>
-                                <strong>Atención requerida</strong>
-                                <p>Ticket crítico pendiente</p>
-                                <small>Hace 1 hora</small>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
             </section>
         </main>
 

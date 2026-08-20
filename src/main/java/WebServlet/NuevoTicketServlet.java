@@ -33,17 +33,25 @@ public class NuevoTicketServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,
+    protected void doPost(
+            HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("idUsuario") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+
+        if (session == null
+                || session.getAttribute("idUsuario") == null) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login"
+            );
+
             return;
         }
 
-        int idSolicitante = (Integer) session.getAttribute("idUsuario");
+        int idSolicitante
+                = (Integer) session.getAttribute("idUsuario");
 
         String titulo = request.getParameter("titulo");
         String descripcion = request.getParameter("descripcion");
@@ -56,14 +64,23 @@ public class NuevoTicketServlet extends HttpServlet {
 
             ticketService.crearTicket(titulo, descripcion, idCategoria, idSolicitante);
 
-            response.sendRedirect(request.getContextPath() + "/dashboardSolicitante");
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/dashboardSolicitante"
+            );
 
         } catch (IllegalArgumentException e) {
-            // titulo/descripcion vacios, o los ids no eran numeros validos
-            request.setAttribute("error", e.getMessage());
+
+            request.setAttribute(
+                    "error",
+                    e.getMessage()
+            );
+
             cargarListas(request);
-            request.getRequestDispatcher("/WEB-INF/jsp/Solicitante/nuevo-ticket.jsp")
-                    .forward(request, response);
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/jsp/Solicitante/nuevo-ticket.jsp"
+            ).forward(request, response);
         }
     }
 

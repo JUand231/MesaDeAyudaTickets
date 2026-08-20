@@ -21,136 +21,58 @@
     <body>
 
         <!-- SIDEBAR -->
-
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
 
             <div class="marca">
-
-                <div class="marca-icono">
-                    <span>⌁</span>
-                </div>
-
+                <div class="marca-icono"><span>🌐</span></div>
                 <div class="marca-texto">
-
                     <strong>MESA DE AYUDA</strong>
-
                     <small>CIMM · SENA</small>
-
                 </div>
-
             </div>
 
-
-            <div class="menu-titulo">
-                PRINCIPAL
-            </div>
-
+            <div class="menu-titulo">PRINCIPAL</div>
 
             <nav class="menu">
 
-                <!-- DASHBOARD -->
-
-                <a href="${pageContext.request.contextPath}/dashboardSolicitante"
-                   class="menu-item">
-
-                    <span>⌂</span>
-
-                    <label>Dashboard</label>
-
+                <a href="${pageContext.request.contextPath}/dashboardSolicitante" class="menu-item ">
+                    <span>⌂</span><label>Dashboard</label>
                 </a>
 
-
-                <!-- MIS TICKETS -->
-
-                <a href="${pageContext.request.contextPath}/tickets"
-                   class="menu-item">
-
-                    <span>▣</span>
-
-                    <label>Mis tickets</label>
-
+                <a href="${pageContext.request.contextPath}/tickets" class="menu-item activo">
+                    <span>🏷</span><label>Mis tickets</label>
                 </a>
 
-
-                <!-- COMENTARIOS -->
-
-                <a href="${pageContext.request.contextPath}/comentarios"
-                   class="menu-item activo">
-
-                    <span>●</span>
-
-                    <label>Comentarios</label>
-
-                </a>
-
-
-                <!-- ESTADO -->
-
-                <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso"
-                   class="menu-item">
-
-                    <span>◷</span>
-
-                    <label>Estado</label>
-
+                <a href="${pageContext.request.contextPath}/tickets?estado=En%20Proceso" class="menu-item">
+                    <span>◷</span><label>Estado</label>
                 </a>
 
             </nav>
 
-
-            <div class="menu-titulo">
-                SISTEMA
-            </div>
-
+            <div class="menu-titulo">SISTEMA</div>
 
             <nav class="menu">
 
-                <!-- PERFIL -->
-
-                <a href="${pageContext.request.contextPath}/perfil"
-                   class="menu-item">
-
-                    <span>⚙</span>
-
-                    <label>Mi Perfil</label>
-
+                <a href="${pageContext.request.contextPath}/perfil" class="menu-item">
+                    <span>⚙</span><label>Mi Perfil</label>
                 </a>
 
-
-                <!-- CERRAR SESIÓN -->
-
-                <a href="${pageContext.request.contextPath}/CerrarSesion"
-                   class="menu-item">
-
+                <a href="${pageContext.request.contextPath}/CerrarSesion" class="menu-item">
                     <span>↪</span>
-
-                    <label>Cerrar sesión</label>
-
+                    <label> Cerrar sesión </label>
                 </a>
 
             </nav>
-
-
-            <!-- USUARIO -->
 
             <div class="usuario-sidebar">
-
-                <div class="usuario-avatar">
-                    S
-                </div>
-
+                <div class="usuario-avatar">S</div>
                 <div>
-
                     <strong>Solicitante</strong>
-
                     <small>Usuario solicitante</small>
-
                 </div>
-
             </div>
 
         </aside>
-
 
         <!-- CONTENIDO -->
 

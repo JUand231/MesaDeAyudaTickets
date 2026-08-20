@@ -1028,7 +1028,7 @@ a {
 .barra-acciones {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .btn-notificacion {
@@ -1077,18 +1077,19 @@ a {
 .estadisticas {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 12px;
+    padding: 16px;
+    gap: 20px;
+    margin-bottom: 2px;
 }
 
 .estadistica {
     background: white;
     border: 1px solid var(--borde);
     border-radius: 12px;
-    padding: 12px;
+    padding: 16px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
     transition: .2s;
 }
 
@@ -1098,15 +1099,16 @@ a {
 }
 
 .estadistica-icono {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 10px;
     font-weight: 800;
-    font-size: 16px;
+    border-radius: 12px;
+    font-size: 20px;
 }
 
 .azul {
@@ -1132,14 +1134,14 @@ a {
 .estadistica span {
     display: block;
     color: #8a96a8;
-    font-size: 9px;
+    font-size: 10.5px;
     font-weight: 700;
     line-height: 1;
 }
 
 .estadistica strong {
     display: block;
-    font-size: 20px;
+    font-size: 26px;
     line-height: 1.1;
     font-weight: 800;
     margin: 2px 0;
@@ -1147,7 +1149,7 @@ a {
 
 .estadistica small {
     color: #8a96a8;
-    font-size: 9px;
+    font-size: 10.5px;
 }
 
 .positivo {
@@ -1164,7 +1166,7 @@ a {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-bottom: 12px;
 }
@@ -1185,14 +1187,14 @@ a {
 }
 
 .panel-header h2 {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
     margin-bottom: 0;
 }
 
 .panel-header p {
     color: #8a96a8;
-    font-size: 10px;
+    font-size: 11px;
     margin: 0;
 }
 
@@ -1363,7 +1365,6 @@ a {
     padding: 10px;
     border: 1px solid #edf0f5;
     background: #fafbfc;
-    border-radius: 99px;
     transition: .2s;
 }
 
@@ -1901,7 +1902,7 @@ a {
     }
 
     .barra-acciones {
-        gap: 5px;
+        gap: 8px;
     }
 
     .btn-principal {
@@ -2856,4 +2857,108 @@ a {
         font-size: 12px;
         border-radius: 6px;
     }
+}
+/* =========================================================
+   DETALLE DE TICKET
+========================================================= */
+.panel-body {
+    padding: 20px 25px;
+}
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+.info-grid strong {
+    display: block;
+    font-size: 11px;
+    color: #253047;
+    margin-bottom: 2px;
+}
+.info-grid p {
+    margin: 0;
+    font-size: 12.5px;
+    color: #64748b;
+}
+.descripcion-box {
+    margin-top: 8px;
+    padding: 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.5;
+}
+.comentario-card {
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+.comentario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.comentario-header strong {
+    font-size: 12px;
+}
+.comentario-header small {
+    color: #718096;
+    font-size: 10px;
+}
+.comentario-texto {
+    margin: 0;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.textarea-comentario {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #d9e0e8;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 12.5px;
+    margin-bottom: 10px;
+}
+.panel-acciones {
+    padding: 25px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.info-resuelto {
+    padding: 12px 16px;
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #166534;
+    line-height: 1.5;
+}
+.estado-box {
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+}
+.estado-box.resuelto {
+    background: #f0fff4;
+    border-color: #c6f6d5;
+    color: #166534;
+}
+.estado-box.cancelado {
+    background: #fff5f5;
+    border-color: #fed7d7;
+    color: #b91c1c;
 }

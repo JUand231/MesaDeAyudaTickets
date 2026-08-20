@@ -98,7 +98,7 @@
             <section class="estadisticas-categorias">
 
                 <div class="card-categoria-resumen">
-                    <div class="icono-resumen azul">◇</div>
+                    <div class="icono-resumen azul">⚐</div>
                     <div>
                         <span>Total categorías</span>
                         <strong>${totalCategorias != null ? totalCategorias : 0}</strong>
@@ -135,7 +135,8 @@
                             <c:forEach var="cat" items="${listaCategorias}">
                                 <article class="categoria-card">
                                     <div class="categoria-card-superior">
-                                        <div class="categoria-icono azul">◈</div>
+                          
+                                        <div class="categoria-icono azul">🖳</div>
                                     </div>
 
                                     <div class="categoria-info">

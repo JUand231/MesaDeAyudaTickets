@@ -11,7 +11,7 @@ public class AsignacionPorTurnoRotativo implements EstrategiaAsignacion {
         if (agentesDisponibles == null || agentesDisponibles.isEmpty()) {
             throw new IllegalStateException("No hay agentes disponibles para asignar");
         }
-        int posicion = ticket.getIdTicket() % agentesDisponibles.size();
-        return agentesDisponibles.get(posicion).getIdUsuario();
+        int posicion = (ticket.getIdTicket() - 1) % agentesDisponibles.size();
+        return agentesDisponibles .get(posicion).getIdUsuario();
     }
 }

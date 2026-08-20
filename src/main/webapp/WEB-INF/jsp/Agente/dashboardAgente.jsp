@@ -31,7 +31,7 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/tickets" class="menu-item">
-                    <span>▣</span>
+                    <span>🏷</span>
                     <label>Mis tickets</label>
                 </a>
 
