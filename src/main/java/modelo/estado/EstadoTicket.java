@@ -1,11 +1,11 @@
 package modelo.estado;
 
-public enum EstadoTicket {
-    NUEVO,
-    ASIGNADO, 
-    ENPROCESO,
-    RESUELTO,
-    CERRADO,
-    CANCELADO
-    
+public interface EstadoTicket {
+    EstadoTicket asignar();
+    EstadoTicket iniciar();
+    EstadoTicket resolver();
+    EstadoTicket cerrar();
+    EstadoTicket reabrir();
+    EstadoTicket cancelar();
+    String nombre();
 }

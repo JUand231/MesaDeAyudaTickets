@@ -1,21 +1,41 @@
 package modelo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Comentario {
+
     private int idComentario;
-    private String autor;
+    private int idUsuario;
+    private int idTicket;
     private String texto;
-    private LocalDate fecha;
+    private LocalDateTime fecha = LocalDateTime.now();
+    // Datos adicionales para consultas
+    private String nombreUsuario;
+    private String nombreRol;
+    private String tituloTicket;
 
     public Comentario() {
     }
 
-    public Comentario(int idComentario, String autor, String texto, LocalDate fecha) {
-        this.idComentario = idComentario;
-        this.autor = autor;
+    // Constructor para crear un nuevo comentario
+    public Comentario(int idTicket, int idUsuario, String texto) {
+        this.idTicket = idTicket;
+        this.idUsuario = idUsuario;
         this.texto = texto;
-        this.fecha = fecha;
+        this.fecha = LocalDateTime.now();
+    }
+
+    // Constructor completo
+    public Comentario(
+            int idComentario,
+            int idUsuario,
+            int idTicket,
+            String texto) {
+
+        this.idComentario = idComentario;
+        this.idUsuario = idUsuario;
+        this.idTicket = idTicket;
+        this.texto = texto;
     }
 
     public int getIdComentario() {
@@ -26,12 +46,20 @@ public class Comentario {
         this.idComentario = idComentario;
     }
 
-    public String getAutor() {
-        return autor;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setAutor(String autor) {
-        this.autor = autor;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public int getIdTicket() {
+        return idTicket;
+    }
+
+    public void setIdTicket(int idTicket) {
+        this.idTicket = idTicket;
     }
 
     public String getTexto() {
@@ -42,14 +70,35 @@ public class Comentario {
         this.texto = texto;
     }
 
-    public LocalDate getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
-    
-    
-    
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getNombreRol() {
+        return nombreRol;
+    }
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
+    public String getTituloTicket() {
+        return tituloTicket;
+    }
+
+    public void setTituloTicket(String tituloTicket) {
+        this.tituloTicket = tituloTicket;
+    }
 }
