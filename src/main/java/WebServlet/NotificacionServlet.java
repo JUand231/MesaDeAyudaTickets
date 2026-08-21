@@ -36,19 +36,12 @@ public class NotificacionServlet extends HttpServlet {
         }
     }
 
-    // ==========================================================
-    // GET
-    // MOSTRAR NOTIFICACIONES
-    // ==========================================================
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ======================================================
-        // VALIDAR SESIÓN
-        // ======================================================
         HttpSession session
                 = request.getSession(false);
 
@@ -64,18 +57,12 @@ public class NotificacionServlet extends HttpServlet {
             return;
         }
 
-        // ======================================================
-        // DATOS DEL USUARIO
-        // ======================================================
         int idUsuario
                 = (Integer) session.getAttribute("idUsuario");
 
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ======================================================
-        // OBTENER NOTIFICACIONES
-        // ======================================================
         List<Notificacion> notificaciones
                 = notificacionRepository.listarPorUsuario(
                         idUsuario
@@ -96,13 +83,6 @@ public class NotificacionServlet extends HttpServlet {
                 noLeidas
         );
 
-        // ======================================================
-        // DETERMINAR DASHBOARD SEGÚN EL ROL
-        //
-        // 1 = SOLICITANTE
-        // 2 = AGENTE
-        // 3 = ADMINISTRADOR
-        // ======================================================
         String dashboard;
 
         switch (idRol) {
@@ -140,9 +120,6 @@ public class NotificacionServlet extends HttpServlet {
                 dashboard
         );
 
-        // ======================================================
-        // MOSTRAR JSP
-        // ======================================================
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/notificaciones.jsp"
         ).forward(
@@ -151,19 +128,12 @@ public class NotificacionServlet extends HttpServlet {
         );
     }
 
-    // ==========================================================
-    // POST
-    // MARCAR NOTIFICACIONES COMO LEÍDAS
-    // ==========================================================
     @Override
     protected void doPost(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ======================================================
-        // VALIDAR SESIÓN
-        // ======================================================
         HttpSession session
                 = request.getSession(false);
 
@@ -187,9 +157,6 @@ public class NotificacionServlet extends HttpServlet {
 
         try {
 
-            // ==================================================
-            // MARCAR UNA NOTIFICACIÓN
-            // ==================================================
             if ("leer".equals(accion)) {
 
                 String idParametro
@@ -213,9 +180,6 @@ public class NotificacionServlet extends HttpServlet {
                                 idParametro
                         );
 
-                // ==============================================
-                // VERIFICAR QUE LA NOTIFICACIÓN SEA DEL USUARIO
-                // ==============================================
                 Optional<Notificacion> resultado
                         = notificacionRepository.buscarPorId(
                                 idNotificacion
@@ -249,9 +213,6 @@ public class NotificacionServlet extends HttpServlet {
                         idNotificacion
                 );
 
-                // ==================================================
-                // MARCAR TODAS COMO LEÍDAS
-                // ==================================================
             } else if ("leerTodas".equals(accion)) {
 
                 notificacionRepository.marcarTodasComoLeidas(
@@ -268,9 +229,6 @@ public class NotificacionServlet extends HttpServlet {
                 return;
             }
 
-            // ==================================================
-            // VOLVER A NOTIFICACIONES
-            // ==================================================
             response.sendRedirect(
                     request.getContextPath()
                     + "/notificaciones"

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 /**
  * Consultas de solo lectura sobre un ticket que necesitan los TRES roles
  * (solicitante, agente y administrador) para ver el detalle de un ticket y su
- * SLA. No mezcla acciones de escritura ni de un rol en particular.
+ * SLA.
  */
 public interface ConsultaTicket {
 

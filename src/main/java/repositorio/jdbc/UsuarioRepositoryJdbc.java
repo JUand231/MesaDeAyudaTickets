@@ -2,7 +2,6 @@ package repositorio.jdbc;
 
 import modelo.Usuario;
 import repositorio.UsuarioRepository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -68,9 +67,6 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         }
     }
 
-    // ==========================================================
-    // LISTAR AGENTES
-    // ==========================================================
     @Override
     public List<Usuario> listarAgentes() throws SQLException {
 
@@ -92,9 +88,6 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         return agentes;
     }
 
-    // ==========================================================
-    // LISTAR ADMINISTRADORES
-    // ==========================================================
     @Override
     public List<Usuario> listarAdministradores()
             throws SQLException {
@@ -117,9 +110,6 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         return administradores;
     }
 
-    // ==========================================================
-    // LISTAR TODOS
-    // ==========================================================
     @Override
     public List<Usuario> listar() {
 
@@ -146,9 +136,6 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         return usuarios;
     }
 
-    // ==========================================================
-    // MAPEAR
-    // ==========================================================
     private Usuario mapear(ResultSet rs)
             throws SQLException {
 
@@ -177,9 +164,6 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         return usuario;
     }
 
-    // ==========================================================
-    // ACTUALIZAR
-    // ==========================================================
     @Override
     public void actualizar(Usuario usuario)
             throws SQLException {

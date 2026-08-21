@@ -2,7 +2,6 @@ package WebServlet;
 
 import modelo.Comentario;
 import repositorio.ComentarioRepository;
-
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -58,9 +57,6 @@ public class ComentariosAdminServlet extends HttpServlet {
             );
         }
 
-        // ==========================================
-        // FILTROS
-        // ==========================================
         String buscar = request.getParameter("buscar");
         String rol = request.getParameter("rol");
 
@@ -69,7 +65,6 @@ public class ComentariosAdminServlet extends HttpServlet {
         System.out.println("PARAMETRO rol = [" + rol + "]");
         System.out.println("=================================");
 
-        // Evitamos null
         if (buscar == null) {
             buscar = "";
         }
@@ -78,9 +73,6 @@ public class ComentariosAdminServlet extends HttpServlet {
             rol = "";
         }
 
-        // ==========================================
-        // BUSCAR COMENTARIOS
-        // ==========================================
         List<Comentario> comentarios
                 = comentarioRepository.buscarAdmin(buscar, rol);
 
@@ -90,9 +82,6 @@ public class ComentariosAdminServlet extends HttpServlet {
                 + " | RESULTADOS: " + comentarios.size()
         );
 
-        // ==========================================
-        // ENVIAR A JSP
-        // ==========================================
         request.setAttribute(
                 "comentarios",
                 comentarios

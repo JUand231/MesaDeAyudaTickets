@@ -30,6 +30,22 @@
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 20px;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: #f4f6f8;
+                padding: 12px 0;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .btn-volver {
+                display: inline-block;
+                margin-bottom: 12px;
+                padding: 8px 14px;
+                border-radius: 5px;
+                background: #ffffff;
+                border: 1px solid #007bff;
+                font-weight: 600;
             }
 
             .notificacion {
@@ -87,6 +103,11 @@
             <div class="cabecera">
 
                 <div>
+                    <a href="${pageContext.request.contextPath}${dashboard}"
+                       class="btn-volver">
+                        ← Volver
+                    </a>
+
                     <h1>Notificaciones</h1>
 
                     <p>
@@ -182,12 +203,6 @@
                     }
                 }
             %>
-
-            <br>
-
-            <a href="${pageContext.request.contextPath}${dashboard}">
-                ← Volver
-            </a>
 
         </div>
 

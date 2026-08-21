@@ -49,9 +49,6 @@ public class AgentesServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================
-        // REPOSITORIO
-        // ==========================================
         UsuarioRepository usuarioRepository
                 = (UsuarioRepository) getServletContext()
                         .getAttribute(
@@ -59,9 +56,6 @@ public class AgentesServlet extends HttpServlet {
 
         try {
 
-            // ==========================================
-            // OBTENER TODOS LOS AGENTES
-            // ==========================================
             List<Usuario> agentes
                     = usuarioRepository.listarAgentes();
 
@@ -69,9 +63,6 @@ public class AgentesServlet extends HttpServlet {
                     "agentes",
                     agentes);
 
-            // ==========================================
-            // ENVIAR A LA VISTA
-            // ==========================================
             request.getRequestDispatcher(
                     "/WEB-INF/jsp/Administrador/agentes.jsp")
                     .forward(request, response);

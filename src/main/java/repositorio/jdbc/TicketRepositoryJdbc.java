@@ -12,15 +12,8 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Optional;
 
-/**
- * Implementacion de TicketRepository contra SQL Server, usando JDBC puro.
- *
- * TicketService no necesita conocer si utiliza esta implementacion o
- * TicketRepositoryEnMemoria.
- */
 public class TicketRepositoryJdbc implements TicketRepository {
 
     @Override

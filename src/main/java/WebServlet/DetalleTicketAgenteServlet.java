@@ -12,12 +12,10 @@ import repositorio.ComentarioRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.TicketService;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,19 +29,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
     private static final DateTimeFormatter FORMATO_SLA
             = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // ==========================================================
-    // GET
-    // MOSTRAR DETALLE DEL TICKET
-    // ==========================================================
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ==========================================================
-        // VALIDAR SESIÓN
-        // ==========================================================
         HttpSession session = request.getSession(false);
 
         if (session == null
@@ -63,13 +54,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ==========================================================
-        // VALIDAR ROL
-        //
-        // 1 = SOLICITANTE
-        // 2 = AGENTE
-        // 3 = ADMINISTRADOR
-        // ==========================================================
         if (idRol != 1 && idRol != 2 && idRol != 3) {
 
             response.sendError(
@@ -79,9 +63,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // OBTENER ID DEL TICKET
-        // ==========================================================
         String idParametro
                 = request.getParameter("id");
 
@@ -110,33 +91,25 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // OBTENER SERVICIOS Y REPOSITORIOS
-        // ==========================================================
         TicketService ticketService
-                = (TicketService) getServletContext()
-                        .getAttribute(
-                                AppContextListener.TICKET_SERVICE);
+                = (TicketService) getServletContext().getAttribute(
+                        AppContextListener.TICKET_SERVICE);
 
         CategoriaRepository categoriaRepository
-                = (CategoriaRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.CATEGORIA_REPOSITORY);
+                = (CategoriaRepository) getServletContext().getAttribute(
+                        AppContextListener.CATEGORIA_REPOSITORY);
 
         PrioridadRepository prioridadRepository
-                = (PrioridadRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.PRIORIDAD_REPOSITORY);
+                = (PrioridadRepository) getServletContext().getAttribute(
+                        AppContextListener.PRIORIDAD_REPOSITORY);
 
         UsuarioRepository usuarioRepository
-                = (UsuarioRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.USUARIO_REPOSITORY);
+                = (UsuarioRepository) getServletContext().getAttribute(
+                        AppContextListener.USUARIO_REPOSITORY);
 
         ComentarioRepository comentarioRepository
-                = (ComentarioRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.COMENTARIO_REPOSITORY);
+                = (ComentarioRepository) getServletContext().getAttribute(
+                        AppContextListener.COMENTARIO_REPOSITORY);
 
         if (ticketService == null
                 || categoriaRepository == null
@@ -148,9 +121,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                     "Los repositorios o servicios no están configurados.");
         }
 
-        // ==========================================================
-        // BUSCAR TICKET
-        // ==========================================================
         Ticket ticket;
 
         try {
@@ -166,18 +136,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // SEGURIDAD
-        //
-        // AGENTE:
-        // Solo puede ver tickets asignados a él.
-        //
-        // SOLICITANTE:
-        // Solo puede ver tickets creados por él.
-        //
-        // ADMINISTRADOR:
-        // Puede ver cualquier ticket, sin restricción.
-        // ==========================================================
         if (idRol == 2) {
 
             if (ticket.getIdAgente() == null
@@ -202,9 +160,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             }
         }
 
-        // ==========================================================
-        // CATEGORÍA
-        // ==========================================================
         String nombreCategoria
                 = categoriaRepository
                         .buscarPorId(
@@ -215,9 +170,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                                 "Categoria #"
                                 + ticket.getIdCategoria());
 
-        // ==========================================================
-        // PRIORIDAD
-        // ==========================================================
         Prioridad prioridad
                 = prioridadRepository
                         .buscarPorId(
@@ -230,9 +182,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                         : "Prioridad #"
                         + ticket.getIdPrioridad();
 
-        // ==========================================================
-        // SOLICITANTE
-        // ==========================================================
         String nombreSolicitante
                 = usuarioRepository
                         .buscarPorId(
@@ -243,9 +192,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                                 "Usuario #"
                                 + ticket.getIdSolicitante());
 
-        // ==========================================================
-        // AGENTE
-        // ==========================================================
         String nombreAgente = "Sin asignar";
 
         if (ticket.getIdAgente() != null) {
@@ -261,9 +207,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                                     + ticket.getIdAgente());
         }
 
-        // ==========================================================
-        // CONVERTIR A DTO
-        // ==========================================================
         TicketDTO ticketDTO
                 = TicketMapper.aDTO(
                         ticket,
@@ -276,9 +219,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                 "ticket",
                 ticketDTO);
 
-        // ==========================================================
-        // SLA
-        // ==========================================================
         if (prioridad != null) {
 
             LocalDateTime fechaLimiteSLA
@@ -305,9 +245,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                     slaVencido);
         }
 
-        // ==========================================================
-        // COMENTARIOS
-        // ==========================================================
         List<Comentario> comentarios
                 = comentarioRepository
                         .listarPorTicket(
@@ -317,13 +254,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                 "comentarios",
                 comentarios);
 
-        // ==========================================================
-        // MOSTRAR VISTA SEGÚN EL ROL
-        //
-        // ROL 1 → SOLICITANTE
-        // ROL 2 → AGENTE
-        // ROL 3 → ADMINISTRADOR
-        // ==========================================================
         if (idRol == 1) {
 
             request.getRequestDispatcher(
@@ -350,27 +280,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         }
     }
 
-    // ==========================================================
-    // POST
-    // COMENTARIOS Y CAMBIOS DE ESTADO
-    // ==========================================================
     @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ==========================================================
-        // CODIFICACIÓN
-        //
-        // Sin esto, tildes/ñ/etc. del textarea llegan mal
-        // decodificadas y quedan corruptas en la base de datos.
-        // ==========================================================
         request.setCharacterEncoding("UTF-8");
 
-        // ==========================================================
-        // VALIDAR SESIÓN
-        // ==========================================================
         HttpSession session = request.getSession(false);
 
         if (session == null
@@ -390,13 +305,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ==========================================================
-        // VALIDAR ROL
-        //
-        // 1 = SOLICITANTE
-        // 2 = AGENTE
-        // 3 = ADMINISTRADOR (solo puede comentar, no cambiar estado)
-        // ==========================================================
         if (idRol != 1 && idRol != 2 && idRol != 3) {
 
             response.sendError(
@@ -406,9 +314,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // DATOS DEL FORMULARIO
-        // ==========================================================
         String idParametro
                 = request.getParameter("id");
 
@@ -442,9 +347,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // SERVICIOS Y REPOSITORIOS
-        // ==========================================================
         TicketService ticketService
                 = (TicketService) getServletContext()
                         .getAttribute(
@@ -456,9 +358,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                     "TicketService no está configurado.");
         }
 
-        // ==========================================================
-        // BUSCAR TICKET
-        // ==========================================================
         Ticket ticket;
 
         try {
@@ -474,15 +373,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // SEGURIDAD PARA MODIFICACIONES
-        //
-        // AGENTE:
-        // Solo puede modificar sus tickets asignados.
-        //
-        // SOLICITANTE:
-        // Solo puede comentar sus propios tickets.
-        // ==========================================================
         if (idRol == 2) {
 
             if (ticket.getIdAgente() == null
@@ -507,16 +397,6 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             }
         }
 
-        // ==========================================================
-        // COMENTAR
-        //
-        // SOLICITANTE, AGENTE Y ADMINISTRADOR
-        // PUEDEN AGREGAR COMENTARIOS.
-        //
-        // Se delega en TicketService.agregarComentario() en vez de
-        // guardar directo en el repositorio, porque ahí es donde
-        // vive la lógica que notifica al agente/solicitante.
-        // ==========================================================
         if ("comentar".equals(accion)) {
 
             String texto
@@ -558,31 +438,20 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // SOLO EL AGENTE PUEDE CAMBIAR ESTADO
-        //
-        // Esta comprobación está ANTES del switch.
-        // ==========================================================
-        if (idRol != 2) {
-
-            response.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "El solicitante no puede cambiar el estado del ticket.");
-
-            return;
-        }
-
-        // ==========================================================
-        // CAMBIAR ESTADO
-        // ==========================================================
         try {
 
             switch (accion) {
 
-                // ==================================================
-                // INICIAR ATENCIÓN
-                // ==================================================
                 case "iniciar":
+
+                    if (idRol != 2) {
+
+                        response.sendError(
+                                HttpServletResponse.SC_FORBIDDEN,
+                                "Solo el agente puede iniciar la atención.");
+
+                        return;
+                    }
 
                     ticketService.iniciarAtencion(
                             idTicket,
@@ -590,10 +459,16 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
 
                     break;
 
-                // ==================================================
-                // RESOLVER
-                // ==================================================
                 case "resolver":
+
+                    if (idRol != 2) {
+
+                        response.sendError(
+                                HttpServletResponse.SC_FORBIDDEN,
+                                "Solo el agente puede resolver el ticket.");
+
+                        return;
+                    }
 
                     ticketService.resolver(
                             idTicket,
@@ -601,9 +476,40 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
 
                     break;
 
-                // ==================================================
-                // ACCIÓN NO VÁLIDA
-                // ==================================================
+                case "cerrar":
+
+                    if (idRol != 1) {
+
+                        response.sendError(
+                                HttpServletResponse.SC_FORBIDDEN,
+                                "Solo el solicitante puede cerrar el ticket.");
+
+                        return;
+                    }
+
+                    ticketService.cerrar(
+                            idTicket,
+                            obtenerSolicitante(ticket));
+
+                    break;
+
+                case "reabrir":
+
+                    if (idRol != 1) {
+
+                        response.sendError(
+                                HttpServletResponse.SC_FORBIDDEN,
+                                "Solo el solicitante puede reabrir el ticket.");
+
+                        return;
+                    }
+
+                    ticketService.reabrir(
+                            idTicket,
+                            obtenerSolicitante(ticket));
+
+                    break;
+
                 default:
 
                     response.sendError(
@@ -613,7 +519,7 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                     return;
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
 
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
@@ -622,18 +528,12 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // VOLVER AL DETALLE
-        // ==========================================================
         response.sendRedirect(
                 request.getContextPath()
                 + "/detalleTicket?id="
                 + idTicket);
     }
 
-    // ==========================================================
-    // OBTENER SOLICITANTE
-    // ==========================================================
     private Usuario obtenerSolicitante(
             Ticket ticket)
             throws ServletException {

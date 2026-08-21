@@ -216,9 +216,6 @@ public class DashboardAgenteServlet extends HttpServlet {
                 resueltos
         );
 
-        // =========================================================
-        // MOSTRAR DASHBOARD
-        // =========================================================
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/Agente/dashboardAgente.jsp"
         ).forward(request, response);

@@ -19,6 +19,8 @@
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/css/estilo.css">
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     </head>
 
     <body>
@@ -314,7 +316,7 @@
                         <div>
 
                             <strong>
-                                SLA
+                                Tiempo máximo de atención
                             </strong>
 
                             <p>
@@ -327,7 +329,7 @@
                         <div>
 
                             <strong>
-                                Fecha límite SLA
+                                Fecha límite
                             </strong>
 
                             <p>
@@ -340,7 +342,7 @@
                         <div>
 
                             <strong>
-                                Estado SLA
+                                Estado
                             </strong>
 
                             <p>
@@ -352,7 +354,7 @@
                                     </c:when>
 
                                     <c:otherwise>
-                                        DENTRO DEL SLA
+                                        DENTRO DEL TIEMPO MAXIMO
                                     </c:otherwise>
 
                                 </c:choose>
@@ -479,10 +481,77 @@
                                  background:#f0fff4;
                                  border:1px solid #c6f6d5;
                                  border-radius:10px;
+                                 margin-bottom:15px;
                                  ">
 
                                 Tu solicitud ha sido marcada como
-                                resuelta.
+                                resuelta. Confirma si quedó bien o,
+                                si el problema sigue, reábrela.
+
+                            </div>
+
+
+                            <div style="
+                                 display:flex;
+                                 gap:12px;
+                                 flex-wrap:wrap;
+                                 ">
+
+                                <!-- CONFIRMAR Y CERRAR -->
+                                <form method="post"
+                                      id="formCerrarTicket"
+                                      action="${pageContext.request.contextPath}/detalleTicket">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="${ticket.idTicket}">
+
+                                    <input type="hidden"
+                                           name="accion"
+                                           value="cerrar">
+
+                                    <button type="button"
+                                            class="btn-principal"
+                                            style="border:none; cursor:pointer;"
+                                            onclick="confirmarCerrarTicket();">
+
+                                        ✓ Confirmar y cerrar
+
+                                    </button>
+
+                                </form>
+
+
+                                <!-- REABRIR -->
+                                <form method="post"
+                                      id="formReabrirTicket"
+                                      action="${pageContext.request.contextPath}/detalleTicket">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="${ticket.idTicket}">
+
+                                    <input type="hidden"
+                                           name="accion"
+                                           value="reabrir">
+
+                                    <button type="button"
+                                            style="
+                                            padding:10px 18px;
+                                            border-radius:8px;
+                                            border:1px solid #d9e0e8;
+                                            background:#ffffff;
+                                            color:#334155;
+                                            cursor:pointer;
+                                            font-weight:600;
+                                            "
+                                            onclick="confirmarReabrirTicket();">
+
+                                        ↺ No quedó resuelto, reabrir
+
+                                    </button>
+
+                                </form>
 
                             </div>
 
@@ -499,6 +568,25 @@
                                  ">
 
                                 Esta solicitud fue cancelada.
+
+                            </div>
+
+                        </c:when>
+
+
+                        <c:when test="${ticket.estado == 'CERRADO'}">
+
+                            <div style="
+                                 padding:15px;
+                                 background:#f8fafc;
+                                 border:1px solid #e2e8f0;
+                                 border-radius:10px;
+                                 color:#718096;
+                                 ">
+
+                                Este ticket está cerrado. Ya quedó
+                                como quedó: no admite más comentarios
+                                ni cambios.
 
                             </div>
 
@@ -643,64 +731,131 @@
                          NUEVO COMENTARIO
                          ================================================== -->
 
-                    <div style="
-                         margin-top:25px;
-                         ">
+                    <c:if test="${ticket.estado != 'CERRADO'}">
 
-                        <h3>
-                            Agregar comentario
-                        </h3>
+                        <div style="
+                             margin-top:25px;
+                             ">
 
-
-                        <form method="post"
-                              action="${pageContext.request.contextPath}/detalleTicket">
-
-                            <input type="hidden"
-                                   name="id"
-                                   value="${ticket.idTicket}">
-
-                            <input type="hidden"
-                                   name="accion"
-                                   value="comentar">
-
-
-                            <textarea
-                                name="texto"
-                                rows="4"
-                                required
-                                placeholder="Escribe un comentario para el equipo de soporte..."
-                                style="
-                                width:100%;
-                                box-sizing:border-box;
-                                padding:12px;
-                                border:1px solid #d9e0e8;
-                                border-radius:8px;
-                                resize:vertical;
-                                font-family:inherit;
-                                margin-bottom:10px;
-                                "></textarea>
-
-
-                            <button type="submit"
-                                    class="btn-principal"
-                                    style="
-                                    border:none;
-                                    cursor:pointer;
-                                    ">
-
+                            <h3>
                                 Agregar comentario
+                            </h3>
 
-                            </button>
 
-                        </form>
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/detalleTicket">
 
-                    </div>
+                                <input type="hidden"
+                                       name="id"
+                                       value="${ticket.idTicket}">
+
+                                <input type="hidden"
+                                       name="accion"
+                                       value="comentar">
+
+
+                                <textarea
+                                    name="texto"
+                                    rows="4"
+                                    required
+                                    placeholder="Escribe un comentario para el equipo de soporte..."
+                                    style="
+                                    width:100%;
+                                    box-sizing:border-box;
+                                    padding:12px;
+                                    border:1px solid #d9e0e8;
+                                    border-radius:8px;
+                                    resize:vertical;
+                                    font-family:inherit;
+                                    margin-bottom:10px;
+                                    "></textarea>
+
+
+                                <button type="submit"
+                                        class="btn-principal"
+                                        style="
+                                        border:none;
+                                        cursor:pointer;
+                                        ">
+
+                                    Agregar comentario
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </c:if>
+
+                    <c:if test="${ticket.estado == 'CERRADO'}">
+
+                        <div style="
+                             margin-top:25px;
+                             padding:15px;
+                             text-align:center;
+                             color:#718096;
+                             background:#f8fafc;
+                             border:1px solid #e2e8f0;
+                             border-radius:10px;
+                             ">
+
+                            Este ticket está cerrado, ya no se pueden
+                            agregar más comentarios.
+
+                        </div>
+
+                    </c:if>
 
                 </div>
 
             </section>
 
         </main>
+
+        <script>
+
+            function confirmarCerrarTicket() {
+
+                Swal.fire({
+                    title: "¿Confirmar y cerrar el ticket?",
+                    text: "Tu problema quedará marcado como resuelto y "
+                            + "el ticket no se podrá volver a comentar ni modificar.",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, cerrar ticket",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#2f855a",
+                    cancelButtonColor: "#94a3b8"
+                }).then(function (resultado) {
+
+                    if (resultado.isConfirmed) {
+                        document.getElementById("formCerrarTicket").submit();
+                    }
+                });
+            }
+
+            function confirmarReabrirTicket() {
+
+                Swal.fire({
+                    title: "¿Reabrir este ticket?",
+                    text: "El ticket volverá a estado EN PROCESO y se le "
+                            + "avisará al agente encargado.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, reabrir",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#dd6b20",
+                    cancelButtonColor: "#94a3b8"
+                }).then(function (resultado) {
+
+                    if (resultado.isConfirmed) {
+                        document.getElementById("formReabrirTicket").submit();
+                    }
+                });
+            }
+
+        </script>
 
     </body>
 

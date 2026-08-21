@@ -31,9 +31,6 @@ public class DashboardAdminServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ==========================================
-        // VERIFICAR SESIÓN
-        // ==========================================
         HttpSession session = request.getSession(false);
 
         if (session == null
@@ -51,9 +48,6 @@ public class DashboardAdminServlet extends HttpServlet {
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ==========================================
-        // VERIFICAR QUE SEA ADMINISTRADOR
-        // ==========================================
         if (idRol != 3) {
 
             response.sendRedirect(
@@ -62,43 +56,29 @@ public class DashboardAdminServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================
-        // OBTENER SERVICIOS Y REPOSITORIOS
-        // ==========================================
         AccionesAdministrador ticketService
-                = (AccionesAdministrador) getServletContext()
-                        .getAttribute(
-                                AppContextListener.TICKET_SERVICE);
+                = (AccionesAdministrador) getServletContext().getAttribute(
+                        AppContextListener.TICKET_SERVICE);
 
         CategoriaRepository categoriaRepository
-                = (CategoriaRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.CATEGORIA_REPOSITORY);
+                = (CategoriaRepository) getServletContext().getAttribute(
+                        AppContextListener.CATEGORIA_REPOSITORY);
 
         PrioridadRepository prioridadRepository
-                = (PrioridadRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.PRIORIDAD_REPOSITORY);
+                = (PrioridadRepository) getServletContext().getAttribute(
+                        AppContextListener.PRIORIDAD_REPOSITORY);
 
         UsuarioRepository usuarioRepository
-                = (UsuarioRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.USUARIO_REPOSITORY);
+                = (UsuarioRepository) getServletContext().getAttribute(
+                        AppContextListener.USUARIO_REPOSITORY);
 
         NotificacionRepository notificacionRepository
-                = (NotificacionRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.NOTIFICACION_REPOSITORY);
+                = (NotificacionRepository) getServletContext().getAttribute(
+                        AppContextListener.NOTIFICACION_REPOSITORY);
 
-        // ==========================================
-        // TODOS LOS TICKETS
-        // ==========================================
         List<Ticket> tickets
                 = ticketService.listarTodos();
 
-        // ==========================================
-        // ESTADÍSTICAS
-        // ==========================================
         int total = tickets.size();
 
         int pendientes = 0;
@@ -123,21 +103,16 @@ public class DashboardAdminServlet extends HttpServlet {
                     || estado.equalsIgnoreCase("CERRADO")
                     || estado.equalsIgnoreCase("CANCELADO");
 
-            // Tickets que todavía requieren atención
             if (!esFinal) {
                 pendientes++;
             }
 
-            // Tickets resueltos o cerrados
             if (estado.equalsIgnoreCase("RESUELTO")
                     || estado.equalsIgnoreCase("CERRADO")) {
 
                 resueltos++;
             }
 
-            // ======================================
-            // TICKETS CRÍTICOS
-            // ======================================
             Prioridad prioridad
                     = prioridadRepository
                             .buscarPorId(
@@ -153,17 +128,11 @@ public class DashboardAdminServlet extends HttpServlet {
             }
         }
 
-        // ==========================================
-        // PORCENTAJE DE RESOLUCIÓN
-        // ==========================================
         int porcentajeResolucion
                 = total == 0
                         ? 0
                         : (resueltos * 100) / total;
 
-        // ==========================================
-        // TICKETS MÁS RECIENTES
-        // ==========================================
         List<Ticket> masRecientes
                 = new ArrayList<>(tickets);
 
@@ -181,9 +150,6 @@ public class DashboardAdminServlet extends HttpServlet {
                     );
         }
 
-        // ==========================================
-        // CONVERTIR A DTO
-        // ==========================================
         List<TicketDTO> ticketsRecientes
                 = new ArrayList<>();
 
@@ -249,16 +215,10 @@ public class DashboardAdminServlet extends HttpServlet {
             );
         }
 
-        // ==========================================
-        // NOTIFICACIONES DEL ADMIN
-        // ==========================================
         int notificacionesNoLeidas
                 = notificacionRepository
                         .contarNoLeidas(idUsuario);
 
-        // ==========================================
-        // ENVIAR DATOS AL JSP
-        // ==========================================
         request.setAttribute(
                 "totalTickets",
                 total);
@@ -287,9 +247,6 @@ public class DashboardAdminServlet extends HttpServlet {
                 "notificacionesNoLeidas",
                 notificacionesNoLeidas);
 
-        // ==========================================
-        // MOSTRAR DASHBOARD
-        // ==========================================
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/Administrador/dashboardAdmin.jsp")
                 .forward(request, response);

@@ -371,7 +371,7 @@
                         <div>
 
                             <strong>
-                                SLA
+                                Tiempo máximo de atención
                             </strong>
 
                             <p>
@@ -384,7 +384,7 @@
                         <div>
 
                             <strong>
-                                Fecha límite SLA
+                                Fecha límite
                             </strong>
 
                             <p>
@@ -397,7 +397,7 @@
                         <div>
 
                             <strong>
-                                Estado SLA
+                                Estado
                             </strong>
 
                             <p>
@@ -409,7 +409,7 @@
                                     </c:when>
 
                                     <c:otherwise>
-                                        DENTRO DEL SLA
+                                        DENTRO DEL TIEMPO MAXIMO
                                     </c:otherwise>
 
                                 </c:choose>

@@ -223,21 +223,21 @@
                         </div>
 
                         <div>
-                            <strong>SLA</strong>
+                            <strong>Tiempo máximo de atención</strong>
                             <p>${horasSLA} horas</p>
                         </div>
 
                         <div>
-                            <strong>Fecha límite SLA</strong>
+                            <strong>Fecha límite</strong>
                             <p>${fechaLimiteSLA}</p>
                         </div>
 
                         <div>
-                            <strong>Estado SLA</strong>
+                            <strong>Estado</strong>
                             <p>
                                 <c:choose>
                                     <c:when test="${slaVencido}">VENCIDO</c:when>
-                                    <c:otherwise>DENTRO DEL SLA</c:otherwise>
+                                    <c:otherwise>DENTRO DEL TIEMPO MAXIMO</c:otherwise>
                                 </c:choose>
                             </p>
                         </div>
@@ -432,7 +432,7 @@
             </section>
 
 
-        </main>
+        </main> 
 
     </body>
 

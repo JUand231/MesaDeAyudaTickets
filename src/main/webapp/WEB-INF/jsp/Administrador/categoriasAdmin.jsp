@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Categorías | Mesa de Ayuda</title>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </head>
     <body>
         <!-- SIDEBAR -->
@@ -135,7 +136,7 @@
                             <c:forEach var="cat" items="${listaCategorias}">
                                 <article class="categoria-card">
                                     <div class="categoria-card-superior">
-                          
+
                                         <div class="categoria-icono azul">🖳</div>
                                     </div>
 
@@ -287,9 +288,22 @@
             }
 
             function eliminarCategoria(id) {
-                if (confirm("¿Estás seguro de eliminar esta categoría?")) {
-                    window.location.href = "${pageContext.request.contextPath}/categorias?accion=eliminar&id=" + id;
-                }
+                Swal.fire({
+                    title: "¿Eliminar esta categoría?",
+                    text: "Los tickets que ya la usan no se verán afectados, "
+                            + "pero no podrás elegirla para tickets nuevos. "
+                            + "Esta acción no se puede deshacer.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, eliminar",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#dc2626",
+                    cancelButtonColor: "#94a3b8"
+                }).then(function (resultado) {
+                    if (resultado.isConfirmed) {
+                        window.location.href = "${pageContext.request.contextPath}/categorias?accion=eliminar&id=" + id;
+                    }
+                });
             }
 
             document.getElementById("modalCategoria").addEventListener("click", function (e) {

@@ -10,13 +10,11 @@ import repositorio.CategoriaRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.TicketService;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,19 +25,12 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/tickets")
 public class TicketsAdminServlet extends HttpServlet {
 
-    // ==========================================================
-    // GET
-    // LISTAR TICKETS
-    // ==========================================================
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ==========================================================
-        // VALIDAR SESIÓN
-        // ==========================================================
         HttpSession session = request.getSession(false);
 
         if (session == null
@@ -57,28 +48,21 @@ public class TicketsAdminServlet extends HttpServlet {
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ==========================================================
-        // OBTENER SERVICIOS Y REPOSITORIOS
-        // ==========================================================
         TicketService ticketService
-                = (TicketService) getServletContext()
-                        .getAttribute(
-                                AppContextListener.TICKET_SERVICE);
+                = (TicketService) getServletContext().getAttribute(
+                        AppContextListener.TICKET_SERVICE);
 
         CategoriaRepository categoriaRepository
-                = (CategoriaRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.CATEGORIA_REPOSITORY);
+                = (CategoriaRepository) getServletContext().getAttribute(
+                        AppContextListener.CATEGORIA_REPOSITORY);
 
         PrioridadRepository prioridadRepository
-                = (PrioridadRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.PRIORIDAD_REPOSITORY);
+                = (PrioridadRepository) getServletContext().getAttribute(
+                        AppContextListener.PRIORIDAD_REPOSITORY);
 
         UsuarioRepository usuarioRepository
-                = (UsuarioRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.USUARIO_REPOSITORY);
+                = (UsuarioRepository) getServletContext().getAttribute(
+                        AppContextListener.USUARIO_REPOSITORY);
 
         if (ticketService == null
                 || categoriaRepository == null
@@ -89,9 +73,6 @@ public class TicketsAdminServlet extends HttpServlet {
                     "Los componentes necesarios no están configurados.");
         }
 
-        // ==========================================================
-        // OBTENER TICKETS SEGÚN EL ROL
-        // ==========================================================
         List<Ticket> tickets;
 
         switch (idRol) {
@@ -117,17 +98,11 @@ public class TicketsAdminServlet extends HttpServlet {
                 break;
         }
 
-        // ==========================================================
-        // CONVERTIR TICKETS A DTO
-        // ==========================================================
         List<TicketDTO> ticketsDTO
                 = new ArrayList<>();
 
         for (Ticket ticket : tickets) {
 
-            // --------------------------------------------------
-            // CATEGORÍA
-            // --------------------------------------------------
             String nombreCategoria
                     = categoriaRepository
                             .buscarPorId(
@@ -138,9 +113,6 @@ public class TicketsAdminServlet extends HttpServlet {
                                     "Categoria #"
                                     + ticket.getIdCategoria());
 
-            // --------------------------------------------------
-            // PRIORIDAD
-            // --------------------------------------------------
             String nombrePrioridad
                     = prioridadRepository
                             .buscarPorId(
@@ -151,9 +123,6 @@ public class TicketsAdminServlet extends HttpServlet {
                                     "Prioridad #"
                                     + ticket.getIdPrioridad());
 
-            // --------------------------------------------------
-            // SOLICITANTE
-            // --------------------------------------------------
             String nombreSolicitante
                     = usuarioRepository
                             .buscarPorId(
@@ -164,9 +133,6 @@ public class TicketsAdminServlet extends HttpServlet {
                                     "Usuario #"
                                     + ticket.getIdSolicitante());
 
-            // --------------------------------------------------
-            // AGENTE
-            // --------------------------------------------------
             String nombreAgente = null;
 
             if (ticket.getIdAgente() != null) {
@@ -182,9 +148,6 @@ public class TicketsAdminServlet extends HttpServlet {
                                         + ticket.getIdAgente());
             }
 
-            // --------------------------------------------------
-            // CREAR DTO
-            // --------------------------------------------------
             ticketsDTO.add(
                     TicketMapper.aDTO(
                             ticket,
@@ -194,9 +157,6 @@ public class TicketsAdminServlet extends HttpServlet {
                             nombreAgente));
         }
 
-        // ==========================================================
-        // FILTROS
-        // ==========================================================
         String buscar
                 = request.getParameter("buscar");
 
@@ -214,9 +174,6 @@ public class TicketsAdminServlet extends HttpServlet {
 
         for (TicketDTO dto : ticketsDTO) {
 
-            // ------------------------------------------------------
-            // BUSCAR
-            // ------------------------------------------------------
             if (buscar != null
                     && !buscar.trim().isEmpty()) {
 
@@ -249,9 +206,6 @@ public class TicketsAdminServlet extends HttpServlet {
                 }
             }
 
-            // ------------------------------------------------------
-            // ESTADO
-            // ------------------------------------------------------
             if (estado != null
                     && !estado.trim().isEmpty()
                     && !normalizar(
@@ -262,9 +216,6 @@ public class TicketsAdminServlet extends HttpServlet {
                 continue;
             }
 
-            // ------------------------------------------------------
-            // PRIORIDAD
-            // ------------------------------------------------------
             if (prioridad != null
                     && !prioridad.trim().isEmpty()
                     && !normalizar(
@@ -275,9 +226,6 @@ public class TicketsAdminServlet extends HttpServlet {
                 continue;
             }
 
-            // ------------------------------------------------------
-            // CATEGORÍA
-            // ------------------------------------------------------
             if (categoria != null
                     && !categoria.trim().isEmpty()
                     && !normalizar(
@@ -291,9 +239,6 @@ public class TicketsAdminServlet extends HttpServlet {
             ticketsFiltrados.add(dto);
         }
 
-        // ==========================================================
-        // ENVIAR TICKETS AL JSP
-        // ==========================================================
         request.setAttribute(
                 "tickets",
                 ticketsFiltrados);
@@ -318,10 +263,6 @@ public class TicketsAdminServlet extends HttpServlet {
                 "filtroCategoria",
                 categoria);
 
-        // ==========================================================
-        // CARGAR AGENTES DISPONIBLES
-        // SOLO ADMINISTRADOR
-        // ==========================================================
         if (idRol != 1 && idRol != 2) {
 
             try {
@@ -341,9 +282,6 @@ public class TicketsAdminServlet extends HttpServlet {
             }
         }
 
-        // ==========================================================
-        // SELECCIONAR JSP SEGÚN ROL
-        // ==========================================================
         if (idRol == 1) {
 
             request.getRequestDispatcher(
@@ -370,20 +308,10 @@ public class TicketsAdminServlet extends HttpServlet {
         }
     }
 
-    // ==========================================================
-    // POST
-    // ASIGNAR AGENTE
-    // NUEVO -> ASIGNADO
-    // ==========================================================
     @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ==========================================================
-        // VALIDAR SESIÓN
-        // ==========================================================
         HttpSession session
                 = request.getSession(false);
 
@@ -397,15 +325,9 @@ public class TicketsAdminServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // OBTENER ROL
-        // ==========================================================
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ==========================================================
-        // SOLO ADMINISTRADOR
-        // ==========================================================
         if (idRol == 1 || idRol == 2) {
 
             response.sendError(
@@ -415,9 +337,6 @@ public class TicketsAdminServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // DATOS DEL FORMULARIO
-        // ==========================================================
         String idTicketStr
                 = request.getParameter("idTicket");
 
@@ -455,9 +374,6 @@ public class TicketsAdminServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================================
-        // OBTENER SERVICIOS
-        // ==========================================================
         TicketService ticketService
                 = (TicketService) getServletContext()
                         .getAttribute(
@@ -477,15 +393,9 @@ public class TicketsAdminServlet extends HttpServlet {
 
         try {
 
-            // ======================================================
-            // BUSCAR TICKET
-            // ======================================================
             Ticket ticket
                     = ticketService.buscarPorId(idTicket);
 
-            // ======================================================
-// CANCELACIÓN POR ADMINISTRADOR
-// ======================================================
             if ("cancelar".equalsIgnoreCase(accion)) {
 
                 // No permitir cancelar un ticket cerrado
@@ -524,10 +434,6 @@ public class TicketsAdminServlet extends HttpServlet {
                 return;
             }
 
-            // ======================================================
-            // VALIDAR ESTADO
-            // SOLO NUEVO PUEDE SER ASIGNADO
-            // ======================================================
             if (!"NUEVO".equals(ticket.getEstadoNombre())
                     && !"EN_PROCESO".equals(ticket.getEstadoNombre())
                     && !"ASIGNADO".equals(ticket.getEstadoNombre())) {
@@ -539,9 +445,6 @@ public class TicketsAdminServlet extends HttpServlet {
                 return;
             }
 
-            // ======================================================
-            // ASIGNACIÓN AUTOMÁTICA
-            // ======================================================
             if ("automatico".equalsIgnoreCase(tipoAsignacion)) {
 
                 List<Usuario> agentesDisponibles
@@ -563,9 +466,6 @@ public class TicketsAdminServlet extends HttpServlet {
 
             } else {
 
-                // ==================================================
-                // ASIGNACIÓN MANUAL
-                // ==================================================
                 if (idAgenteStr == null
                         || idAgenteStr.trim().isEmpty()) {
 
@@ -627,9 +527,6 @@ public class TicketsAdminServlet extends HttpServlet {
 
     }
 
-    // ==========================================================
-    // NORMALIZAR
-    // ==========================================================
     private String normalizar(String texto) {
 
         if (texto == null) {
@@ -637,18 +534,8 @@ public class TicketsAdminServlet extends HttpServlet {
         }
 
         String sinAcentos
-                = Normalizer.normalize(
-                        texto,
-                        Normalizer.Form.NFD)
-                        .replaceAll(
-                                "\\p{M}",
-                                "");
+                = Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
 
-        return sinAcentos
-                .trim()
-                .toUpperCase()
-                .replace(
-                        " ",
-                        "_");
+        return sinAcentos.trim().toUpperCase().replace(" ", "_");
     }
 }

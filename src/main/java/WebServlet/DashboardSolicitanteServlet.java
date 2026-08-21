@@ -32,9 +32,6 @@ public class DashboardSolicitanteServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        // ==========================================
-        // VERIFICAR SESIÓN
-        // ==========================================
         if (session == null
                 || session.getAttribute("idUsuario") == null) {
 
@@ -50,9 +47,6 @@ public class DashboardSolicitanteServlet extends HttpServlet {
         int idRol
                 = (Integer) session.getAttribute("idRol");
 
-        // ==========================================
-        // VERIFICAR QUE SEA SOLICITANTE
-        // ==========================================
         if (idRol != 1) {
 
             response.sendRedirect(
@@ -61,43 +55,29 @@ public class DashboardSolicitanteServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================
-        // OBTENER REPOSITORIOS Y SERVICIOS
-        // ==========================================
         AccionesSolicitante ticketService
-                = (AccionesSolicitante) getServletContext()
-                        .getAttribute(
-                                AppContextListener.TICKET_SERVICE);
+                = (AccionesSolicitante) getServletContext().getAttribute(
+                        AppContextListener.TICKET_SERVICE);
 
         CategoriaRepository categoriaRepository
-                = (CategoriaRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.CATEGORIA_REPOSITORY);
+                = (CategoriaRepository) getServletContext().getAttribute(
+                        AppContextListener.CATEGORIA_REPOSITORY);
 
         PrioridadRepository prioridadRepository
-                = (PrioridadRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.PRIORIDAD_REPOSITORY);
+                = (PrioridadRepository) getServletContext().getAttribute(
+                        AppContextListener.PRIORIDAD_REPOSITORY);
 
         UsuarioRepository usuarioRepository
-                = (UsuarioRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.USUARIO_REPOSITORY);
+                = (UsuarioRepository) getServletContext().getAttribute(
+                        AppContextListener.USUARIO_REPOSITORY);
 
         NotificacionRepository notificacionRepository
-                = (NotificacionRepository) getServletContext()
-                        .getAttribute(
-                                AppContextListener.NOTIFICACION_REPOSITORY);
+                = (NotificacionRepository) getServletContext().getAttribute(
+                        AppContextListener.NOTIFICACION_REPOSITORY);
 
-        // ==========================================
-        // OBTENER TICKETS DEL SOLICITANTE
-        // ==========================================
         List<Ticket> tickets
                 = ticketService.listarPorSolicitante(idUsuario);
 
-        // ==========================================
-        // CONVERTIR TICKET -> TICKETDTO
-        // ==========================================
         List<TicketDTO> ticketsDTO
                 = new ArrayList<>();
 
@@ -195,9 +175,6 @@ public class DashboardSolicitanteServlet extends HttpServlet {
         int notificacionesNoLeidas
                 = notificacionRepository.contarNoLeidas(idUsuario);
 
-        // ==========================================
-        // ENVIAR DATOS AL JSP
-        // ==========================================
         request.setAttribute(
                 "ticketsRecientes",
                 ticketsDTO);
@@ -222,9 +199,6 @@ public class DashboardSolicitanteServlet extends HttpServlet {
                 "notificacionesNoLeidas",
                 notificacionesNoLeidas);
 
-        // ==========================================
-        // MOSTRAR DASHBOARD
-        // ==========================================
         request.getRequestDispatcher(
                 "/WEB-INF/jsp/Solicitante/dashboardSolicitante.jsp")
                 .forward(request, response);

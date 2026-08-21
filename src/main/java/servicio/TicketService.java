@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementación única de las tres interfaces de rol (ISP-01).
+ * Implementación única de las tres interfaces de rol.
  */
 public class TicketService implements AccionesSolicitante, AccionesAgente, AccionesAdministrador {
 
@@ -84,7 +84,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
                 "No existe la categoria con id " + idCategoria));
 
         // ==========================================================
-        // RF-03: PRIORIDAD AUTOMÁTICA
+        // PRIORIDAD AUTOMÁTICA
         // ==========================================================
         int idPrioridad = calcularIdPrioridad(
                 titulo,
@@ -101,7 +101,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
         Ticket creado = ticketRepository.guardar(ticket);
 
         // ==========================================================
-        // RF-04 / OCP-02: ASIGNACIÓN AUTOMÁTICA DE AGENTE
+        // ASIGNACIÓN AUTOMÁTICA DE AGENTE
         // ==========================================================
         try {
             List<Usuario> agentesDisponibles = usuarioRepository.listarAgentes();
@@ -139,9 +139,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
     }
 
     /**
-     * Usa la Strategy de prioridad (calculadoraPrioridad) para decidir el tipo
-     * ("BAJA"/"MEDIA"/"ALTA"/"CRITICA") y lo traduce al id correspondiente de
-     * la tabla Prioridad.
+     * Usa la Strategy de prioridad (calculadoraPrioridad).
      */
     private int calcularIdPrioridad(
             String titulo,
@@ -159,8 +157,7 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
             prioridades = prioridadRepository.listarTodas();
         } catch (SQLException e) {
             throw new IllegalStateException(
-                    "No se pudieron cargar las prioridades disponibles",
-                    e);
+                    "No se pudieron cargar las prioridades disponibles", e);
         }
 
         return prioridades.stream()
@@ -398,32 +395,6 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
     }
 
     @Override
-    public Ticket reasignarAgente(
-            int idTicket,
-            int nuevoIdAgente,
-            Usuario solicitante) {
-
-        Ticket ticket = buscarPorId(idTicket);
-
-        ticket.setIdAgente(nuevoIdAgente);
-
-        Ticket actualizado = ticketRepository.actualizar(ticket);
-
-        Usuario nuevoAgente = obtenerUsuario(nuevoIdAgente);
-
-        notificador.notificar(
-                nuevoAgente,
-                actualizado,
-                "Se te asignó el ticket #"
-                + actualizado.getIdTicket()
-                + ": "
-                + actualizado.getTitulo()
-        );
-
-        return actualizado;
-    }
-
-    @Override
     public Comentario agregarComentario(
             int idTicket,
             int idUsuario,
@@ -437,6 +408,12 @@ public class TicketService implements AccionesSolicitante, AccionesAgente, Accio
         }
 
         Ticket ticket = buscarPorId(idTicket);
+
+        if ("CERRADO".equals(ticket.getEstadoNombre())) {
+            throw new IllegalArgumentException(
+                    "Este ticket está cerrado y no admite más comentarios."
+            );
+        }
 
         // ==========================================================
         // VALIDAR PERMISOS

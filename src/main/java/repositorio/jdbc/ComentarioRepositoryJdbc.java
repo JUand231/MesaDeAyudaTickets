@@ -41,8 +41,6 @@ public class ComentarioRepositoryJdbc
                     comentario.getIdUsuario()
             );
 
-            // IMPORTANTE:
-            // NVARCHAR en SQL Server
             stmt.setNString(
                     3,
                     comentario.getTexto()
@@ -78,9 +76,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // BUSCAR POR ID
-    // ==========================================================
     @Override
     public Optional<Comentario> buscarPorId(
             int idComentario) {
@@ -121,9 +116,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // LISTAR POR TICKET
-    // ==========================================================
     @Override
     public List<Comentario> listarPorTicket(
             int idTicket) {
@@ -184,9 +176,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // LISTAR POR SOLICITANTE
-    // ==========================================================
     @Override
     public List<Comentario> listarPorSolicitante(
             int idUsuario) {
@@ -243,9 +232,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // VERIFICAR PROPIETARIO
-    // ==========================================================
     @Override
     public boolean ticketPerteneceAUsuario(
             int idTicket,
@@ -283,9 +269,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // LISTAR TODOS
-    // ==========================================================
     @Override
     public List<Comentario> listarTodos() {
 
@@ -332,9 +315,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // BUSCAR ADMIN
-    // ==========================================================
     @Override
     public List<Comentario> buscarAdmin(
             String buscar,
@@ -448,9 +428,6 @@ public class ComentarioRepositoryJdbc
         }
     }
 
-    // ==========================================================
-    // MAPEAR BÁSICO
-    // ==========================================================
     private Comentario mapear(
             ResultSet rs)
             throws SQLException {
@@ -487,9 +464,6 @@ public class ComentarioRepositoryJdbc
         return comentario;
     }
 
-    // ==========================================================
-    // MAPEAR COMPLETO
-    // ==========================================================
     private Comentario mapearCompleto(
             ResultSet rs)
             throws SQLException {
