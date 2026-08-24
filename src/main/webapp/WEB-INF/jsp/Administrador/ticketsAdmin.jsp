@@ -157,6 +157,9 @@
                 border-color: #dc2626;
             }
         </style>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     </head>
 
     <body>
@@ -471,6 +474,7 @@
                                                           || ticket.estado == 'EN_PROCESO'}">
 
                                                   <form method="post"
+                                                        id="formCancelar${ticket.idTicket}"
                                                         action="${pageContext.request.contextPath}/tickets"
                                                         style="display:inline;">
 
@@ -482,10 +486,10 @@
                                                              name="accion"
                                                              value="cancelar">
 
-                                                      <button type="submit"
+                                                      <button type="button"
                                                               class="accion cancelar"
                                                               title="Cancelar ticket"
-                                                              onclick="return confirmarCancelacion();">
+                                                              onclick="confirmarCancelacion('formCancelar${ticket.idTicket}', ${ticket.idTicket});">
                                                           ×
                                                       </button>
 
@@ -643,11 +647,24 @@
                     }
                 }
             }
-            function confirmarCancelacion() {
+            function confirmarCancelacion(idFormulario, idTicket) {
 
-                return confirm(
-                        "¿Estás seguro de que deseas cancelar este ticket?"
-                        );
+                Swal.fire({
+                    title: "¿Cancelar el ticket #" + idTicket + "?",
+                    text: "Esta acción cancela la solicitud y se le "
+                            + "notificará al solicitante. No se puede deshacer.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, cancelar ticket",
+                    cancelButtonText: "No, volver",
+                    confirmButtonColor: "#dc2626",
+                    cancelButtonColor: "#94a3b8"
+                }).then(function (resultado) {
+
+                    if (resultado.isConfirmed) {
+                        document.getElementById(idFormulario).submit();
+                    }
+                });
             }
             // ==========================================================
             // CERRAR AL HACER CLIC FUERA

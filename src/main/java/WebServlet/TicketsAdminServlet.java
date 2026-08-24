@@ -207,13 +207,23 @@ public class TicketsAdminServlet extends HttpServlet {
             }
 
             if (estado != null
-                    && !estado.trim().isEmpty()
-                    && !normalizar(
-                            dto.getEstado())
-                            .equals(
-                                    normalizar(estado))) {
+                    && !estado.trim().isEmpty()) {
 
-                continue;
+                boolean coincideEstado = false;
+
+                for (String estadoPermitido : estado.split(",")) {
+
+                    if (normalizar(dto.getEstado())
+                            .equals(normalizar(estadoPermitido))) {
+
+                        coincideEstado = true;
+                        break;
+                    }
+                }
+
+                if (!coincideEstado) {
+                    continue;
+                }
             }
 
             if (prioridad != null

@@ -41,7 +41,7 @@
 
             <nav class="menu">
                 <!-- PENDIENTES -->
-                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO"
+                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO,ASIGNADO"
                    class="menu-item">
                     <span>●</span>
                     <label>Pendientes</label>
