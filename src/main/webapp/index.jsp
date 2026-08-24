@@ -70,7 +70,7 @@
                     <div class="portal-caracteristica">
 
                         <div class="caracteristica-icono">
-                            ✓
+                            🎫
                         </div>
 
                         <div>
@@ -86,7 +86,7 @@
                     <div class="portal-caracteristica">
 
                         <div class="caracteristica-icono">
-                            ◷
+                            🔍
                         </div>
 
                         <div>
@@ -102,7 +102,7 @@
                     <div class="portal-caracteristica">
 
                         <div class="caracteristica-icono">
-                            ◈
+                            💡
                         </div>
 
                         <div>
