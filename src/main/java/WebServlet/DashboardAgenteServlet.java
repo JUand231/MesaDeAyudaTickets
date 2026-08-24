@@ -5,6 +5,7 @@ import repositorio.CategoriaRepository;
 import modelo.Ticket;
 import modelo.Prioridad;
 import modelo.Usuario;
+import repositorio.NotificacionRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.roles.AccionesAgente;
@@ -65,6 +66,11 @@ public class DashboardAgenteServlet extends HttpServlet {
                 = (UsuarioRepository) getServletContext()
                         .getAttribute(
                                 AppContextListener.USUARIO_REPOSITORY);
+
+        NotificacionRepository notificacionRepository
+                = (NotificacionRepository) getServletContext()
+                        .getAttribute(
+                                AppContextListener.NOTIFICACION_REPOSITORY);
 
         AccionesAgente ticketService
                 = (AccionesAgente) getServletContext()
@@ -174,6 +180,12 @@ public class DashboardAgenteServlet extends HttpServlet {
         }
 
         // =========================================================
+        // NOTIFICACIONES SIN LEER
+        // =========================================================
+        int notificacionesNoLeidas
+                = notificacionRepository.contarNoLeidas(idUsuario);
+
+        // =========================================================
         // ENVIAR DATOS AL JSP
         // =========================================================
         request.setAttribute(
@@ -214,6 +226,11 @@ public class DashboardAgenteServlet extends HttpServlet {
         request.setAttribute(
                 "resueltos",
                 resueltos
+        );
+
+        request.setAttribute(
+                "notificacionesNoLeidas",
+                notificacionesNoLeidas
         );
 
         request.getRequestDispatcher(

@@ -82,7 +82,7 @@
 
             <nav class="menu">
 
-                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO"
+                <a href="${pageContext.request.contextPath}/tickets?estado=NUEVO,ASIGNADO"
                    class="menu-item">
 
                     <span>●</span>
