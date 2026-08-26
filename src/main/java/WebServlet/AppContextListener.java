@@ -36,6 +36,7 @@ public class AppContextListener implements ServletContextListener {
     public static final String COMENTARIO_REPOSITORY = "comentarioRepository";
     public static final String NOTIFICACION_REPOSITORY = "notificacionRepository";
     public static final String TICKET_REPOSITORY = "ticketRepository";
+    public static final String NOTIFICADOR = "notificador";
 
     @Override
     public void contextInitialized(ServletContextEvent evento) {
@@ -120,6 +121,11 @@ public class AppContextListener implements ServletContextListener {
         contexto.setAttribute(
                 TICKET_REPOSITORY,
                 ticketRepository
+        );
+
+        contexto.setAttribute(
+                NOTIFICADOR,
+                notificador
         );
     }
 

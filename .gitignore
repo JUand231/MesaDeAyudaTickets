@@ -4,3 +4,4 @@ db.properties
 src/main/resources/db.properties
 .nb-gradle/
 nbproject/private/
+src/main/resources/mail.properties

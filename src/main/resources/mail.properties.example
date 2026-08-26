@@ -1,0 +1,4 @@
+mail.username=TU_CORREO@gmail.com
+mail.password=TU_CLAVE_DE_APLICACION
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587

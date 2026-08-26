@@ -497,29 +497,114 @@
                                  flex-wrap:wrap;
                                  ">
 
-                                <!-- CONFIRMAR Y CERRAR -->
-                                <form method="post"
-                                      id="formCerrarTicket"
-                                      action="${pageContext.request.contextPath}/detalleTicket">
+                                <c:choose>
 
-                                    <input type="hidden"
-                                           name="id"
-                                           value="${ticket.idTicket}">
+                                    <c:when test="${!otpPendienteCierre}">
 
-                                    <input type="hidden"
-                                           name="accion"
-                                           value="cerrar">
+                                        <form method="post"
+                                              id="formSolicitarOtp"
+                                              action="${pageContext.request.contextPath}/detalleTicket">
 
-                                    <button type="button"
-                                            class="btn-principal"
-                                            style="border:none; cursor:pointer;"
-                                            onclick="confirmarCerrarTicket();">
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="${ticket.idTicket}">
 
-                                        ✓ Confirmar y cerrar
+                                            <input type="hidden"
+                                                   name="accion"
+                                                   value="solicitarCierreOtp">
 
-                                    </button>
+                                            <button type="button"
+                                                    class="btn-principal"
+                                                    style="border:none; cursor:pointer;"
+                                                    onclick="confirmarSolicitarOtp();">
 
-                                </form>
+                                                ✓ Confirmar y cerrar
+
+                                            </button>
+
+                                        </form>
+
+                                    </c:when>
+
+                                    <c:otherwise>
+
+                                        <div style="
+                                             padding:12px 15px;
+                                             background:#fffbea;
+                                             border:1px solid #fde68a;
+                                             border-radius:10px;
+                                             width:100%;
+                                             ">
+
+                                            Te enviamos un código de 6 dígitos
+                                            a tus notificaciones. Ingrésalo
+                                            para confirmar el cierre (vence
+                                            en 10 minutos).
+
+                                        </div>
+
+
+                                        <form method="post"
+                                              id="formCerrarTicket"
+                                              action="${pageContext.request.contextPath}/detalleTicket">
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="${ticket.idTicket}">
+
+                                            <input type="hidden"
+                                                   name="accion"
+                                                   value="cerrar">
+
+                                            <input type="hidden"
+                                                   name="otp"
+                                                   id="otpIngresado">
+
+                                            <button type="button"
+                                                    class="btn-principal"
+                                                    style="border:none; cursor:pointer;"
+                                                    onclick="pedirCodigoCierre();">
+
+                                                ✓ Ingresar código y cerrar
+
+                                            </button>
+
+                                        </form>
+
+
+                                        <form method="post"
+                                              id="formReenviarOtp"
+                                              action="${pageContext.request.contextPath}/detalleTicket">
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="${ticket.idTicket}">
+
+                                            <input type="hidden"
+                                                   name="accion"
+                                                   value="solicitarCierreOtp">
+
+                                            <button type="button"
+                                                    style="
+                                                    padding:10px 18px;
+                                                    border-radius:8px;
+                                                    border:1px solid #d9e0e8;
+                                                    background:#ffffff;
+                                                    color:#334155;
+                                                    cursor:pointer;
+                                                    font-weight:600;
+                                                    "
+                                                    onclick="document.getElementById('formReenviarOtp').submit();">
+
+                                                ↻ Reenviar código
+
+                                            </button>
+
+                                        </form>
+
+                                    </c:otherwise>
+
+                                </c:choose>
 
 
                                 <!-- REABRIR -->
@@ -815,21 +900,56 @@
 
         <script>
 
-            function confirmarCerrarTicket() {
+            function confirmarSolicitarOtp() {
 
                 Swal.fire({
                     title: "¿Confirmar y cerrar el ticket?",
-                    text: "Tu problema quedará marcado como resuelto y "
-                            + "el ticket no se podrá volver a comentar ni modificar.",
+                    text: "Te enviaremos un código de 6 dígitos a tus "
+                            + "notificaciones para confirmar el cierre. "
+                            + "Una vez cerrado, el ticket no se podrá "
+                            + "volver a comentar ni modificar.",
                     icon: "question",
                     showCancelButton: true,
-                    confirmButtonText: "Sí, cerrar ticket",
+                    confirmButtonText: "Sí, enviarme el código",
                     cancelButtonText: "Cancelar",
                     confirmButtonColor: "#2f855a",
                     cancelButtonColor: "#94a3b8"
                 }).then(function (resultado) {
 
                     if (resultado.isConfirmed) {
+                        document.getElementById("formSolicitarOtp").submit();
+                    }
+                });
+            }
+
+            function pedirCodigoCierre() {
+
+                Swal.fire({
+                    title: "Ingresa el código de cierre",
+                    text: "Revisa tus notificaciones, te enviamos un "
+                            + "código de 6 dígitos.",
+                    icon: "question",
+                    input: "text",
+                    inputPlaceholder: "Ej: 123456",
+                    inputAttributes: {
+                        maxlength: 6,
+                        autocapitalize: "off",
+                        autocorrect: "off"
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: "Confirmar cierre",
+                    cancelButtonText: "Cancelar",
+                    confirmButtonColor: "#2f855a",
+                    cancelButtonColor: "#94a3b8",
+                    inputValidator: function (valor) {
+                        if (!valor || valor.trim().length !== 6) {
+                            return "El código debe tener 6 dígitos.";
+                        }
+                    }
+                }).then(function (resultado) {
+
+                    if (resultado.isConfirmed) {
+                        document.getElementById("otpIngresado").value = resultado.value.trim();
                         document.getElementById("formCerrarTicket").submit();
                     }
                 });

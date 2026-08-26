@@ -30,6 +30,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- JavaMail para envío de correos -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        
         <!-- JSTL para JSP -->
         <dependency>
             <groupId>javax.servlet</groupId>

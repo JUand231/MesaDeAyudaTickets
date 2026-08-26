@@ -12,7 +12,9 @@ import repositorio.ComentarioRepository;
 import repositorio.PrioridadRepository;
 import repositorio.UsuarioRepository;
 import servicio.TicketService;
+import servicio.notificacion.Notificador;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,6 +30,10 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
 
     private static final DateTimeFormatter FORMATO_SLA
             = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    private static final String SESSION_OTP_CODIGO = "otpCierreCodigo_";
+    private static final String SESSION_OTP_EXPIRA = "otpCierreExpira_";
+    private static final int OTP_MINUTOS_VALIDEZ = 10;
 
     @Override
     protected void doGet(
@@ -254,6 +260,13 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                 "comentarios",
                 comentarios);
 
+        boolean otpPendienteCierre
+                = session.getAttribute(SESSION_OTP_CODIGO + idTicket) != null;
+
+        request.setAttribute(
+                "otpPendienteCierre",
+                otpPendienteCierre);
+
         if (idRol == 1) {
 
             request.getRequestDispatcher(
@@ -397,6 +410,68 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
             }
         }
 
+        if ("solicitarCierreOtp".equals(accion)) {
+
+            if (idRol != 1) {
+
+                response.sendError(
+                        HttpServletResponse.SC_FORBIDDEN,
+                        "Solo el solicitante puede pedir el código de cierre.");
+
+                return;
+            }
+
+            if (!"RESUELTO".equals(ticket.getEstadoNombre())) {
+
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Solo se puede pedir el código cuando el ticket está RESUELTO.");
+
+                return;
+            }
+
+            String codigo
+                    = String.format(
+                            "%06d",
+                            new SecureRandom().nextInt(1_000_000));
+
+            session.setAttribute(
+                    SESSION_OTP_CODIGO + idTicket,
+                    codigo);
+
+            session.setAttribute(
+                    SESSION_OTP_EXPIRA + idTicket,
+                    LocalDateTime.now().plusMinutes(OTP_MINUTOS_VALIDEZ));
+
+            Notificador notificador
+                    = (Notificador) getServletContext()
+                            .getAttribute(AppContextListener.NOTIFICADOR);
+
+            if (notificador == null) {
+
+                throw new ServletException(
+                        "Notificador no está configurado.");
+            }
+
+            notificador.notificar(
+                    obtenerSolicitante(ticket),
+                    ticket,
+                    "Tu código para confirmar el cierre del ticket #"
+                    + ticket.getIdTicket()
+                    + " es "
+                    + codigo
+                    + ". Vence en "
+                    + OTP_MINUTOS_VALIDEZ
+                    + " minutos.");
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/detalleTicket?id="
+                    + idTicket);
+
+            return;
+        }
+
         if ("comentar".equals(accion)) {
 
             String texto
@@ -487,9 +562,55 @@ public class DetalleTicketAgenteServlet extends HttpServlet {
                         return;
                     }
 
+                    String otpIngresado
+                            = request.getParameter("otp");
+
+                    String otpEsperado
+                            = (String) session.getAttribute(
+                                    SESSION_OTP_CODIGO + idTicket);
+
+                    LocalDateTime otpExpira
+                            = (LocalDateTime) session.getAttribute(
+                                    SESSION_OTP_EXPIRA + idTicket);
+
+                    if (otpEsperado == null) {
+
+                        response.sendError(
+                                HttpServletResponse.SC_BAD_REQUEST,
+                                "Primero debes solicitar el código de cierre.");
+
+                        return;
+                    }
+
+                    if (otpExpira == null
+                            || LocalDateTime.now().isAfter(otpExpira)) {
+
+                        session.removeAttribute(SESSION_OTP_CODIGO + idTicket);
+                        session.removeAttribute(SESSION_OTP_EXPIRA + idTicket);
+
+                        response.sendError(
+                                HttpServletResponse.SC_BAD_REQUEST,
+                                "El código venció. Solicita uno nuevo.");
+
+                        return;
+                    }
+
+                    if (otpIngresado == null
+                            || !otpEsperado.equals(otpIngresado.trim())) {
+
+                        response.sendError(
+                                HttpServletResponse.SC_BAD_REQUEST,
+                                "El código ingresado no es correcto.");
+
+                        return;
+                    }
+
                     ticketService.cerrar(
                             idTicket,
                             obtenerSolicitante(ticket));
+
+                    session.removeAttribute(SESSION_OTP_CODIGO + idTicket);
+                    session.removeAttribute(SESSION_OTP_EXPIRA + idTicket);
 
                     break;
 
