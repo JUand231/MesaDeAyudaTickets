@@ -20,11 +20,15 @@ import servicio.TicketService;
 import servicio.asignacion.AsignacionPorMenorCarga;
 import servicio.asignacion.EstrategiaAsignacion;
 import servicio.notificacion.Notificador;
+import servicio.notificacion.NotificadorCompuesto;
+import servicio.notificacion.NotificadorCorreo;
 import servicio.notificacion.NotificadorEnAplicacion;
 import servicio.prioridad.CalculadoraPrioridad;
 import servicio.prioridad.CalculadoraPrioridadPorPalabrasClave;
 import servicio.sla.CalculadoraSLA;
 import servicio.sla.CalculadoraSLAPorPrioridad;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebListener
 public class AppContextListener implements ServletContextListener {
@@ -70,10 +74,30 @@ public class AppContextListener implements ServletContextListener {
         EstrategiaAsignacion estrategiaAsignacion
                 = new AsignacionPorMenorCarga();
 
-        Notificador notificador
-                = new NotificadorEnAplicacion(
+        List<Notificador> canalesNotificacion = new ArrayList<>();
+
+        canalesNotificacion.add(
+                new NotificadorEnAplicacion(
                         notificacionRepository
-                );
+                )
+        );
+
+        try {
+
+            canalesNotificacion.add(new NotificadorCorreo());
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "No se pudo configurar el correo real (revisa "
+                    + "mail.properties). Se continúa solo con "
+                    + "notificaciones en la aplicación. Detalle: "
+                    + e.getMessage()
+            );
+        }
+
+        Notificador notificador
+                = new NotificadorCompuesto(canalesNotificacion);
 
         TicketService ticketService
                 = new TicketService(
